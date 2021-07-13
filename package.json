@@ -1,0 +1,15 @@
+{
+    "name": "akinpoz-mvp",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "client": "npm start --prefix client",
+        "server": "npm start --prefix server",
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "prod_test": "cd server && node bin/www",
+        "deploy": "sh deploy.sh"
+    },
+    "dependencies": {
+        "concurrently": "^6.2.0"
+    }
+}
