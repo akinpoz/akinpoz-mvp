@@ -92,5 +92,5 @@ function onListening() {
   const url = process.env.NODE_ENV === 'development' ? 'http://localhost:8001' : ""
   //TODO: !Create .env in production VM
   console.log(`%cServer is running on: ${url}`, "color: green")
-  open(url);
+ // open(url);
 }

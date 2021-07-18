@@ -3,11 +3,21 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var cors = require('cors')
+var mongoose = require('mongoose')
 const dotenv = require('dotenv');
 dotenv.config();
+
+
+var db = process.env.MONGOURI
+mongoose.connect(db, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('MongoDB Connected')
+}).catch(e => {
+  console.error(e)
+})
 
 var app = express();
 
@@ -17,13 +27,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public/build')));
 
+app.use(cors())
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/build/index.html'))
 })
 
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/users', require('./routes/api/users'))
+app.use('/api/auth', require('./routes/api/auth'))
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,7 +49,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({ error: err.message })
 });
 
 module.exports = app;

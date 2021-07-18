@@ -1,0 +1,52 @@
+.loginContainer {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(6, 1fr);
+    grid-gap: 5%;
+    height: 500px;
+    width: 25%;
+    padding: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20vh;
+    border: 1px solid #dbdbdb;
+}
+
+.logo {
+    width: 50%;
+    height: 120px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.message {
+    height: 90% !important;
+}
+
+input {
+    border: 1px solid #9455e0;
+    border-radius: 3px;
+}
+
+.submit {
+    height: 100%;
+}
+
+.registerConatiner {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(7, 1fr);
+    grid-gap: 5%;
+    height: 500px;
+    width: 25%;
+    padding: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20vh;
+    border: 1px solid #dbdbdb;
+}
+
+@media screen and (max-width: 800px) {
+    .loginContainer {width: 80%;}
+    .registerConatiner {width: 80%;}
+}

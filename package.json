@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "client": "npm start --prefix client",
-        "server": "npm start --prefix server",
+        "server": "npm run nodemon --prefix server",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
         "prod_test": "cd server && node bin/www",
         "deploy": "sh deploy.sh"
