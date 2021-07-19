@@ -1,0 +1,28 @@
+.containerDiv {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    height: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.actionContainer {
+    width: 50%;
+    min-width: 310px;
+    height: 80%;
+    min-height: 400px;
+    padding: 20px;
+}
+.selection {
+    height: 50px;
+    width: 80%;
+    background: gray;
+    border-radius: 10px;
+    margin-left: 10%;
+}
+.buttonContainer {
+    justify-content: flex-end;
+    display: flex;
+    margin-right: 12%;
+    margin-top: 10px;
+}
