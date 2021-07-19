@@ -5,9 +5,11 @@ import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
 import Home from './components/home'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
+import Profile from './components/profile'
 
 const components = {
-    Home: Home
+    Home: Home,
+    Profile: Profile
 }
 
 

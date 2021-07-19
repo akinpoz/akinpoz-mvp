@@ -21,6 +21,9 @@
 .topnav .icon {
   display: none;
 }
+.navLink {
+  padding: 4px;
+}
 
 @media screen and (max-width: 600px) {
   .topnav a {
