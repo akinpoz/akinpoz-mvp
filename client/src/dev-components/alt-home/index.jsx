@@ -4,7 +4,7 @@ import styles from "./Home.module.css"
 function Home() {
     return (
         <div className={styles.container}>
-            <h2 style={{marginBottom: 50, marginTop: 50, textAlign: "center"}}>Welcome back, User</h2>
+            <h2 style={{marginBottom: 50, marginTop: 50, textAlign: "center"}}>Welcome back, Client</h2>
             <div className={styles.rowOne}>
                 <div className={styles.tabItem}>
                     <i className="huge user icon"/>

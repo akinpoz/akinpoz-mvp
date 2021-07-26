@@ -2,11 +2,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
-import Home from './components/home'
+import Home from './dev-components/alt-home'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import Profile from './components/profile'
 import InteractiveCampaign from "./components/interactive-campaign/interactive-campaign";
+import OwnerProfile from "./owner-profile/owner-profile";
+import CampaignsCrud from "./components/campaigns-crud/campaigns-crud";
+import PlacesCrud from "./components/places-crud/places-crud";
+import Analytics from "./components/analytics/analytics";
 
 const components = {
     Home: Home,
@@ -19,7 +23,7 @@ function Router(props) {
       <HashRouter>
         <Switch>
           <Route exact path="/">
-            <Home />
+            <CampaignsCrud />
           </Route>
           <Route exact path="/register">
             <Register />
@@ -30,9 +34,25 @@ function Router(props) {
           <Route exact path='/profile'>
             <PrivateRoute {...props} component={`Profile`} />
           </Route>
+
+          {/* DEV PATHS */}
           <Route path='/interactive-campaign'>
             <InteractiveCampaign />
           </Route>
+          <Route path='/owner-profile'>
+            <OwnerProfile />
+          </Route>
+          <Route path='/places-crud'>
+            <PlacesCrud />
+          </Route>
+          <Route path='/campaigns-crud'>
+            <CampaignsCrud />
+          </Route>
+          <Route path='/analytics'>
+            <Analytics />
+          </Route>
+          {/* DEV PATHS */}
+
           <Route path="*" component={PageNotFound} />
         </Switch>
 
