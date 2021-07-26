@@ -1,28 +1,52 @@
-.containerDiv {
+.container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex: 1;
     height: 100%;
     flex-wrap: wrap;
+}
+
+.rowOne {
+    display: flex;
+    flex-direction: row;
+    height: 150px;
+    width: 90%;
+    margin-left: 5%;
+    min-width: 350px;
     justify-content: center;
+    align-items: center;
 }
-.actionContainer {
-    width: 50%;
-    min-width: 310px;
-    height: 80%;
-    min-height: 400px;
-    padding: 20px;
+
+.rowTwo {
+/*    is this really needed???    */
 }
-.selection {
-    height: 50px;
-    width: 80%;
+
+.tabItem {
+    height: 150px;
+    width: 150px;
     background: gray;
     border-radius: 10px;
-    margin-left: 10%;
-}
-.buttonContainer {
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
     display: flex;
-    margin-right: 12%;
-    margin-top: 10px;
+    flex-direction: column;
+}
+
+.tabItem h4 {
+    user-select: none; /* supported by Chrome and Opera */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.tabItem:hover {
+    cursor: pointer;
+    background: lightslategray;
+    transform: scale(0.97);
+}
+
+.spacer {
+    width: 50px;
+    height: 50px;
 }

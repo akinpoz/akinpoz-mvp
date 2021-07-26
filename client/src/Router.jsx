@@ -6,6 +6,7 @@ import Home from './components/home'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import Profile from './components/profile'
+import InteractiveCampaign from "./components/interactive-campaign/interactive-campaign";
 
 const components = {
     Home: Home,
@@ -29,9 +30,12 @@ function Router(props) {
           <Route exact path='/profile'>
             <PrivateRoute {...props} component={`Profile`} />
           </Route>
+          <Route path='/interactive-campaign'>
+            <InteractiveCampaign />
+          </Route>
           <Route path="*" component={PageNotFound} />
         </Switch>
-  
+
       </HashRouter>
     )
   }
@@ -42,7 +46,7 @@ function Router(props) {
       </div>
     )
   }
-  
+
   const PrivateRoute = (props) => {
     if (props.auth.isAuthenticated) {
       var Component = components[props.component]
@@ -55,15 +59,15 @@ function Router(props) {
         <Redirect to="/login" />
       )
     }
-  
+
   }
-  
+
   Router.propTypes = {
     auth: PropTypes.object.isRequired
   }
-  
+
   const mapStateToProps = (state) => ({
     auth: state.auth
   })
-  
+
   export default connect(mapStateToProps, null)(Router)
