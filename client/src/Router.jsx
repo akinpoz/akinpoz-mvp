@@ -9,7 +9,6 @@ import Profile from './components/profile'
 import InteractiveCampaign from "./components/interactive-campaign/interactive-campaign";
 import OwnerProfile from "./owner-profile/owner-profile";
 import CampaignsCrud from "./components/campaigns-crud/campaigns-crud";
-import PlacesCrud from "./components/places-crud/places-crud";
 import Analytics from "./components/analytics/analytics";
 
 const components = {
@@ -42,9 +41,7 @@ function Router(props) {
           <Route path='/owner-profile'>
             <OwnerProfile />
           </Route>
-          <Route path='/places-crud'>
-            <PlacesCrud />
-          </Route>
+
           <Route path='/campaigns-crud'>
             <CampaignsCrud />
           </Route>
