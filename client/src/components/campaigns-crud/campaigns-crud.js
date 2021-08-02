@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./campaigns-crud.module.css"
+import styles from "./home.module.css"
 import {Button, Card, Form, Icon, Modal} from "semantic-ui-react";
 
 function CampaignsCrud() {

@@ -12,6 +12,10 @@ import { Fragment } from 'react'
 
 function MyNavbar(props) {
     const [isLoggedIn, setIsLoggedIn] = useState(props.auth.isAuthenticated)
+    const [toggle, setToggle] = useState(true)
+    function toggleHamburger() {
+        setToggle(!toggle)
+    }
     useEffect(() => {
         setIsLoggedIn(props.auth.isAuthenticated)
     }, [props])
@@ -27,19 +31,19 @@ function MyNavbar(props) {
                 />{' '}
                 <span style={{lineHeight: "28px"}}>Akopoz</span>
             </a>
-            <button aria-controls="responsive-navbar-nav" type="button" aria-label="Toggle navigation" className={cx(globalStyles["navbar-toggler"], globalStyles.collapsed)}><span className={cx(globalStyles["navbar-toggler-icon"])}></span></button>
-            <div className={cx(globalStyles["navbar-collapse"], globalStyles.collapse)} id="responsive-navbar-nav">
+            <button onClick={toggleHamburger} aria-controls="responsive-navbar-nav" type="button" aria-label="Toggle navigation" className={cx(globalStyles["navbar-toggler"], globalStyles.collapsed)}><span className={cx(globalStyles["navbar-toggler-icon"])}></span></button>
+            <div className={toggle ? cx(globalStyles["navbar-collapse"], globalStyles.collapse) : cx(globalStyles["navbar-collapse"], globalStyles.collapse, globalStyles.show)} id="responsive-navbar-nav">
                 <div className={cx(globalStyles["mr-auto"], globalStyles["navbar-nav"])}>
                     {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>Home</a>}
                 </div>
                 <div className={cx(globalStyles["navbar-nav"])}>
+                    {isLoggedIn && <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])} style={{lineHeight: "25px"}}>{toggle ?  <Icon name='user' size="large" /> : <span>Profile</span>}
+                    </a>}
                     {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>
                         <Logout onClick={() => { setIsLoggedIn(false) }} />
                     </a>}
                     {!isLoggedIn && <a href="/#/login" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>
                         <Fragment><Button size="tiny">Login</Button></Fragment>
-                    </a>}
-                    {isLoggedIn && <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])} style={{lineHeight: "25px"}}><Icon name='user' size="large" />
                     </a>}
                     {/* <div className={styles.navLink}><span style={{ color: "white" }}>Light 🌞</span> <Radio slider checked={props.theme === "App-light" ? false : true} onChange={props.changeTheme} /> <span>Dark 🌚 </span></div> */}
                 </div>
