@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
+import {Button, Form} from "semantic-ui-react";
 
 function Profile(props) {
     return (
@@ -16,7 +17,11 @@ function EndUserDashboard(props) {
     return (
         <div>
             <br/>
-            <h1 style={{textAlign: "center"}}>Welcome, {props.props.auth.user.name}!</h1>
+            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <h1 style={{textAlign: "center"}}>Welcome, {props.props.auth.user.name}!</h1>
+                <div className={styles.divider}/>
+            </div>
+            <br/>
             <div className={styles.endUserDashboardContainer}>
                 <AccountSettings/>
                 <History/>
@@ -33,26 +38,17 @@ function AccountSettings() {
                 Profile Pic
             </div>
             <br/>
-            <div className="ui input" style={{marginBottom: 10}}>
-                <input type="text" placeholder="Email" required/>
-            </div>
-
-            <div className="ui input" style={{marginBottom: 10}}>
-                <input type="text" placeholder="Username" required/>
-            </div>
-
-            <div className="ui input">
-                <input type="text" placeholder="Password" required/>
-            </div>
+            <Form style={{minWidth: 300}}>
+                <Form.Input placeholder="Email" required />
+                <Form.Input placeholder='Username' required />
+                <Form.Input placeholder='Password' required />
+            </Form>
             <br/>
             <div>
                 {/* TODO: Make Buttons work, reset fields */}
-                <button className="ui button">
-                    Cancel
-                </button>
-                <button className="ui primary button">
-                    Submit
-                </button>
+                <Button style={{marginRight: 10}}>Cancel</Button>
+                <Button primary>Submit</Button>
+
             </div>
         </div>
     )
