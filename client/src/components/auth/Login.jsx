@@ -5,7 +5,7 @@ import { login } from '../../actions/authActions'
 import { clearErrors } from '../../actions/errorActions'
 import history from '../../history'
 import styles from './Auth.module.css'
-import { Message } from 'semantic-ui-react'
+import { Form, Message } from 'semantic-ui-react'
 import logo from '../../images/akinpoz-logo.png'
 
 
@@ -28,8 +28,8 @@ function Login(props) {
     }, [props.error])
 
     useEffect(() => {
-        if(props.isAuthenticated) {
-          history.push(history.location.pathname)
+        if (props.isAuthenticated) {
+            history.push(history.location.pathname)
         }
     }, [props.isAuthenticated])
 
@@ -56,22 +56,42 @@ function Login(props) {
         setTimeout(redirect(), 1000)
     }
     return (
-        <div className={styles.loginContainer}>
-            <img className={styles.logo} src={logo} />
-            {msg &&
-                <Message negative className={styles.message}>
-                    <Message.Header>{msg}</Message.Header>
-                </Message>
-            }
-            <input type="email" onChange={handleChange} value={values.email} name="email" placeholder="Email..." />
-            <input type="password" onChange={handleChange} value={values.password} name="password" placeholder="Password..." onKeyPress={(e) => {
-                if(e.key === 'Enter') {
-                    onSubmit(e)
+        <div className={styles.auth}>
+            <Form className={styles.formContainer}>
+                {msg &&
+                    <Message negative className={styles.message}>
+                        <Message.Header>{msg}</Message.Header>
+                    </Message>
                 }
-            }}/>
-            <button className={styles.submit} onClick={onSubmit} >Login</button>
-                <p>Don't have an account? <a href="/#/register">Register Here.</a></p>
+                <Form.Input type="email" onChange={handleChange} placeholder="Email..." label="Email" value={values.email} name="email" />
+                <Form.Input type="password" onChange={handleChange} placeholder="Password..." label="Password" value={values.password} name="password" />
+                <Form.Button content="Login" type="submit" color="blue" onClick={onSubmit} onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        onSubmit(e)
+                    }
+                }
+                } />
+                <Message>
+                    <Message.Header>Don't have an account? <a href="/#/register">Register Here</a></Message.Header>
+                </Message>
+            </Form>
         </div>
+
+        // <div >
+
+        //     <div className={styles.loginContainer}>
+        //
+        //         <input type="email" onChange={handleChange} value={values.email} name="email" placeholder="Email..." />
+        //         <input type="password" onChange={handleChange} value={values.password} name="password" placeholder="Password..." onKeyPress={(e) => {
+        //             if (e.key === 'Enter') {
+        //                 onSubmit(e)
+        //             }
+        //         }} />
+        //         <button className={styles.submit} onClick={onSubmit} >Login</button>
+        //     </div>
+
+        // </div>
+
     )
 }
 
