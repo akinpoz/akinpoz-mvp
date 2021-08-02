@@ -10,6 +10,7 @@ import InteractiveCampaign from "./components/interactive-campaign/interactive-c
 import OwnerProfile from "./owner-profile/owner-profile";
 import CampaignsCrud from "./components/campaigns-crud/campaigns-crud";
 import Analytics from "./components/analytics/analytics";
+import Jukebox from "./components/jukebox/jukebox";
 
 const components = {
     Home: Home,
@@ -47,6 +48,9 @@ function Router(props) {
           </Route>
           <Route path='/analytics'>
             <Analytics />
+          </Route>
+          <Route path='/jukebox'>
+            <Jukebox />
           </Route>
           {/* DEV PATHS */}
 

@@ -16,8 +16,6 @@
 
 .userAccountSettings {
     height: 400px;
-    width: 50%;
-    min-width: 310px;
     padding: 20px;
     display: flex;
     align-items: center;
