@@ -10,6 +10,7 @@ import InteractiveCampaign from "./components/interactive-campaign/interactive-c
 import OwnerProfile from "./owner-profile/owner-profile";
 import Home from "./components/home";
 import Analytics from "./components/analytics/analytics";
+import Jukebox from "./components/jukebox/jukebox";
 
 const components = {
   Home: Home,
@@ -48,6 +49,16 @@ function Router(props) {
 
         <Route path="*" component={PageNotFound} />
       </Switch>
+          <Route path='/campaigns-crud'>
+            <CampaignsCrud />
+          </Route>
+          <Route path='/analytics'>
+            <Analytics />
+          </Route>
+          <Route path='/jukebox'>
+            <Jukebox />
+          </Route>
+          {/* DEV PATHS */}
 
     </HashRouter>
   )

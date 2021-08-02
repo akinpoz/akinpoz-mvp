@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './interactive-campaign.module.css'
-import {Card} from "semantic-ui-react";
+import {Card, Form, Input, Radio} from "semantic-ui-react";
 
 function InteractiveCampaign() {
     return (
@@ -37,26 +37,58 @@ const fakeOptions = ['Buffalo Chicken', 'Caesar', 'Meatzilla']
 
 // This will be the one action option
 function SingleAction() {
+    const otherVisible = true;
+    const handleChange = (event, {value}) => setChoice(value);
+    const [choiceState, setChoice] = React.useState('');
+    const [otherValue, setOtherValue] = React.useState('');
+    const handleOtherChange = (event, {value}) => {
+        setOtherValue(value);
+        setChoice(value)
+    }
+
     return (
         <div style={{width: '100%', maxWidth: 650}}>
             <Card fluid className={styles.actionCard}>
                 <div className={styles.actionContainer}>
                     <br/>
-                    <h3 style={{textAlign: 'center'}}>What Pizza Should Be Our Special Next Week?</h3>
+                    <h2 style={{textAlign: 'center'}}>What Pizza Should Be Our Special Next Week?</h2>
                     <br/>
-                    <div style={{width: '100%', marginBottom: 20}}>
-                        {fakeOptions.map((value, index) => {
-                            return (
-                                <div>
-                                    <div className={styles.selection}>
-                                        <div style={{height: 15}}/>
-                                        <p className={styles.noselect} style={{textAlign: 'center'}}>{value}</p>
+                    <div style={{width: '70%', marginBottom: 20}}>
+                        <Form>
+                            {fakeOptions.map((value, index) => {
+                                return (
+                                    <div style={{width: '100%'}}>
+                                        <Form.Field>
+                                            <Radio
+                                                label={value}
+                                                name='radioGroup'
+                                                value={value}
+                                                checked={choiceState === value}
+                                                onChange={handleChange}
+                                            />
+                                        </Form.Field>
                                     </div>
-                                    <br hidden={index == (fakeOptions.length - 1)}/>
+                                )
+                            })}
+                            <Form.Field>
+                                <Radio
+                                    label='Other Suggestions'
+                                    name='radioGroup'
+                                    value={otherValue}
+                                    checked={choiceState === otherValue}
+                                    onChange={handleChange}
+                                />
+                                <div hidden={choiceState !== otherValue} style={{maxWidth: 350}}>
+                                    <Form.Input
+                                        onChange={handleOtherChange}
+                                        required={choiceState === otherValue}
+                                    />
                                 </div>
-                            )
-                        })}
+                            </Form.Field>
+                        </Form>
                     </div>
+
+
                     <div className={styles.buttonContainer}>
                         <p className={styles.noselect} style={{paddingTop: 10, marginRight: 10}}>4 Votes Left</p>
                         <button className="ui primary button">

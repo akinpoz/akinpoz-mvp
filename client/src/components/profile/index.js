@@ -33,22 +33,24 @@ function EndUserDashboard(props) {
 function AccountSettings() {
     // TODO: Make these inputs update user in backend
     return (
-        <Card className={styles.userAccountSettings}>
-            <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
-                Profile Pic
-            </div>
-            <br/>
-            <Form style={{minWidth: 300}}>
-                <Form.Input placeholder="Email" required />
-                <Form.Input placeholder='Username' required />
-                <Form.Input placeholder='Password' required />
-            </Form>
-            <br/>
-            <div>
-                {/* TODO: Make Buttons work, reset fields */}
-                <Button style={{marginRight: 10}}>Cancel</Button>
-                <Button primary>Save</Button>
+        <Card>
+            <div className={styles.userAccountSettings}>
+                <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
+                    Profile Pic
+                </div>
+                <br/>
+                <Form style={{width: '90%'}}>
+                    <Form.Input placeholder="Email" required />
+                    <Form.Input placeholder='Username' required />
+                    <Form.Input placeholder='Password' required />
+                </Form>
+                <br/>
+                <div>
+                    {/* TODO: Make Buttons work, reset fields */}
+                    <Button style={{marginRight: 10}}>Cancel</Button>
+                    <Button primary>Save</Button>
 
+                </div>
             </div>
         </Card>
     )
