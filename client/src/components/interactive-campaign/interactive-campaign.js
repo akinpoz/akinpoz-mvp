@@ -25,7 +25,7 @@ function LocationInfo() {
             </div>
             <br/>
             <p style={{padding: 5, textAlign: 'center'}}>
-                Welcome to Angelico's the best pizzeria in town!  We offer all sorts of stuff like pizza and drinks.
+                Welcome to Angelico's the best pizzeria in town! We offer all sorts of stuff like pizza and drinks.
                 Come by on tuesday for karaoke or thursday for DJ Night!
             </p>
 
@@ -33,36 +33,39 @@ function LocationInfo() {
     )
 }
 
+const fakeOptions = ['Buffalo Chicken', 'Caesar', 'Meatzilla']
+
 // This will be the one action option
 function SingleAction() {
     return (
-        <Card className={styles.actionContainer}>
-            <br/>
-            <h3 style={{textAlign: 'center'}}>What Pizza Should Be Our Special Next Week?</h3>
-            <br/>
-            <div style={{width: '100%', marginBottom: 20}}>
-                <div className={styles.selection}>
-                    <div style={{height: 15}}/>
-                    <p style={{textAlign: 'center'}}>Buffalo Chicken</p>
+        <div style={{width: '100%', maxWidth: 650}}>
+            <Card fluid className={styles.actionCard}>
+                <div className={styles.actionContainer}>
+                    <br/>
+                    <h3 style={{textAlign: 'center'}}>What Pizza Should Be Our Special Next Week?</h3>
+                    <br/>
+                    <div style={{width: '100%', marginBottom: 20}}>
+                        {fakeOptions.map((value, index) => {
+                            return (
+                                <div>
+                                    <div className={styles.selection}>
+                                        <div style={{height: 15}}/>
+                                        <p className={styles.noselect} style={{textAlign: 'center'}}>{value}</p>
+                                    </div>
+                                    <br hidden={index == (fakeOptions.length - 1)}/>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className={styles.buttonContainer}>
+                        <p className={styles.noselect} style={{paddingTop: 10, marginRight: 10}}>4 Votes Left</p>
+                        <button className="ui primary button">
+                            Submit
+                        </button>
+                    </div>
                 </div>
-                <br/>
-                <div className={styles.selection}>
-                    <div style={{height: 15}}/>
-                    <p style={{textAlign: 'center'}}>Caesar</p>
-                </div>
-                <br/>
-                <div className={styles.selection}>
-                    <div style={{height: 15}}/>
-                    <p style={{textAlign: 'center'}}>Meatzilla</p>
-                </div>
-            </div>
-            <div className={styles.buttonContainer}>
-                <p style={{paddingTop: 10, marginRight: 10}}>4 Votes Left</p>
-                <button className="ui primary button">
-                    Submit
-                </button>
-            </div>
-        </Card>
+            </Card>
+        </div>
 
     )
 }
