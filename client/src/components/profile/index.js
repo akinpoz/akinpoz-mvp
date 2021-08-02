@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
-import {Button, Form} from "semantic-ui-react";
+import {Button, Card, Form} from "semantic-ui-react";
 
 function Profile(props) {
     return (
@@ -22,10 +22,10 @@ function EndUserDashboard(props) {
                 <div className={styles.divider}/>
             </div>
             <br/>
-            <div className={styles.endUserDashboardContainer}>
+            <Card.Group className={styles.endUserDashboardContainer}>
                 <AccountSettings/>
                 <History/>
-            </div>
+            </Card.Group>
         </div>
     )
 }
@@ -33,7 +33,7 @@ function EndUserDashboard(props) {
 function AccountSettings() {
     // TODO: Make these inputs update user in backend
     return (
-        <div className={styles.userAccountSettings}>
+        <Card className={styles.userAccountSettings}>
             <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
                 Profile Pic
             </div>
@@ -47,10 +47,10 @@ function AccountSettings() {
             <div>
                 {/* TODO: Make Buttons work, reset fields */}
                 <Button style={{marginRight: 10}}>Cancel</Button>
-                <Button primary>Submit</Button>
+                <Button primary>Save</Button>
 
             </div>
-        </div>
+        </Card>
     )
 }
 
@@ -58,7 +58,7 @@ function History() {
 
     // TODO: Figure out what exactly we want to report here.  What information do we need to display?
     return (
-        <div className={styles.userAccountSettings}>
+        <Card className={styles.userAccountSettings}>
             <h2>History</h2>
             <br/>
             <div className={styles.divider}/>
@@ -68,7 +68,7 @@ function History() {
             <div className={styles.divider}/>
             <br/>
             <LocationHistory name='Restaurant 2' />
-        </div>
+        </Card>
     )
 }
 

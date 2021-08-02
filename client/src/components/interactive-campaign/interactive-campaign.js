@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './interactive-campaign.module.css'
+import {Card} from "semantic-ui-react";
 
 function InteractiveCampaign() {
     return (
@@ -35,7 +36,7 @@ function LocationInfo() {
 // This will be the one action option
 function SingleAction() {
     return (
-        <div className={styles.actionContainer}>
+        <Card className={styles.actionContainer}>
             <br/>
             <h3 style={{textAlign: 'center'}}>What Pizza Should Be Our Special Next Week?</h3>
             <br/>
@@ -61,7 +62,7 @@ function SingleAction() {
                     Submit
                 </button>
             </div>
-        </div>
+        </Card>
 
     )
 }

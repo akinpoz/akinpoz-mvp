@@ -29,7 +29,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <div style={{display: "flex", flex: 1, flexDirection: "column"}}>
+        <div style={{display: "flex", flex: 1, flexDirection: "column", height: '100%'}}>
           <NavBar changeTheme={this.changeTheme} theme={this.state.theme} />
           <div className={this.state.theme}>
             {/* Create Routing Component and connect it to redux state... then use props.isLoading/isAuthenticating to build private routes */}

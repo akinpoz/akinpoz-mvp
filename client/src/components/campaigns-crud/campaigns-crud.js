@@ -135,7 +135,7 @@ function ModalAddLocation() {
                onOpen={() => setOpen(true)}
                open={open}
                trigger={
-                   <Button style={{position: 'absolute', bottom: 15, right: 15}} icon labelPosition='right'
+                   <Button style={{position: 'fixed', bottom: 15, right: 15}} icon labelPosition='right'
                                 color='green'>
                        <Icon className='plus'/>
                        Add Location

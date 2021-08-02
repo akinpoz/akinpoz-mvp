@@ -14,12 +14,12 @@ body {
     background-color: rgb(56, 53, 53);
     flex: 1;
     color: white;
-    display: block;
+    display: flex;
 }
 
 .App-light {
     background-color: rgb(255, 255, 255);
     flex: 1;
     color: black;
-    display: block;
+    display: flex;
 }

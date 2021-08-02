@@ -1,19 +1,19 @@
 .containerDiv {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex: 1;
-    min-height: 100%;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    padding: 0 0 20px 0;
 }
 .actionContainer {
     width: 50%;
     min-width: 310px;
     /*height: 80%;*/
     /*min-height: 400px;*/
-    padding: 0 20px;
+    padding: 15px 20px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
 }
 .selection {
     height: 50px;
