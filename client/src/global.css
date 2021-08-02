@@ -12,12 +12,14 @@ body {
 
 .App-dark {
     background-color: rgb(56, 53, 53);
-    height: 100%;
+    flex: 1;
     color: white;
+    display: block;
 }
 
 .App-light {
     background-color: rgb(255, 255, 255);
-    height: 100%;
+    flex: 1;
     color: black;
+    display: block;
 }

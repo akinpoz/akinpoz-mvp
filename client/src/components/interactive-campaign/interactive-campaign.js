@@ -4,7 +4,7 @@ import styles from './interactive-campaign.module.css'
 function InteractiveCampaign() {
     return (
         <div className={styles.containerDiv}>
-            <LocationInfo/>
+            {/*<LocationInfo/>*/}
 
             {/* TODO: Make this have conditional visibility based on number of actions */}
             {/* Change this to see Multi-Action or Single-Action View*/}

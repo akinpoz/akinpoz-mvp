@@ -10,13 +10,13 @@ import Router from './Router'
 
 class App extends Component {
   constructor(props) {
-    super(props); 
+    super(props);
     this.state = {
       theme: localStorage.getItem("theme")
     }
 
   }
-  
+
   componentDidMount() {
     store.dispatch(loadUser())
   }
@@ -29,10 +29,12 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <NavBar changeTheme={this.changeTheme} theme={this.state.theme} />
-        <div className={this.state.theme}>
-          {/* Create Routing Component and connect it to redux state... then use props.isLoading/isAuthenticating to build private routes */}
-          <Router />
+        <div style={{display: "flex", flex: 1, flexDirection: "column"}}>
+          <NavBar changeTheme={this.changeTheme} theme={this.state.theme} />
+          <div className={this.state.theme}>
+            {/* Create Routing Component and connect it to redux state... then use props.isLoading/isAuthenticating to build private routes */}
+            <Router />
+          </div>
         </div>
       </Provider>
     )
