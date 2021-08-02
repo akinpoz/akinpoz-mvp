@@ -24,7 +24,7 @@ function MyNavbar(props) {
                     height="30"
                     className="d-inline-block align-top"
                 />{' '}
-                Akinpoz
+                Akopoz
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
