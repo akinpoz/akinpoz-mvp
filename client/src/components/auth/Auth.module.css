@@ -1,16 +1,27 @@
 .loginContainer {
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: repeat(6, 1fr);
-    grid-gap: 5%;
-    height: 500px;
-    width: 25%;
+    grid-template-rows: repeat(4, 1fr);
+    grid-gap: 0%;
+    height: 50%;
+    width: 100%;
     padding: 8px;
+    border: 1px solid #dbdbdb;
+    position: relative;
+}
+.formContainer {
+    padding: 10% 5% 10% 5%;
+    border: 1.5px solid #dbdbdb;
+    border-radius: 5px;
+}
+.auth {
+    display: grid;
+    place-items: center;
     margin-left: auto;
     margin-right: auto;
-    border: 1px solid #dbdbdb;
+    grid-template-rows: 100%;
+    width: 50%;
 }
-
 .logo {
     width: 50%;
     height: 120px;

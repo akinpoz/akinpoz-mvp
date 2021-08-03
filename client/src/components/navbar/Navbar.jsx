@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import styles from './Navbar.module.css'
 import globalStyles from '../../assets/global-styles/bootstrap.min.module.css'
 import cx from 'classnames'
 import logo from '../../images/akinpoz-logo.png'
