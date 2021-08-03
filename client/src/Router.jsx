@@ -45,20 +45,22 @@ function Router(props) {
         <Route path='/analytics'>
           <Analytics />
         </Route>
+
+        {/* DEV PATHS */}
+
+        <Route path='/analytics'>
+          <Analytics />
+        </Route>
+        <Route path='/jukebox'>
+          <Jukebox />
+        </Route>
+
         {/* DEV PATHS */}
 
         <Route path="*" component={PageNotFound} />
       </Switch>
-          <Route path='/campaigns-crud'>
-            <CampaignsCrud />
-          </Route>
-          <Route path='/analytics'>
-            <Analytics />
-          </Route>
-          <Route path='/jukebox'>
-            <Jukebox />
-          </Route>
-          {/* DEV PATHS */}
+
+
 
     </HashRouter>
   )

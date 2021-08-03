@@ -30,6 +30,13 @@ function Location(props) {
 
                 </div>
                 <div style={{ marginLeft: 20 }}>
+                    <div style={{display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center"}}>
+                        <a href='/#/jukebox' style={{marginBottom: 5}}><h4>Music</h4></a>
+                        <div style={{flex: 1, display: "flex"}} />
+                        <div style={{marginRight: 100, height: 30}}>
+                            <Button size='mini' color='green'>Enable</Button>
+                        </div>
+                    </div>
                     {campaigns.map(j => {
                         return (
                             <Campaign {...props} j={j} />

@@ -4,7 +4,7 @@ import ModalUpdateCampaign from '../campaign/UpdateCampaign';
 function Campaign(props) {
     console.log(props)
     return (
-        <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5 }}>
+        <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, height: 30 }}>
             <a href='/#/interactive-campaign'><h4>{props.j}</h4></a>
             <div style={{ flex: 1 }} />
             <ModalUpdateCampaign />
