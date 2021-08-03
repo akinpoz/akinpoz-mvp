@@ -1,8 +1,8 @@
 import React from 'react';
 import ModalUpdateLocation from './UpdateLocation'
-import ModalAddCampaign from '../campaign/AddCampaign';
+import ModalAddCampaign from '../campaign-link/AddCampaign';
 import { Button, Card, Form, Icon, Modal } from "semantic-ui-react";
-import Campaign from '../campaign';
+import CampaignLink from '../campaign-link';
 
 
 function Location(props) {
@@ -39,7 +39,7 @@ function Location(props) {
                     </div>
                     {campaigns.map(j => {
                         return (
-                            <Campaign {...props} j={j} />
+                            <CampaignLink {...props} j={j} />
                         )
                     })}
                     <ModalAddCampaign />

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './interactive-campaign.module.css'
 import {Card, Form, Input, Radio} from "semantic-ui-react";
 
-function InteractiveCampaign() {
+function Campaign() {
     return (
         <div className={styles.containerDiv}>
             {/*<LocationInfo/>*/}
@@ -127,7 +127,7 @@ function MultiAction() {
     )
 }
 
-export default InteractiveCampaign
+export default Campaign
 
 // TODO: generally we need to figure out how we are differentiating clients and users.  We also need
 //  to figure out how we are storing a client's campaigns

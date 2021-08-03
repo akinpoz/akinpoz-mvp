@@ -6,7 +6,7 @@ import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import Profile from './components/profile'
-import InteractiveCampaign from "./components/interactive-campaign/interactive-campaign";
+import Campaign from "./components/campaign";
 import OwnerProfile from "./owner-profile/owner-profile";
 import Home from "./components/home";
 import Analytics from "./components/analytics/analytics";
@@ -37,7 +37,7 @@ function Router(props) {
 
         {/* DEV PATHS */}
         <Route path='/interactive-campaign'>
-          <InteractiveCampaign />
+          <Campaign />
         </Route>
         <Route path='/owner-profile'>
           <OwnerProfile />

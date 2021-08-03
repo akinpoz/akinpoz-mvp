@@ -1,7 +1,7 @@
 import React from 'react';
-import ModalUpdateCampaign from '../campaign/UpdateCampaign';
+import ModalUpdateCampaign from './/UpdateCampaign';
 
-function Campaign(props) {
+function CampaignLink(props) {
     console.log(props)
     return (
         <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, height: 30 }}>
@@ -14,4 +14,4 @@ function Campaign(props) {
     )
 }
 
-export default Campaign;
+export default CampaignLink;
