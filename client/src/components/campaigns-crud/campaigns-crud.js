@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./home.module.css"
-import {Button, Card, Form, Icon, Modal} from "semantic-ui-react";
+import {Button, Card, Form, Icon, Menu, Modal} from "semantic-ui-react";
 
 function CampaignsCrud() {
 
@@ -34,9 +34,16 @@ function CampaignsCrud() {
                         </div>
                         <div style={{marginLeft: 20}}>
                             <div style={{marginBottom: 20}}>
+                                <div style={{display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center"}}>
+                                    <a href='/#/jukebox' style={{marginBottom: 5}}><h4>Music</h4></a>
+                                    <div style={{flex: 1, display: "flex"}} />
+                                    <div style={{marginRight: 100, height: 30}}>
+                                        <Button size='mini' color='green'>Enable</Button>
+                                    </div>
+                                </div>
                                 {campaigns.map(j => {
                                     return (
-                                        <div style={{display: "flex", flexDirection: 'row', marginBottom: 5}}>
+                                        <div style={{display: "flex", flexDirection: 'row', marginBottom: 5, height: 30}}>
                                             <a href='/#/interactive-campaign'><h4>{j}</h4></a>
                                             <div style={{flex: 1}}/>
                                             <ModalEditCampaign />
