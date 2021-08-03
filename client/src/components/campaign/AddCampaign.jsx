@@ -1,29 +1,11 @@
 import React from 'react';
-import {Button, Form, Modal, Tab} from "semantic-ui-react";
+import {Button, Form, Modal, Radio, Tab} from "semantic-ui-react";
+import SurveyForm from "./AddSurveyForm";
+import RaffleForm from "./AddRaffleForm";
 
 const panes = [
-    {
-        menuItem: 'Survey', render: () => (
-            <Form>
-                <br/>
-                <Form.Input label='Survey Title' placeholder='Enter Title'/>
-                <Form.TextArea label='Description' placeholder='Enter Description'/>
-                <Form.Input label='What do you want to ask?' placeholder='Enter Question'/>
-                <Form.TextArea label='Options (Separate by three commas)'
-                               placeholder='Enter Options Separated by Three Commas (,,,)'/>
-            </Form>
-        )
-    },
-    {
-        menuItem: 'Raffle', render: () => (
-            <Form>
-                <br/>
-                <Form.Input label='Raffle Title' placeholder='Enter Title' />
-                <Form.TextArea label='Description' placeholder='Enter Description' />
-                <Form.Input label='Cost Per Ticket' placeholder='Enter in Dollars' />
-            </Form>
-        )
-    }
+    { menuItem: 'Survey', render: () => <SurveyForm /> },
+    { menuItem: 'Raffle', render: () => <RaffleForm /> }
 ]
 
 function ModalAddCampaign() {
