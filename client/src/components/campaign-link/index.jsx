@@ -5,11 +5,11 @@ function CampaignLink(props) {
     console.log(props)
     return (
         <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, height: 30 }}>
-            <a href='/#/interactive-campaign'><h4>{props.j}</h4></a>
+            <a href='/#/campaign'><h4>{props.j}</h4></a>
             <div style={{ flex: 1 }} />
             <ModalUpdateCampaign />
             <i className='red trash icon' style={{ marginRight: 30 }} />
-            <a href='/#/analytics'>View Results</a>
+            <a href='/#/results'>View Results</a>
         </div>
     )
 }

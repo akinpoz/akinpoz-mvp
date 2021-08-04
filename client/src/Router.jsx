@@ -7,10 +7,12 @@ import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import Profile from './components/profile'
 import Campaign from "./components/campaign";
-import OwnerProfile from "./owner-profile/owner-profile";
+import OwnerProfile from "./dev-components/owner-profile/owner-profile";
 import Home from "./components/home";
 import Analytics from "./components/analytics/analytics";
 import Jukebox from "./components/jukebox/jukebox";
+import Results from "./components/results";
+import LocationCampaigns from "./components/location-campaigns";
 
 const components = {
   Home: Home,
@@ -36,14 +38,20 @@ function Router(props) {
         </Route>
 
         {/* DEV PATHS */}
-        <Route path='/interactive-campaign'>
+        <Route path='/campaign'>
           <Campaign />
+        </Route>
+        <Route path='/location-campaigns'>
+          <LocationCampaigns />
         </Route>
         <Route path='/owner-profile'>
           <OwnerProfile />
         </Route>
         <Route path='/analytics'>
           <Analytics />
+        </Route>
+        <Route path='/results'>
+          <Results />
         </Route>
 
         {/* DEV PATHS */}

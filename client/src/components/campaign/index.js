@@ -47,7 +47,7 @@ function SingleAction() {
     }
 
     return (
-        <div style={{width: '100%', maxWidth: 650}}>
+        <div style={{width: '100%', maxWidth: 650, alignItems: "center", display: "flex"}}>
             <Card fluid className={styles.actionCard}>
                 <div className={styles.actionContainer}>
                     <br/>

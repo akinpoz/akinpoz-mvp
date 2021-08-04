@@ -3,6 +3,7 @@ import ModalUpdateLocation from './UpdateLocation'
 import ModalAddCampaign from '../campaign-link/AddCampaign';
 import { Button, Card, Form, Icon, Modal } from "semantic-ui-react";
 import CampaignLink from '../campaign-link';
+import ShowQRCode from "./show-qrcode";
 
 
 function Location(props) {
@@ -24,8 +25,9 @@ function Location(props) {
                     </div> */}
                     <h2 style={{ marginRight: 20, marginBottom: 0, marginTop: 0 }}>{i}</h2>
                     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <ShowQRCode />
                         <ModalUpdateLocation />
-                        <i className='red trash icon' />
+                        <i className='red trash icon'/>
                     </div>
 
                 </div>
