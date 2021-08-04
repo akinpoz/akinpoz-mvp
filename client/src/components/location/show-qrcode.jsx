@@ -17,7 +17,7 @@ function ShowQRCode() {
             <Modal.Content>
                 <div style={{display: 'flex', justifyContent: "center", padding: 15}}>
                     <div id='QRCode' style={{padding: 5}}>
-                        <QRCode value={'localhost:3000'} className="HpQrcode"/> {/* TODO: make this a real url */}
+                        <QRCode value={'http://localhost:3000/#/location-campaigns'} className="HpQrcode"/> {/* TODO: make this a real url */}
                     </div>
                 </div>
             </Modal.Content>
