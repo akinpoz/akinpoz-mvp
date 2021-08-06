@@ -1,8 +1,7 @@
 import React from 'react';
 import ModalUpdateCampaign from './/UpdateCampaign';
 
-function CampaignLink(props) {
-    console.log(props)
+function Campaign(props) {
     return (
         <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, height: 30 }}>
             <a href='/#/campaign'><h4>{props.j}</h4></a>

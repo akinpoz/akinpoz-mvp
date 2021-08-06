@@ -69,6 +69,16 @@ function Router(props) {
       </Switch>
 
 
+          <Route path='/campaigns-crud'>
+            <Home />
+          </Route>
+          <Route path='/analytics'>
+            <Analytics />
+          </Route>
+          <Route path='/jukebox'>
+            <Jukebox />
+          </Route>
+          {/* DEV PATHS */}
 
     </HashRouter>
   )

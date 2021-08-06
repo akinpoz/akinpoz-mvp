@@ -39,6 +39,7 @@ function Register(props) {
     const onSubmit = e => {
         e.preventDefault()
         const { name, email, password, type } = values
+       
         const newUser = {
             name,
             email,
@@ -51,7 +52,6 @@ function Register(props) {
             props.register(newUser)
         }
         else {
-            console.log(score, name, email, password, type);
             setmsg('Please fill in all the fields')
         }
     }
@@ -80,8 +80,9 @@ function Register(props) {
                 </Message>}
                 <Form.Field required>
                     <label>Select If you are a Business or Customer</label>
-                    <Dropdown selection fluid options={[{ key: 'business', text: 'Business', value: 'business' }, { key: 'customer', text: 'Customer', value: 'customer' }]} placeholder="Are you a business or a customer" onChange={(e, value) => {
-                        setvalues({ ...values, type: value })
+                    <Dropdown selection fluid options={[{ key: 'business', text: 'Business', value: 'business' }, { key: 'customer', text: 'Customer', value: 'customer' }]} placeholder="Are you a business or a customer" 
+                    onChange={(e, data) => {
+                        setvalues({ ...values, type: data.value })
                     }
                     } />
                 </Form.Field>

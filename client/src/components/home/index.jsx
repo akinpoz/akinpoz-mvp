@@ -2,35 +2,44 @@ import React, { useEffect, useState } from "react";
 import styles from "./home.module.css"
 import Location from "../location";
 import { connect } from 'react-redux'
-import AddLocation from '../location/AddLocation'
-import PropTypes from 'prop-types'
 
+import PropTypes from 'prop-types'
+import { getLocations, addLocation } from "../../actions/locationActions"
+import { Button, Icon } from "semantic-ui-react";
+import Modal from "../location/Modal"
 function Home(props) {
-    const [isLoggedIn, setIsLoggedIn] = useState(props.auth.isAuthenticated)
     // get locations
-    const locations = ['Restaurant 1', 'Restaurant 2'];
     useEffect(() => {
-        setIsLoggedIn(props.auth.isAuthenticated)
-    }, [props])
+        props.getLocations(props.auth.user._id)
+    }, [])
+    const locations = props.location.locations
+    const AddTrigger = <Button className={styles.button} size="tiny" icon labelPosition='left'
+        color='green'>
+        <Icon className='plus' />
+        <span>Add Location</span>
+    </Button>
     return (
         <div className={styles.container}>
-            <h1 style={{textAlign: "center"}}>Campaign Manager</h1>
-            <AddLocation  {...props}/>
-
-            <br/>
-            {locations.map((i, index) => {
+            <h1 style={{ textAlign: "center" }}>Campaign Manager</h1>
+            <Modal action={"add"} trigger={AddTrigger} {...props}/>
+            {/* <AddLocation action={"add"} trigger={addTrigger} {...props} /> */}
+            <br />
+            {locations.map(location => {
                 return (
-                   <Location i={i} index={index} {...props}/>
+                    <Location {...location} />
                 )
             })}
         </div>
     )
 }
 Home.propTypes = {
-    auth: PropTypes.object.isRequired
+    auth: PropTypes.object.isRequired,
+    getLocations: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired
 }
 
 const mapStateToProps = (state) => ({
-    auth: state.auth
+    auth: state.auth,
+    location: state.location
 })
-export default connect(mapStateToProps, null)(Home)
+export default connect(mapStateToProps, { getLocations, addLocation })(Home)

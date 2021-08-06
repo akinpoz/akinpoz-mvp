@@ -2,8 +2,6 @@ var mongoose = require('mongoose')
 
 var Schema = mongoose.Schema
 
-// Create Schema
-
 var UserSchema = new Schema({
     name: {
         type: String,
@@ -29,7 +27,22 @@ var UserSchema = new Schema({
     register_date: {
         type: Date,
         default: Date.now()
-    }
+    },
+    locations: {
+        type: [String],
+        date: {
+            type: Date,
+            default: Date.now()
+        }
+    },
+    type: {
+        type: String,
+        required: true,
+        date: {
+            type: Date,
+            default: Date.now()
+        }
+    },
 })
 
 module.exports = User = mongoose.model('user', UserSchema)

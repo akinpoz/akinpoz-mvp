@@ -10,3 +10,29 @@
 i:hover {
     cursor: pointer;
 }
+
+.button {
+    width: 15% !important;
+    margin-left: auto !important;
+    margin-right: 5% !important;
+    white-space: nowrap !important;
+    font-size: 75% !important;
+}
+
+@media only screen and (max-width: 750px) {
+    .button {
+        width: 20% !important;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .button {
+        width: 30% !important;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .button {
+        width: 90% !important;
+    }
+}

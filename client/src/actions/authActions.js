@@ -10,14 +10,14 @@ export const loadUser = () => (dispatch, getState) => {
     axios.get('/api/auth/user', tokenConfig(getState)).then(res => {
         dispatch({ type: USER_LOADED, payload: res.data })
     }).catch(e => {
-        dispatch(returnErrors(e.response.data, e.response.status))
-        dispatch({ type: AUTH_ERROR })
+       // dispatch(returnErrors(e.response.data, e.response.status))
+        // dispatch({ type: AUTH_ERROR })
     })
 }
 
 // Register User
 
-export const register = ({ name, email, password }) => dispatch => {
+export const register = ({ name, email, password, type }) => dispatch => {
     // Headers
     const config = {
         headers: {
@@ -25,7 +25,7 @@ export const register = ({ name, email, password }) => dispatch => {
         }
     }
     // Request body
-    const body = JSON.stringify({ name, email, password })
+    const body = JSON.stringify({ name, email, password, type })
     axios.post('/api/users', body, config).then(res => {
         dispatch({
             type: REGISTER_SUCCESS,
