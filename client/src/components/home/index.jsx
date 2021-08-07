@@ -8,7 +8,6 @@ import { getLocations, addLocation } from "../../actions/locationActions"
 import { Button, Icon } from "semantic-ui-react";
 import Modal from "../location/Modal"
 function Home(props) {
-    // get locations
     useEffect(() => {
         props.getLocations(props.auth.user._id)
     }, [])

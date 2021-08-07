@@ -1,4 +1,4 @@
-import { GET_LOCATIONS, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION } from './types'
+import { GET_LOCATIONS, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
 
@@ -34,15 +34,28 @@ export const updateLocation = (location) => (dispatch, getState) => {
         })
     })
 }
-export const deleteLocation = id => (dispatch, getState) => {
+export const deleteLocation = (location) => (dispatch, getState) => {
     dispatch(setLocationsLoading())
-    axios.delete(`/api/locations/${id}`, tokenConfig(getState)).then(res => {
+    console.log(location)
+    axios.post(`/api/locations/delete`, location, tokenConfig(getState)).then(res => {
         dispatch({
             type: DELETE_LOCATION,
             payload: res.data
         })
     })
 }
+export const toggleMusic = (payload) => (dispatch, getState) => {
+    dispatch(setLocationsLoading())
+    console.log(payload)
+    const {music, _id} = payload
+    axios.post(`/api/locations/toggleMusic`, {music, _id}, tokenConfig(getState)).then(res => {
+        dispatch({
+            type: TOGGLE_MUSIC,
+            payload: res.data
+        })
+    })
+}
+
 export const setLocationsLoading = () => {
     return {
         type: LOCATIONS_LOADING

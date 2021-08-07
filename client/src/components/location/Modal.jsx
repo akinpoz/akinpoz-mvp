@@ -18,11 +18,10 @@ function LocationModal(props) {
             name: values.name,
             description: values.description,
             user: props.auth.user._id,
-            _id: props._id || null
+            location_id: props._id
         }
         if (values.name) {
             props[`${props.action}Location`](locationDetails)
-            props.getLocations(props.auth.user._id)
             close()
         }
     }
@@ -66,8 +65,8 @@ function LocationModal(props) {
                         {/* <img src={imageData} className={styles.image} /> */}
                         {/* <input type="file" accept="image/*" onChange={handleUpload} placeholder="Upload your logo"/> */}
                     </div>
-                    <Form.Input value={values.name} name="name" label='Location Name' placeholder='Enter Name' onChange={handleChange} />
-                    <Form.TextArea value={values.description} name="description" label={'Location Description'} placeholder='Enter Description' onChange={handleChange} />
+                    <Form.Input value={values.name || ""} name="name" label='Location Name' placeholder='Enter Name' onChange={handleChange} />
+                    <Form.TextArea value={values.description || ""} name="description" label={'Location Description'} placeholder='Enter Description' onChange={handleChange} />
                 </Form>
             </Modal.Content>
             <Modal.Actions>

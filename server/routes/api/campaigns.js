@@ -4,23 +4,38 @@ const dotenv = require('dotenv');
 dotenv.config();
 const Location = require('../../models/Location');
 const User = require('../../models/User');
+const Campaign = require('../../models/Campaign');
 var auth = require('../../middleware/auth')
 
 /**
- * @route GET api/locations
- * @desc get all locations by userID
+ * @route GET api/campaigns/location
+ * @desc get all campaigns by userID
  * @access Private
  */
-router.get('/', auth, async function (req, res) {
+router.get('/location', auth, async function (req, res) {
+    console.log('hit')
     try {
-        let locations = await Location.find({ user: req.user.id })
-        res.status(200).send(locations)
+        let campaigns = await Campaign.find({ location: req.location._id })
+        res.status(200).send(campaigns)
     } catch (e) {
         console.error(err)
     }
 })
 /**
- * @route POST api/locations/add 
+ * @route GET api/campaigns/locations
+ * @desc get all campaigns by userID
+ * @access Private
+ */
+ router.get('/user', auth, async function (req, res) {
+    try {
+        let campaigns = await Campaign.find({ user: req.user.id })
+        res.status(200).send(campaigns)
+    } catch (e) {
+        console.error(err)
+    }
+})
+/**
+ * @route POST api/campaigns/add 
  * @desc post a new location
  * @access Private
  */
@@ -31,7 +46,7 @@ router.post('/add', auth, (req, res) => {
         newLocation.save(async function (err, location) {
             if (err) res.status(500).send(err);
             if (location) {
-                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { locations: location._id } }, { new: true })
+                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { campaigns: location._id } }, { new: true })
                 res.status(200).send(location);
             }
         })
@@ -41,7 +56,7 @@ router.post('/add', auth, (req, res) => {
     }
 })
 /**
- * @route POST api/locations/update
+ * @route POST api/campaigns/update
  * @desc post an update to a location
  * @access Private
  */
@@ -55,7 +70,7 @@ router.post('/update', auth, async (req, res) => {
     }
 })
 /**
- * @route POST api/locations/delete
+ * @route POST api/campaigns/delete
  * @desc delete a location
  * @access Private
  */
@@ -63,7 +78,7 @@ router.post('/delete', auth, async (req, res) => {
     try {
         const location = await Location.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
         const user = await User.findOne({ _id: req.body.user })
-        user.locations.splice(user.locations.indexOf(req.body._id), 1)
+        user.campaigns.splice(user.campaigns.indexOf(req.body._id), 1)
         await user.save();
         res.status(200).send(location._id)
     } catch (e) {
@@ -73,7 +88,7 @@ router.post('/delete', auth, async (req, res) => {
 })
 
 /**
- * @route POST api/locations/toggleMusic
+ * @route POST api/campaigns/toggleMusic
  * @desc enable/disable music for a location
  * @access Private
  */

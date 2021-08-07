@@ -1,19 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ModalAddCampaign from '../campaign-link/AddCampaign';
-import { Button, Card, Form, Icon } from "semantic-ui-react";
-import { updateLocation, getLocations, deleteLocation } from '../../actions/locationActions';
+import { Button, Card, Icon, Radio } from "semantic-ui-react";
+import { updateLocation, deleteLocation, toggleMusic } from '../../actions/locationActions';
+import { getCampaignsByLocation } from '../../actions/campaignActions'
 import Modal from './Modal'
 import { connect } from 'react-redux'
 
 function Location(props) {
-    
-    const { name, campaigns, description, music, _id, user } = props
+    const { name, description, music, _id, user } = props
+    const [isEnabled, setIsEnabled] = useState(music)
     const UpdateTrigger = <div><i className="pencil alternate icon" style={{ marginRight: 10 }} /></div>
-    // get campaigns based on props.name (location name)
+    useEffect(() => {
+        props.getCampaignsByLocation(_id)
+    }, [])
     function handleDelete() {
-        props.deleteLocation(props._id)
-        props.getLocations()
+        const location = {
+            _id,
+            user,
+        }  
+        if (window.confirm('Are you sure you want to delete this location?')) props.deleteLocation(location)
     }
+    function handleToggle() {
+        setIsEnabled(!isEnabled)
+        props.toggleMusic({ music: !isEnabled, _id })
+    
+    }
+    console.log(props.campaign)
+    const campaigns = []
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
             <Card style={{ marginBottom: 20, width: '90%', padding: 20 }}>
@@ -30,17 +43,19 @@ function Location(props) {
                     <h2 style={{ marginRight: 20, marginBottom: 0, marginTop: 0 }}>{name}</h2>
                     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                         <Modal action={"update"} trigger={UpdateTrigger} {...props} />
-                        <i className='red trash icon' onClick={handleDelete}/>
+                        <i className='red trash icon' onClick={handleDelete} />
                     </div>
 
                 </div>
                 <p>{description}</p>
                 <div style={{ marginLeft: 20 }}>
                     <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center", gap: "10%" }}>
-                        <a href='/#/jukebox' style={{ marginBottom: 5 }}><h4>Music</h4></a>
-                        <div style={{ flex: 1, display: "flex" }} />
-                        <div style={{ marginRight: 100, height: 30 }}>
-                            <Button size='mini' color='green'>Enable</Button>
+                        <Button icon basic color={!isEnabled ? "grey" : "blue"} disabled={!isEnabled} href='/#/jukebox' style={{ marginBottom: 5, border: "none !important" }}><Icon name="music" /> Jukebox</Button>
+                        {/* <div style={{ flex: 1, display: "flex" }} /> */}
+                        <div style={{ height: 30 }}>
+
+                            <Radio toggle checked={isEnabled} onChange={handleToggle} />
+                            {/* <Button size='mini' color='green'>Enable</Button> */}
                         </div>
                     </div>
                     {campaigns.map(campaign => {
@@ -59,8 +74,8 @@ function Location(props) {
 
 const mapStateToProps = (state) => ({
     auth: state.auth,
-    location: state.location
+    campaign: state.campaign,
 })
 
-export default connect(mapStateToProps, { getLocations, updateLocation, deleteLocation })(Location)
+export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation })(Location)
 

@@ -26,7 +26,7 @@ function ModalAddCampaign() {
                       labelPosition='right'
                       color='white'>
                        <i className='add icon'/>
-                       Add Another Campaign
+                       Add Campaign
                    </a>}>
             <Modal.Header>Add New Campaign</Modal.Header>
             <Modal.Content scrolling>
