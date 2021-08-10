@@ -10,13 +10,14 @@ import Campaign from "./components/campaign";
 import OwnerProfile from "./dev-components/owner-profile/owner-profile";
 import Home from "./components/home";
 import Analytics from "./components/analytics/analytics";
-import Jukebox from "./components/jukebox/jukebox";
+import Jukebox from "./components/jukebox";
 import Results from "./components/results";
 import LocationCampaigns from "./components/location-campaigns";
 
 const components = {
   Home: Home,
-  Profile: Profile
+  Profile: Profile,
+  Jukebox: Jukebox
 }
 
 
@@ -60,7 +61,7 @@ function Router(props) {
           <Analytics />
         </Route>
         <Route path='/jukebox'>
-          <Jukebox />
+          <PrivateRoute {...props} component={'Jukebox'}/>
         </Route>
 
         {/* DEV PATHS */}
@@ -74,9 +75,6 @@ function Router(props) {
           </Route>
           <Route path='/analytics'>
             <Analytics />
-          </Route>
-          <Route path='/jukebox'>
-            <Jukebox />
           </Route>
           {/* DEV PATHS */}
 

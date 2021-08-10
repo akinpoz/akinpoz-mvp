@@ -10,6 +10,7 @@
         "deploy": "sh deploy.sh"
     },
     "dependencies": {
-        "concurrently": "^6.2.0"
+        "concurrently": "^6.2.0",
+        "spotify-web-api-node": "^5.0.2"
     }
 }
