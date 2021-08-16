@@ -16,3 +16,8 @@
     min-width: 280px;
     width: 100%;
 }
+
+.ui.search > .results {
+    overflow-y: auto;
+    max-height: 550px;
+}

@@ -1,19 +1,17 @@
-import {SPOTIFY_CLIENT_AUTH, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG, SPOTIFY_USER_AUTH} from "../actions/types";
+import {
+    SPOTIFY_LOADING,
+    SPOTIFY_QUEUE_SONG,
+    SPOTIFY_USER_AUTH
+} from "../actions/types";
 
 const initialState = {
-    clientToken: null,
     userToken: '',
-    loading: false
+    loading: false,
+    searchResult: null
 }
 
 export default function (state = initialState, action) {
     switch (action.type) {
-        case SPOTIFY_CLIENT_AUTH:
-            return {
-                ...state,
-                clientToken: action.payload,
-                loading: false
-            }
         case SPOTIFY_USER_AUTH:
             return {
                 ...state,
