@@ -31,7 +31,7 @@ class App extends Component {
       <Provider store={store}>
         <div style={{display: "flex", flex: 1, flexDirection: "column", height: '100%'}}>
           <NavBar changeTheme={this.changeTheme} theme={this.state.theme} />
-          <div className={this.state.theme}>
+          <div className={'App-light'}> {/* TODO: Hard coded to light for dev purposes */}
             {/* Create Routing Component and connect it to redux state... then use props.isLoading/isAuthenticating to build private routes */}
             <Router />
           </div>
