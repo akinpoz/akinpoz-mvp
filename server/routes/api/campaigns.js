@@ -9,20 +9,19 @@ var auth = require('../../middleware/auth')
 
 /**
  * @route GET api/campaigns/location
- * @desc get all campaigns by userID
+ * @desc get all campaigns by location ID
  * @access Private
  */
 router.get('/location', auth, async function (req, res) {
-    console.log('hit')
     try {
-        let campaigns = await Campaign.find({ location: req.location._id })
+        let campaigns = await Campaign.find({ location: req.query.location_id })
         res.status(200).send(campaigns)
     } catch (e) {
-        console.error(err)
+        console.error(e)
     }
 })
 /**
- * @route GET api/campaigns/locations
+ * @route GET api/campaigns/campaigns
  * @desc get all campaigns by userID
  * @access Private
  */
@@ -36,18 +35,18 @@ router.get('/location', auth, async function (req, res) {
 })
 /**
  * @route POST api/campaigns/add 
- * @desc post a new location
+ * @desc post a new campaign
  * @access Private
  */
 router.post('/add', auth, (req, res) => {
     try {
-        console.log(req.body)
-        var newLocation = new Location(req.body);
-        newLocation.save(async function (err, location) {
+        var newCampaign = new Campaign(req.body);
+        newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);
-            if (location) {
-                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { campaigns: location._id } }, { new: true })
-                res.status(200).send(location);
+            if (campaign) {
+                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { campaigns: campaign._id } }, { new: true })
+                await Locaton.findOneAndUpdate({ _id: req.body.location }, { $push: { campaigns: campaign._id } }, { new: true })
+                res.status(200).send(campaign);
             }
         })
     } catch (e) {
@@ -57,13 +56,13 @@ router.post('/add', auth, (req, res) => {
 })
 /**
  * @route POST api/campaigns/update
- * @desc post an update to a location
+ * @desc post an update to a campaign
  * @access Private
  */
 router.post('/update', auth, async (req, res) => {
     try {
-        const location = await Location.findOneAndUpdate({ _id: req.body.location_id }, { name: req.body.name, description: req.body.description }, { useFindAndModify: false, new: true })
-        res.status(200).send(location)
+        const campaign = await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, { name: req.body.name, description: req.body.description }, { useFindAndModify: false, new: true })
+        res.status(200).send(campaign)
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
@@ -71,16 +70,16 @@ router.post('/update', auth, async (req, res) => {
 })
 /**
  * @route POST api/campaigns/delete
- * @desc delete a location
+ * @desc delete a campaign
  * @access Private
  */
 router.post('/delete', auth, async (req, res) => {
     try {
-        const location = await Location.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
+        const campaign = await Campaign.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
         const user = await User.findOne({ _id: req.body.user })
         user.campaigns.splice(user.campaigns.indexOf(req.body._id), 1)
         await user.save();
-        res.status(200).send(location._id)
+        res.status(200).send(campaign._id)
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
@@ -89,14 +88,14 @@ router.post('/delete', auth, async (req, res) => {
 
 /**
  * @route POST api/campaigns/toggleMusic
- * @desc enable/disable music for a location
+ * @desc enable/disable music for a campaign
  * @access Private
  */
 router.post('/toggleMusic', auth, async (req, res) => {
     try {
         const { music, _id } = req.body;
-        const location = await Location.findOneAndUpdate({ _id }, { music }, { useFindAndModify: false, new: true })
-        res.status(200).send(location)
+        const campaign = await Campaign.findOneAndUpdate({ _id }, { music }, { useFindAndModify: false, new: true })
+        res.status(200).send(campaign)
     } catch (e) {
         console.error(e)
         res.status(500).send(e)

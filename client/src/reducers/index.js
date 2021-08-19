@@ -6,11 +6,13 @@ import locationsReducer from './locationReducer'
 import spotifyReducer from "./spotifyReducer";
 import searchReducer from "./searchReducer";
 
+import campaignReducer from './campaignReducer'
 
 export default combineReducers({
     error: errorReducer,
     auth: authReducer,
     location: locationsReducer,
     spotify: spotifyReducer,
-    search: searchReducer
+    search: searchReducer,
+    campaign: campaignReducer
 })

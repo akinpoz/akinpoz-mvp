@@ -23,11 +23,10 @@ export const startSearch = (query) => (dispatch, getState) => {
     })
 }
 
-export const updateSelection = (song) => (dispatch, getState) => {
-    console.log("in update selection" + song)
+export const updateSelection = (song) => (dispatch) => {
     dispatch({type: UPDATE_SELECTION, selection: song, value: song.name})
 }
 
-export const cleanQuery = () => (dispatch, getState) => {
+export const cleanQuery = () => (dispatch) => {
     dispatch({type: CLEAN_QUERY})
 }

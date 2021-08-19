@@ -3,11 +3,11 @@ import axios from 'axios'
 import { tokenConfig } from './authActions'
 
 
-export const getCampaignsByLocation = (user) => (dispatch, getState) => {
+export const getCampaignsByLocation = (location_id) => (dispatch, getState) => {
     dispatch(setCampaignsLoading())
     const config = {
         headers: tokenConfig(getState).headers,
-        params: {user}
+        params: {location_id}
     }
     axios.get('/api/campaigns/location', config).then(res => {
         dispatch({
