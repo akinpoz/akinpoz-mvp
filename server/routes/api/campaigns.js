@@ -40,12 +40,13 @@ router.get('/location', auth, async function (req, res) {
  */
 router.post('/add', auth, (req, res) => {
     try {
+        console.log(req.body)
         var newCampaign = new Campaign(req.body);
         newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);
             if (campaign) {
                 await User.findOneAndUpdate({ _id: req.body.user }, { $push: { campaigns: campaign._id } }, { new: true })
-                await Locaton.findOneAndUpdate({ _id: req.body.location }, { $push: { campaigns: campaign._id } }, { new: true })
+                await Location.findOneAndUpdate({ _id: req.body.location }, { $push: { campaigns: campaign._id } }, { new: true })
                 res.status(200).send(campaign);
             }
         })

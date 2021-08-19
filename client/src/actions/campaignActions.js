@@ -30,6 +30,7 @@ export const getCampaignsByUser = (user) => (dispatch, getState) => {
     })
 }
 export const addCampaign = (campaign) => (dispatch, getState) => {
+    console.log(campaign)
     dispatch(setCampaignsLoading())
     axios.post('/api/campaigns/add', campaign, tokenConfig(getState)).then(res => {
         dispatch({

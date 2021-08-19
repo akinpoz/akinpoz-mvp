@@ -1,42 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Modal, Radio, Tab } from "semantic-ui-react";
-import SurveyForm from "./AddSurveyForm";
-import RaffleForm from "./AddRaffleForm";
+import { Button, Form, Modal, Icon, Message } from "semantic-ui-react";
 import { connect } from "react-redux"
 import { addCampaign } from "../../actions/campaignActions"
 
 
 function ModalAddCampaign(props) {
-    const panes = [
-        { menuItem: 'Survey', render: () => <SurveyForm /> },
-        { menuItem: 'Raffle', render: () => <RaffleForm /> }
-    ]
     const [open, setOpen] = useState(false);
+    const [msg, setmsg] = useState();
     const [values, setvalues] = useState(
         {
-            title: props.title,
-            description: props.description,
-            details: props.details || { type: "Survery", options: ["abc"] },
+            title: "",
+            description: "",
+            question: "",
+            details: {type: "Survey", options: [""]},
         });
-    useEffect(() => {
-        setvalues({
-            ...values,
-            title: props.title,
-            description: props.description,
-            details: props.details || { type: "Survery", options: ["abc"] }
-        })
-    }, [open]);
+
     function submit(e) {
         e.preventDefault();
         //campaign ID will be null if new location but has value if updating
         const campaignDetails = {
             title: values.title,
             description: values.description,
+            question: values.question,
             details: values.details,
             user: props.auth.user._id,
-            campaign_id: props._id
+            location: props.location
         }
-        if (values.name && values.details) {
+
+        if (!values.title || !values.description || !values.details || !values.question) {
+            setmsg("Please fill in all required fields and verify you have at least two options");
+        }
+        else {
             props[`${props.action}Campaign`](campaignDetails);
             close()
         }
@@ -54,15 +48,24 @@ function ModalAddCampaign(props) {
     function handleClick(e) {
         var details = values.details
         details.type = e.target.innerHTML
-        setvalues({ ...values, details })
+        setvalues({ ...values, question: "", details })
     }
     function handleOptionChange(data, index) {
         var options = values.details.options
         options[index] = data.value
         setvalues({ ...values, details: { ...values.details, options } })
     }
+    function handleOptionAdd() {
+        var options = values.details.options
+        options.push("")
+        setvalues({ ...values, details: { ...values.details, options } })
+    }
+    function handleOptionRemove(index) {
+        var options = values.details.options
+        options.splice(index, 1)
+        setvalues({ ...values, details: { ...values.details, options } })
+    }
     const title = props.action.substring(0, 1).toUpperCase() + props.action.substring(1)
-    console.log(values.details)
     return (
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
@@ -85,33 +88,54 @@ function ModalAddCampaign(props) {
             <Modal.Content scrolling>
                 {/* {props.action === "add" &&  <Tab panes={panes} /> } */}
                 {props.action === "add" && <Button.Group basic>
-                    <Button toggle active={values.details.type === "Survery"} onClick={handleClick}>Survery</Button>
+                    <Button toggle active={values.details.type === "Survey"} onClick={handleClick}>Survey</Button>
                     <Button toggle active={values.details.type === "Raffle"} onClick={handleClick}>Raffle</Button>
                 </Button.Group>}
                 <Form>
+                    {msg && <Message negative>
+                        <Message.header>{msg}</Message.header>
+                    </Message> }
                     <br />
-                    <Form.Input label={`${values.details.type} Title`} placeholder='Enter Title' />
-                    <Form.TextArea label='Description' placeholder='Enter Description' />
-                    {values.details.type === "Survery" && <Form.Input label='What do you want to ask?' placeholder='Enter Question' />}
-                    {values.details.type === "Raffle" && <Form.Input label='Cost Per Ticket' placeholder='Enter in Dollars' />}
-                    {values.details.type === "Survery" &&
-                        <table>
+                    <Form.Input required label={`${values.details.type} Title`} placeholder='enter title...' value={values.title} onChange={handleChange} name="title"/>
+                    <Form.TextArea required label='Description' placeholder='enter description...' value={values.description} name="description" onChange={handleChange}/>
+                    {values.details.type === "Survey" && <Form.Input required label='What do you want to ask?' placeholder='enter question...' onChange={handleChange} value={values.question} name="question"/>}
+                    {values.details.type === "Raffle" && <Form.Input required value={values.question} label='Cost Per Ticket' placeholder='enter in dollars...' onChange={handleChange}/>}
+                    {values.details.type === "Survey" && 
+                        <table style={{ width: '100%' }}>
                             <thead>
                                 <tr>
-                                    <th>Options</th>
+                                    <th>Options (2 required)</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    {values.details.options.map((option, index) => {
-                                        return (
+                                {values.details.options.map((option, index) => {
+                                    return (
+                                        <tr>
                                             <td>
-                                                <Form.Input name={`${values.details.options}_${index}`} value={values.details.options[index]} onChange={(e, data) => handleOptionChange(data, index)} />
+                                                <Form.Input placeholder={`enter option ${index+1}...`}  name={`${values.details.options}_${index}`} value={values.details.options[index]} onChange={(e, data) => handleOptionChange(data, index)} />
                                             </td>
-                                        )
-                                    })}
-                                </tr>
+                                            <td>
+                                                <a style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    cursor: 'pointer',
+                                                    color: 'red',
+                                                    fontWeight: 'bold'
+                                                }}
+                                                    icon
+                                                    labelPosition='right'
+                                                    color='white'
+                                                    onClick={handleOptionRemove.bind(null, index)}>
+                                                    <Icon name="trash" />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
                             </tbody>
+                            <tfoot>
+                                <AddOptionButton handler={handleOptionAdd} />
+                            </tfoot>
                         </table>
 
                     }
@@ -131,6 +155,24 @@ function ModalAddCampaign(props) {
     )
 }
 
+function AddOptionButton(props) {
+    return (
+        <a style={{
+            display: 'flex',
+            flexDirection: 'row',
+            cursor: 'pointer',
+            color: '#4183c4',
+            fontWeight: 'bold'
+        }}
+            icon
+            labelPosition='right'
+            color='white'
+            onClick={props.handler}>
+            <i className='add icon' />
+            Add Option
+        </a>
+    )
+}
 
 const mapStateToProps = (state) => ({
     auth: state.auth,

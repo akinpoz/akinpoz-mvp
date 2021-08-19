@@ -60,11 +60,11 @@ function Location(props) {
                     {campaigns.map(campaign => {
                         console.log(campaign);
                         return (
-                            <div />
-                            //  <Campaign {...campaign} />
+                                <div/>
+                              // <Campaign {...campaign} />
                         )
                     })}
-                    <ModalAddCampaign action={"add"}/>
+                    <ModalAddCampaign action={"add"} location={_id}/>
                 </div>
             </Card>
         </div>
