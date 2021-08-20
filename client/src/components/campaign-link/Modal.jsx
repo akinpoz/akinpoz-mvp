@@ -88,6 +88,7 @@ function CampaignModal(props) {
                 {props.action === "add" && <Button.Group basic>
                     <Button toggle active={values.details.type === "Survey"} onClick={handleClick}>Survey</Button>
                     <Button toggle active={values.details.type === "Raffle"} onClick={handleClick}>Raffle</Button>
+                    <Button toggle active={values.details.type === "Fastpass"} onClick={handleClick}>Fastpass</Button>
                 </Button.Group>}
                 <Form>
                     {msg && <Message negative>
@@ -98,6 +99,7 @@ function CampaignModal(props) {
                     <Form.TextArea required label='Description' placeholder='enter description...' value={values.description} name="description" onChange={handleChange} />
                     {values.details.type === "Survey" && <Form.Input required label='What do you want to ask?' placeholder='enter question...' onChange={handleChange} value={values.question} name="question" />}
                     {values.details.type === "Raffle" && <Form.Input required value={values.question} label='Cost Per Ticket' type="number" placeholder='enter in dollar amount...' onChange={handleChange} name="question" />}
+                    {values.details.type === "Fastpass" && <Form.Input required value={values.question} label='Cost to Skip' type="number" placeholder='enter in dollar amount...' onChange={handleChange} name="question" />}
                     {values.details.type === "Survey" &&
                         <table style={{ width: '100%' }}>
                             <thead>

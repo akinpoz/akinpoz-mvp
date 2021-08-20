@@ -19,6 +19,12 @@
 #### Currently working on
 
     - [ ] Skip the line campaign
+        - [x] Frontend implemented
+        - [ ] connect to frontend to redux
+        - [ ] create api endpoint to remove
+        - [ ] create customer side front-end to purchase pass
+        - [ ] connect to ^^ to redux
+        - [ ] create endpoint to add user to detials.option of that campaign
 
 #### Completed (Summary of work)
 
