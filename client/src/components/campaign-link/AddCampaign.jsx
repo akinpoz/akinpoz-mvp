@@ -39,7 +39,7 @@ function ModalAddCampaign(props) {
         setvalues({ ...values, [e.target.name]: e.target.value });
     }
     function clear() {
-        setvalues({ ...values, title: "", description: "", details: { type: "Survey" } });
+        setvalues({ ...values, title: "", description: "", details: { type: "Survey", options: [""] } });
     }
     function close() {
         setOpen(false);

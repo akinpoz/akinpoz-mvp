@@ -2,3 +2,8 @@
     padding: 1rem 1rem;
     text-align: right;
 }
+.campaign_extra_div {
+    display: grid !important;
+    grid-template-columns: 33.33% 33.33% 33.33%;
+    place-items: center;
+}

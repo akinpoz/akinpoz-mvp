@@ -38,19 +38,13 @@ var CampaignSchema = new Schema({
     details: {
         type: Object,
         required: true,
-        typeOf: {
-            type: String,
-            required: true,
-        },
-        question: {
-            type: String,
-        },
         options: {
             type: [String],
-        },
-        costPerTicket: {
-            type: Number,
         }
+    },
+    question: {
+        type: String,
+        required: true
     }
 })
 

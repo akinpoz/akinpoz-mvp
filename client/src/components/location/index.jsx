@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import ModalAddCampaign from '../campaign-link/AddCampaign';
+import ModalAddCampaign from '../campaign-link/Modal';
 import { Button, Card, Icon, Radio } from "semantic-ui-react";
 import { updateLocation, deleteLocation, toggleMusic } from '../../actions/locationActions';
 import { getCampaignsByLocation, deleteCampaign, updateCampaign } from '../../actions/campaignActions'
 import Modal from './Modal'
 import { connect } from 'react-redux'
+import Campaign from '../campaign-link'
 
 function Location(props) {
     const { name, description, music, _id, user } = props
     const [isEnabled, setIsEnabled] = useState(music)
     const UpdateTrigger = <div><i className="pencil alternate icon" style={{ marginRight: 10 }} /></div>
+    const AddTrigger = <a style={{
+        display: 'flex',
+        flexDirection: 'row',
+        cursor: 'pointer',
+        color: '#4183c4',
+        fontWeight: 'bold'
+    }}
+        icon
+        labelPosition='right'
+        color='white'>
+        <i className='add icon' />
+        Add Campaign
+    </a>
     useEffect(() => {
         props.getCampaignsByLocation(_id)
     }, [])
@@ -58,13 +72,11 @@ function Location(props) {
                         </div>
                     </div>
                     {campaigns.map(campaign => {
-                        console.log(campaign);
                         return (
-                                <div/>
-                              // <Campaign {...campaign} />
+                            <Campaign key={campaign._id} {...campaign} />
                         )
                     })}
-                    <ModalAddCampaign action={"add"} location={_id}/>
+                    <ModalAddCampaign action={"add"} location={_id} trigger={AddTrigger} />
                 </div>
             </Card>
         </div>
