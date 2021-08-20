@@ -4,7 +4,7 @@ import styles from "./location.module.css";
 import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 
-function ShowQRCode() {
+function ShowQRCode(props) {
     const [open, setOpen] = React.useState(false);
     return (
         <Modal onClose={() => setOpen(false)}
@@ -17,7 +17,7 @@ function ShowQRCode() {
             <Modal.Content>
                 <div style={{display: 'flex', justifyContent: "center", padding: 15}}>
                     <div id='QRCode' style={{padding: 5}}>
-                        <QRCode value={'http://localhost:3000/#/location-campaigns'} className="HpQrcode"/> {/* TODO: make this a real url */}
+                        <QRCode value={props.url} className="HpQrcode"/> {/* TODO: make this a real url */}
                     </div>
                 </div>
             </Modal.Content>

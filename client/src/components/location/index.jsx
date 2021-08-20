@@ -5,7 +5,8 @@ import { updateLocation, deleteLocation, toggleMusic } from '../../actions/locat
 import { getCampaignsByLocation, deleteCampaign, updateCampaign } from '../../actions/campaignActions'
 import Modal from './Modal'
 import { connect } from 'react-redux'
-import Campaign from '../campaign-link'
+import ShowQRCode from './show-qrcode';
+import Campaign from '../campaign-link';
 
 function Location(props) {
     const { name, description, music, _id, user } = props
@@ -39,22 +40,15 @@ function Location(props) {
         props.toggleMusic({ music: !isEnabled, _id })
 
     }
-    const campaigns = props.campaign.campaigns
+    const campaigns = []
+    const url = 'http://localhost:3000/#/campaign' //TODO: make responsive with actual link to real campaign
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
+        <div style ={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
             <Card style={{ marginBottom: 20, width: '90%', padding: 20 }}>
                 <div style={{ display: "flex", flexDirection: 'row', alignItems: "center", marginBottom: 10 }}>
-                    {/* <div style={{
-                        height: 40,
-                        width: 40,
-                        backgroundColor: "gray",
-                        borderRadius: 10,
-                        marginRight: 10
-                    }}>
-                        Logo
-                    </div> */}
                     <h2 style={{ marginRight: 20, marginBottom: 0, marginTop: 0 }}>{name}</h2>
                     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <ShowQRCode url={url} />
                         <Modal action={"update"} trigger={UpdateTrigger} {...props} />
                         <i className='red trash icon' onClick={handleDelete} />
                     </div>
@@ -64,11 +58,8 @@ function Location(props) {
                 <div style={{ marginLeft: 20 }}>
                     <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center", gap: "10%" }}>
                         <Button icon basic color={!isEnabled ? "grey" : "blue"} disabled={!isEnabled} href='/#/jukebox' style={{ marginBottom: 5, border: "none !important" }}><Icon name="music" /> Jukebox</Button>
-                        {/* <div style={{ flex: 1, display: "flex" }} /> */}
                         <div style={{ height: 30 }}>
-
                             <Radio toggle checked={isEnabled} onChange={handleToggle} />
-                            {/* <Button size='mini' color='green'>Enable</Button> */}
                         </div>
                     </div>
                     {campaigns.map(campaign => {
@@ -76,7 +67,7 @@ function Location(props) {
                             <Campaign key={campaign._id} {...campaign} />
                         )
                     })}
-                    {campaigns.length == 0 &&
+                    {campaigns.length === 0 &&
                         <div style={{ display: 'grid', placeItems: 'center' }}>
                             <h4>No Campaigns added yet, click "Add Campaign" to create your first Campaign!</h4>
                         </div>
