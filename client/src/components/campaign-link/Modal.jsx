@@ -76,7 +76,7 @@ function CampaignModal(props) {
         options.splice(index, 1)
         setvalues({ ...values, details: { ...values.details, options } })
     }
-    const title = props.action.substring(0, 1).toUpperCase() + props.action.substring(1)
+    const title = props.action?.substring(0, 1).toUpperCase() + props.action?.substring(1)
     return (
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
