@@ -4,7 +4,7 @@
 
 ## TODOS
 
-- [] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
+- [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
 
 ### Drew
 
@@ -18,7 +18,7 @@
 
 #### Currently working on
 
-    - [ ] Link view button with correct information
+    - [ ] Skip the line campaign
 
 #### Completed (Summary of work)
 

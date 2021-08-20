@@ -25,7 +25,7 @@ function CampaignLink(props) {
             </Card.Content>
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
-                <a href="/#/campaign"><abbr style={{ textDecoration: 'none' }} title="Preview Campaign"><Icon name="eye" /></abbr></a>
+                {/* <a href="/#/campaign"><abbr style={{ textDecoration: 'none' }} title="Preview Campaign"><Icon name="eye" /></abbr></a> */}
                 <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete}/>
             </Card.Content>

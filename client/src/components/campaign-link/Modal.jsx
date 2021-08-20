@@ -97,7 +97,7 @@ function CampaignModal(props) {
                     <Form.Input required label={`${values.details.type} Title`} placeholder='enter title...' value={values.title} onChange={handleChange} name="title" />
                     <Form.TextArea required label='Description' placeholder='enter description...' value={values.description} name="description" onChange={handleChange} />
                     {values.details.type === "Survey" && <Form.Input required label='What do you want to ask?' placeholder='enter question...' onChange={handleChange} value={values.question} name="question" />}
-                    {values.details.type === "Raffle" && <Form.Input required value={values.question} label='Cost Per Ticket' placeholder='enter in dollars...' onChange={handleChange} name="question" />}
+                    {values.details.type === "Raffle" && <Form.Input required value={values.question} label='Cost Per Ticket' type="number" placeholder='enter in dollar amount...' onChange={handleChange} name="question" />}
                     {values.details.type === "Survey" &&
                         <table style={{ width: '100%' }}>
                             <thead>
