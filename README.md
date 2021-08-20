@@ -4,6 +4,8 @@
 
 ## TODOS
 
+- [] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
+
 ### Drew
 
 #### Currently working on
@@ -17,7 +19,9 @@
 #### Currently working on
 
 - [ ] Campaign CRUD operations
-    - [ ] add fails. Says options are undefined. 
+    - [x] Add
+    - [ ] Update
+    - [ ] Delete
 
 #### Completed (Summary of work)
 
