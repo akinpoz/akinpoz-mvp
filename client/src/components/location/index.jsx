@@ -76,6 +76,11 @@ function Location(props) {
                             <Campaign key={campaign._id} {...campaign} />
                         )
                     })}
+                    {campaigns.length == 0 &&
+                        <div style={{ display: 'grid', placeItems: 'center' }}>
+                            <h4>No Campaigns added yet, click "Add Campaign" to create your first Campaign!</h4>
+                        </div>
+                    }
                     <ModalAddCampaign action={"add"} location={_id} trigger={AddTrigger} />
                 </div>
             </Card>

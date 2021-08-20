@@ -9,7 +9,12 @@ import { Button, Icon } from "semantic-ui-react";
 import Modal from "../location/Modal"
 function Home(props) {
     useEffect(() => {
-        props.getLocations(props.auth.user._id)
+        if (props.auth.user) {
+            props.getLocations(props.auth.user._id)
+        }
+        else {
+            window.location = "/login"
+        }
     }, [])
     const locations = props.location.locations
     const AddTrigger = <Button className={styles.button} size="tiny" icon labelPosition='left'
@@ -20,14 +25,19 @@ function Home(props) {
     return (
         <div className={styles.container}>
             <h1 style={{ textAlign: "center" }}>Campaign Manager</h1>
-            <Modal action={"add"} trigger={AddTrigger} {...props}/>
+            <Modal action={"add"} trigger={AddTrigger} {...props} />
             {/* <AddLocation action={"add"} trigger={addTrigger} {...props} /> */}
             <br />
-            {locations.map(location => {
+            {locations.length > 0 && locations.map(location => {
                 return (
                     <Location {...location} />
                 )
             })}
+            {locations.length == 0 &&
+                <div style={{display: 'grid', placeItems: 'center'}}>
+                    <h4>No Locations added yet, click "Add Location" to get started!</h4>
+                </div>
+            }
         </div>
     )
 }

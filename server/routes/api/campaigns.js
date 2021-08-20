@@ -25,7 +25,7 @@ router.get('/location', auth, async function (req, res) {
  * @desc get all campaigns by userID
  * @access Private
  */
- router.get('/user', auth, async function (req, res) {
+router.get('/user', auth, async function (req, res) {
     try {
         let campaigns = await Campaign.find({ user: req.user.id })
         res.status(200).send(campaigns)
@@ -62,8 +62,17 @@ router.post('/add', auth, (req, res) => {
  */
 router.post('/update', auth, async (req, res) => {
     try {
-        const campaign = await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, { name: req.body.name, description: req.body.description }, { useFindAndModify: false, new: true })
-        res.status(200).send(campaign)
+
+        const campaign = await Campaign.findOneAndUpdate(
+            { _id: req.body.campaign_id },
+            {
+                title: req.body.title,
+                description: req.body.description,
+                question: req.body.question,
+                details: req.body.details,
+            },
+            { useFindAndModify: false, new: true })
+        res.status(200).send(campaign);
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
@@ -80,6 +89,9 @@ router.post('/delete', auth, async (req, res) => {
         const user = await User.findOne({ _id: req.body.user })
         user.campaigns.splice(user.campaigns.indexOf(req.body._id), 1)
         await user.save();
+        const location = await Location.findOne({ _id: req.body.location })
+        location.campaigns.splice(location.campaigns.indexOf(req.body._id), 1)
+        await location.save();
         res.status(200).send(campaign._id)
     } catch (e) {
         console.error(e)

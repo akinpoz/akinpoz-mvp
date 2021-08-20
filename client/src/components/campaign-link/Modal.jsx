@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal, Icon, Message } from "semantic-ui-react";
 import { connect } from "react-redux"
-import { addCampaign } from "../../actions/campaignActions"
+import { addCampaign, updateCampaign } from "../../actions/campaignActions"
 
 
 function CampaignModal(props) {
@@ -33,7 +33,8 @@ function CampaignModal(props) {
             question: values.question,
             details: values.details,
             user: props.auth.user._id,
-            location: props.location
+            location: props.location,
+            campaign_id: props._id,
         }
 
         if (!values.title || !values.description || !values.details || !values.question) {
@@ -76,7 +77,6 @@ function CampaignModal(props) {
         setvalues({ ...values, details: { ...values.details, options } })
     }
     const title = props.action.substring(0, 1).toUpperCase() + props.action.substring(1)
-    console.log(props.details)
     return (
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
@@ -176,4 +176,4 @@ const mapStateToProps = (state) => ({
     auth: state.auth,
     campaign: state.campaign,
 })
-export default connect(mapStateToProps, { addCampaign })(CampaignModal)
+export default connect(mapStateToProps, { addCampaign, updateCampaign })(CampaignModal)

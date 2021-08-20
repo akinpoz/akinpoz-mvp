@@ -35,6 +35,13 @@ var UserSchema = new Schema({
             default: Date.now()
         }
     },
+    campaigns: {
+        type: [String],
+        date: {
+            type: Date,
+            default: Date.now()
+        }
+    },
     type: {
         type: String,
         required: true,
