@@ -36,8 +36,8 @@ var LocationSchema = new Schema({
         }
     },
     user: {
-        type: String, 
-        required: true, 
+        type: String,
+        required: true,
         date: {
             type: Date,
             default: Date.now()
@@ -47,6 +47,16 @@ var LocationSchema = new Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+    access_token: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    refresh_token: {
+        type: String,
+        required: false,
+        default: ''
     }
 })
 

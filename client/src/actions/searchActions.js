@@ -24,7 +24,7 @@ export const startSearch = (query) => (dispatch, getState) => {
 }
 
 export const updateSelection = (song) => (dispatch) => {
-    dispatch({type: UPDATE_SELECTION, selection: song, value: song.name})
+    dispatch({type: UPDATE_SELECTION, selection: song, value: song?.name})
 }
 
 export const cleanQuery = () => (dispatch) => {

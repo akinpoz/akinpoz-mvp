@@ -15,12 +15,13 @@ router.get('/', auth, async function (req, res) {
     try {
         let locations = await Location.find({ user: req.user.id })
         res.status(200).send(locations)
+
     } catch (e) {
         console.error(err)
     }
 })
 /**
- * @route POST api/locations/add 
+ * @route POST api/locations/add
  * @desc post a new location
  * @access Private
  */
@@ -54,6 +55,7 @@ router.post('/update', auth, async (req, res) => {
         res.status(500).send(e)
     }
 })
+
 /**
  * @route POST api/locations/delete
  * @desc delete a location

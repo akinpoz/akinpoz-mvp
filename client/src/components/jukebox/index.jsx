@@ -1,16 +1,18 @@
 import React from 'react';
 import styles from './jukebox.module.css'
-import {Card, Search} from "semantic-ui-react";
+import {Button, Card, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
+import {queueSong} from "../../actions/spotifyActions";
 
 function Jukebox(props) {
-
+    const location_id = '6123e1b317f94ec7c58618c4' // TODO: make real location id through url processing or by adding locaiton state
     const timeoutRef = React.useRef()
     const handleSearchChange = React.useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
         props.startSearch(data.value)
+        props.updateSelection(null)
         timeoutRef.current = setTimeout(() => {
             if (data.value.length === 0) {
                 props.cleanQuery()
@@ -53,6 +55,11 @@ function Jukebox(props) {
                             resultRenderer={resultRender}
                             onResultSelect={handleSelectionChange}
                         />
+                        <br/>
+                        <div style={{flexDirection: "row-reverse", display: "flex"}}>
+                            <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>
+                            <Button style={{marginRight: 10}} onClick={() => props.cleanQuery()}>Clear Selection</Button>
+                        </div>
                     </div>
                 </Card>
             </div>
@@ -65,7 +72,8 @@ Jukebox.propTypes = {
     auth: PropTypes.object.isRequired,
     startSearch: PropTypes.func.isRequired,
     cleanQuery: PropTypes.func.isRequired,
-    updateSelection: PropTypes.func.isRequired
+    updateSelection: PropTypes.func.isRequired,
+    queueSong: PropTypes.func.isRequired
 }
 const mapStateToProps = (state) => ({
     auth: state.auth,
@@ -73,4 +81,4 @@ const mapStateToProps = (state) => ({
     search: state.search
 })
 
-export default connect(mapStateToProps, {startSearch, cleanQuery, updateSelection})(Jukebox);
+export default connect(mapStateToProps, {startSearch, cleanQuery, updateSelection, queueSong})(Jukebox);

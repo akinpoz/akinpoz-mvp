@@ -40,7 +40,7 @@ export const register = ({ name, email, password, type }) => dispatch => {
 }
 
 // Setup config/headers and token
-export const tokenConfig = getState => {
+export const tokenConfig = (getState) => {
     const token = getState().auth.token
     // Headers
     const config = {

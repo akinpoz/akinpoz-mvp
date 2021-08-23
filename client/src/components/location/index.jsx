@@ -7,6 +7,7 @@ import Modal from './Modal'
 import { connect } from 'react-redux'
 import ShowQRCode from './show-qrcode';
 import Campaign from '../campaign-link';
+import {openAuth} from "../../actions/spotifyActions";
 
 function Location(props) {
     const { name, description, music, _id, user } = props
@@ -38,7 +39,9 @@ function Location(props) {
     function handleToggle() {
         setIsEnabled(!isEnabled)
         props.toggleMusic({ music: !isEnabled, _id })
-
+        if (!isEnabled) {
+            props.openAuth(_id)
+        }
     }
     const campaigns = []
     const url = 'http://localhost:3000/#/campaign' //TODO: make responsive with actual link to real campaign
@@ -82,7 +85,8 @@ function Location(props) {
 const mapStateToProps = (state) => ({
     auth: state.auth,
     campaign: state.campaign,
+    spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation, deleteCampaign, updateCampaign })(Location)
+export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation, deleteCampaign, updateCampaign, openAuth })(Location)
 

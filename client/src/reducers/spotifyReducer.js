@@ -5,9 +5,7 @@ import {
 } from "../actions/types";
 
 const initialState = {
-    userToken: '',
     loading: false,
-    searchResult: null
 }
 
 export default function (state = initialState, action) {
@@ -15,7 +13,6 @@ export default function (state = initialState, action) {
         case SPOTIFY_USER_AUTH:
             return {
                 ...state,
-                userToken: action.payload,
                 loading: false
             }
         case SPOTIFY_LOADING:
