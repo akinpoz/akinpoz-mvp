@@ -49,14 +49,14 @@ var LocationSchema = new Schema({
         default: false
     },
     access_token: {
-        type: String,
+        type: [String],
         required: false,
-        default: ''
+        default: []
     },
     refresh_token: {
-        type: String,
+        type: [String],
         required: false,
-        default: ''
+        default: []
     }
 })
 
