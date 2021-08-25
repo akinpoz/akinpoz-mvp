@@ -60,13 +60,12 @@ router.get('/getAuthURL', auth, async function(req, res) {
  */
 router.get('/callback', async function (req, res) {
     const authorizationCode  = req.query.code; // Read the authorization code from the query parameters
-    console.log('state: ' + req.query.state)
-
     const credentials = {
         clientId: process.env.SPOTIFY_CLIENT_ID,
         clientSecret: process.env.SPOTIFY_SECRET,
         redirectUri: redirectUri
     }
+
     let spotifyApi = new SpotifyWebApi(credentials);
     spotifyApi.authorizationCodeGrant(authorizationCode)
         .then(async (data) => {
@@ -79,12 +78,11 @@ router.get('/callback', async function (req, res) {
                     // TODO: encrypt these keys
 
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send(location)
+                res.status(200).send("<script>window.close();</script >")
             } catch (e) {
                 console.error(e)
                 res.status(500).send(e)
             }
-
         }, function(err) {
             console.log('Something went wrong when retrieving the access token!', err.message);
             res.status(500).send(err);

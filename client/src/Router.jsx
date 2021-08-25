@@ -13,11 +13,13 @@ import Analytics from "./components/analytics/analytics";
 import Jukebox from "./components/jukebox";
 import Results from "./components/results";
 import LocationCampaigns from "./components/location-campaigns";
+import Checkout from "./components/checkout";
 
 const components = {
   Home: Home,
   Profile: Profile,
-  Jukebox: Jukebox
+  Jukebox: Jukebox,
+  Checkout: Checkout
 }
 
 
@@ -62,6 +64,9 @@ function Router(props) {
         </Route>
         <Route path='/jukebox'>
           <PrivateRoute {...props} component={'Jukebox'}/>
+        </Route>
+        <Route path='/checkout'>
+          <PrivateRoute {...props} component={'Checkout'} />
         </Route>
 
         {/* DEV PATHS */}
