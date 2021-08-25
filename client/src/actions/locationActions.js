@@ -1,10 +1,11 @@
-import { GET_LOCATIONS, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC } from './types'
+import { GET_LOCATIONS, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC, SET_LOCATION } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
 
 
 export const getLocations = (user) => (dispatch, getState) => {
     dispatch(setLocationsLoading())
+    dispatch({type: SET_LOCATION, payload: ""})
     const config = {
         headers: tokenConfig(getState).headers,
         params: {user}
@@ -46,7 +47,6 @@ export const deleteLocation = (location) => (dispatch, getState) => {
 }
 export const toggleMusic = (payload) => (dispatch, getState) => {
     dispatch(setLocationsLoading())
-    console.log(payload)
     const {music, _id} = payload
     axios.post(`/api/locations/toggleMusic`, {music, _id}, tokenConfig(getState)).then(res => {
         dispatch({
@@ -54,6 +54,15 @@ export const toggleMusic = (payload) => (dispatch, getState) => {
             payload: res.data
         })
     })
+}
+
+/**
+ * @func setLocation
+ * @desc set the selecected location in the state
+ * @param {string} _id - the id of the location
+ */
+export const setLocation = _id => (dispatch) => {
+    dispatch({type: SET_LOCATION, payload: _id})
 }
 
 export const setLocationsLoading = () => {

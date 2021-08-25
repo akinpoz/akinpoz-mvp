@@ -5,7 +5,7 @@
 ## TODOS
 
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
-
+- [ ] Make sure to include all of the required env properties when deploying
 ### Drew
 
 #### Currently working on
@@ -28,11 +28,8 @@
 ### Paul
 
 #### Currently working on
-
-- [ ] Campaigns aren't loading
-- [ ] Delete campaigns when location is deleted 
+- [ ] Check if jukebox is enabled / token is not null 
 - [ ] Skip the line campaign
-- [ ] Make location id available in the jukebox page.
 	- [x] Frontend implemented
 	- [ ] connect to frontend to redux
 	- [ ] create api endpoint to remove
@@ -46,6 +43,7 @@
 - [x] Location CRUD operations
 - [x] Merged Dependencies to top level of project
 - [x] Campaign CRUD operations
+- [x] Make location id available in the jukebox page.
 
 
 ## Known bugs
@@ -59,8 +57,6 @@
       - Jukebox must be enabled and authenticated via spotify account associated with device playing music
       - The spotify client_id, client_secret and authentication_key must all be present in the .env file in server
     - What is left to do:
-      
-      - Check if jukebox is enabled / token is not null
       - Server error handling
 
   - 8/25: Began payment wall

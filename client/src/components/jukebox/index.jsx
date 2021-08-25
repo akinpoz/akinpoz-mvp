@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef, useCallback} from 'react';
 import styles from './jukebox.module.css'
 import {Button, Card, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
@@ -7,9 +7,9 @@ import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActi
 import {queueSong} from "../../actions/spotifyActions";
 
 function Jukebox(props) {
-    const location_id = '6123e1b317f94ec7c58618c4' // TODO: make real location id through url processing or by adding locaiton state
-    const timeoutRef = React.useRef()
-    const handleSearchChange = React.useCallback((e, data) => {
+    const location_id = props.location.select_location 
+    const timeoutRef = useRef()
+    const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
         props.startSearch(data.value)
         props.updateSelection(null)
@@ -19,7 +19,8 @@ function Jukebox(props) {
             }
         }, 300)
     }, [])
-    React.useEffect(() => {
+    useEffect(() => {
+        
         return () => {
             clearTimeout(timeoutRef.current)
         }
@@ -35,7 +36,6 @@ function Jukebox(props) {
             <p>{item.artist}</p>
         </div>
     )
-
     return (
         <div className={styles.container}>
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
@@ -78,7 +78,8 @@ Jukebox.propTypes = {
 const mapStateToProps = (state) => ({
     auth: state.auth,
     spotify: state.spotify,
-    search: state.search
+    search: state.search,
+    location: state.location
 })
 
 export default connect(mapStateToProps, {startSearch, cleanQuery, updateSelection, queueSong})(Jukebox);

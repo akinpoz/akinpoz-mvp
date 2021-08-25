@@ -1,8 +1,9 @@
-import { GET_LOCATIONS, ADD_LOCATION, LOCATIONS_LOADING, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC } from '../actions/types'
+import { GET_LOCATIONS, ADD_LOCATION, LOCATIONS_LOADING, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC,  SET_LOCATION } from '../actions/types'
 
 const initialState = {
     locations: [],
-    loading: false
+    loading: false,
+    select_location: ""
 }
 
 export default function (state = initialState, action) {
@@ -37,6 +38,11 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: true
+            }
+        case SET_LOCATION:
+            return {
+                ...state,
+                location: action.payload
             }
         default:
             return state

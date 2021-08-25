@@ -4,7 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 const Location = require('../../models/Location');
 const User = require('../../models/User');
-var auth = require('../../middleware/auth')
+var auth = require('../../middleware/auth');
+const Campaign = require('../../models/Campaign');
 
 /**
  * @route GET api/locations
@@ -63,11 +64,15 @@ router.post('/update', auth, async (req, res) => {
  */
 router.post('/delete', auth, async (req, res) => {
     try {
-        // TODO: delete all campaigns that have this locations ID as it's location
-        const location = await Location.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
+        const location = await Location.findOne({ _id: req.body._id })
         const user = await User.findOne({ _id: req.body.user })
         user.locations.splice(user.locations.indexOf(req.body._id), 1)
-        await user.save();
+        for (var campaign of location.campaigns) {
+            user.campaigns.splice(user.campaigns.indexOf(campaign), 1)
+        }
+        await user.save()
+        await Campaign.deleteMany({ location: req.body._id })
+        await Location.remove({ _id: req.body._id }, { useFindAndModify: false })
         res.status(200).send(location._id)
     } catch (e) {
         console.error(e)

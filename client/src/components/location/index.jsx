@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ModalAddCampaign from '../campaign-link/Modal';
 import { Button, Card, Icon, Radio } from "semantic-ui-react";
-import { updateLocation, deleteLocation, toggleMusic } from '../../actions/locationActions';
+import { updateLocation, deleteLocation, toggleMusic, setLocation } from '../../actions/locationActions';
 import { getCampaignsByLocation, deleteCampaign, updateCampaign } from '../../actions/campaignActions'
 import Modal from './Modal'
 import { connect } from 'react-redux'
@@ -12,6 +12,7 @@ import {openAuth} from "../../actions/spotifyActions";
 function Location(props) {
     const { name, description, music, _id, user } = props
     const [isEnabled, setIsEnabled] = useState(music)
+    console.log(music)
     const UpdateTrigger = <div><i className="pencil alternate icon" style={{ marginRight: 10 }} /></div>
     const AddTrigger = <a style={{
         display: 'flex',
@@ -34,7 +35,7 @@ function Location(props) {
             _id,
             user,
         }
-        if (window.confirm('Are you sure you want to delete this location?')) props.deleteLocation(location)
+        if (window.confirm('Are you sure you want to delete this location? \nThis action will also delete all campaigns associated with this location. This action is not reversable.')) props.deleteLocation(location)
     }
     function handleToggle() {
         setIsEnabled(!isEnabled)
@@ -43,8 +44,12 @@ function Location(props) {
             props.openAuth(_id)
         }
     }
-    const campaigns = []
-    const url = 'http://localhost:3000/#/campaign' //TODO: make responsive with actual link to real campaign
+    function handleClick() {
+        props.setLocation(_id)
+    }
+    const campaigns = props.campaign.campaigns
+    //TODO: make responsive with actual link to real campaign
+    const url = 'http://localhost:3000/#/campaign' 
     return (
         <div style ={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
             <Card style={{ marginBottom: 20, width: '90%', padding: 20 }}>
@@ -60,7 +65,7 @@ function Location(props) {
                 <p>{description}</p>
                 <div style={{ marginLeft: 20 }}>
                     <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center", gap: "10%" }}>
-                        <Button icon basic color={!isEnabled ? "grey" : "blue"} disabled={!isEnabled} href='/#/jukebox' style={{ marginBottom: 5, border: "none !important" }}><Icon name="music" /> Jukebox</Button>
+                        <Button icon basic color={!isEnabled ? "grey" : "blue"} disabled={!isEnabled} href='/#/jukebox' style={{ marginBottom: 5, border: "none !important" }} onClick={handleClick}><Icon name="music" /> Jukebox</Button>
                         <div style={{ height: 30 }}>
                             <Radio toggle checked={isEnabled} onChange={handleToggle} />
                         </div>
@@ -88,5 +93,5 @@ const mapStateToProps = (state) => ({
     spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation, deleteCampaign, updateCampaign, openAuth })(Location)
+export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation, deleteCampaign, updateCampaign, openAuth, setLocation })(Location)
 
