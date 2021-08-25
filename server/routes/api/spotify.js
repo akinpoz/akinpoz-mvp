@@ -71,12 +71,8 @@ router.get('/callback', async function (req, res) {
         .then(async (data) => {
             try {
                 const location = await Location.findOneAndUpdate({_id: req.query.state}, {
-
-                    // TODO: encrypt these keys
                     access_token: encrypt(data.body['access_token']),
                     refresh_token: encrypt(data.body['refresh_token'])
-                    // TODO: encrypt these keys
-
                 }, {useFindAndModify: false, new: true})
                 res.status(200).send("<script>window.close();</script >")
             } catch (e) {

@@ -63,6 +63,7 @@ router.post('/update', auth, async (req, res) => {
  */
 router.post('/delete', auth, async (req, res) => {
     try {
+        // TODO: delete all campaigns that have this locations ID as it's location
         const location = await Location.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
         const user = await User.findOne({ _id: req.body.user })
         user.locations.splice(user.locations.indexOf(req.body._id), 1)
