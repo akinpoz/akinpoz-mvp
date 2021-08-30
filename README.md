@@ -1,20 +1,21 @@
 # akinpoz-mvp
 
-  
-
 ## TODOS
+- [ ] Update logo/fonts/design
+- [ ] Profile page
+- [ ] Decide how to implement the naming a menu item after yourself feature
 - [ ] Make the home link the Akopoz logo and get rid of the home nav tag
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
 - [ ] Make sure to include all of the required env properties when deploying
+
 ### Drew
 
 #### Currently working on
-
-    - [ ] Payment wall
-        - [ ] frontend implemented
-        - [ ] design history management - CRUD
-        - [ ] connect history to redux (front / back)
-        - [ ] add to jukebox, raffle and survey
+- [ ] Payment wall
+    - [ ] frontend implemented
+    - [ ] design history management - CRUD
+    - [ ] connect history to redux (front / back)
+    - [ ] add to jukebox, raffle and survey
 
 #### Completed (Summary of work)
 
@@ -39,6 +40,8 @@
 
 #### Completed (Summary of work)
 
+##### Tentative Change Log
+
 - [x] Authentication
 - [x] Location CRUD operations
 - [x] Merged Dependencies to top level of project
@@ -50,14 +53,10 @@
 - [ ] JWT token expires too quickly and makes actions like add fail. When those actions fail, they crash the site. Either extend the token to infinite or handle the 400 user not found error and redirect to the login for all actions. 
 
 ## Change Log
-
-  - 8/23: Added Spotify integration
-    - How to use:
-      - Spotify account must be active (playing music from intended device)
-      - Jukebox must be enabled and authenticated via spotify account associated with device playing music
-      - The spotify client_id, client_secret and authentication_key must all be present in the .env file in server
-    - What is left to do:
-      - Server error handling
+  - 8/30
+    - What to expect: 
+        - Location ID 500 server bug fix
+        - README updates: merged considerations, updated todos
 
   - 8/25: Began payment wall
     - What to expect:
@@ -67,9 +66,18 @@
       - connect history to redux (front / back)
       - add to jukebox, raffle and survey
 
-## Considerations
+  - 8/23: Added Spotify integration
+    - How to use:
+      - Spotify account must be active (playing music from intended device)
+      - Jukebox must be enabled and authenticated via spotify account associated with device playing music
+      - The spotify client_id, client_secret and authentication_key must all be present in the .env file in server
+    - What is left to do:
+      - Server error handling
 
- - [ ] Restructuring objects like campaign and location. Should there be parent objects called locations/campaigns that then render each campain rather than have the location object get the campaigns then render them one by one. Really, this would be a file strucutre change to look like
+
+
+## Considerations
+ 
 ```
 Client
 │   node_modules
