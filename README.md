@@ -3,7 +3,7 @@
   
 
 ## TODOS
-
+- [ ] Make the home link the Akopoz logo and get rid of the home nav tag
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
 - [ ] Make sure to include all of the required env properties when deploying
 ### Drew

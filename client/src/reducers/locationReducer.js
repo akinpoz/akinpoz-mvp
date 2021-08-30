@@ -42,7 +42,7 @@ export default function (state = initialState, action) {
         case SET_LOCATION:
             return {
                 ...state,
-                location: action.payload
+                select_location: action.payload
             }
         default:
             return state
