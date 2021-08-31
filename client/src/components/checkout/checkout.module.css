@@ -4,5 +4,39 @@
     flex: 1;
     justify-content: center;
     align-items: center;
-    padding: 20px
+    padding: 20px;
+}
+
+.divider {
+    height: 1px;
+    width: 100%;
+    background-color: slategray;
+}
+
+.itemContainer {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttonGroupContainer {
+    display: flex;
+    justify-content: space-around;
+}
+
+.smallInputContainer {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    flex-grow: 2;
+    justify-content: space-evenly;
+}
+
+.cardFormButtonsContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }

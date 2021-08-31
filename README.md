@@ -12,7 +12,7 @@
 
 #### Currently working on
 - [ ] Payment wall
-    - [ ] frontend implemented
+    - [x] frontend implemented
     - [ ] design history management - CRUD
     - [ ] connect history to redux (front / back)
     - [ ] add to jukebox, raffle and survey
@@ -53,6 +53,12 @@
 - [ ] JWT token expires too quickly and makes actions like add fail. When those actions fail, they crash the site. Either extend the token to infinite or handle the 400 user not found error and redirect to the login for all actions. 
 
 ## Change Log
+  - 8/31
+    - What to expect:
+      - Payment Wall UI completed
+    - Left to do:
+      - Connect to backend and incorporate redux actions
+      - Incorporate Stripe
   - 8/30
     - What to expect: 
         - Location ID 500 server bug fix
