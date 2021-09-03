@@ -69,15 +69,12 @@ function Jukebox(props) {
 }
 
 Jukebox.propTypes = {
-    auth: PropTypes.object.isRequired,
     startSearch: PropTypes.func.isRequired,
     cleanQuery: PropTypes.func.isRequired,
     updateSelection: PropTypes.func.isRequired,
     queueSong: PropTypes.func.isRequired
 }
 const mapStateToProps = (state) => ({
-    auth: state.auth,
-    spotify: state.spotify,
     search: state.search,
     location: state.location
 })

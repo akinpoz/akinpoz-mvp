@@ -1,36 +1,23 @@
-import { GET_CAMPAIGNS_BY_LOCATION, GET_CAMPAIGNS_BY_USER, CAMPAIGNS_LOADING, ADD_CAMPAIGN, UPDATE_CAMPAIGN, DELETE_CAMPAIGN } from './types'
+import { GET_CAMPAIGNS, CAMPAIGNS_LOADING, ADD_CAMPAIGN, UPDATE_CAMPAIGN, DELETE_CAMPAIGN } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
 
 
-export const getCampaignsByLocation = (location_id) => (dispatch, getState) => {
-    dispatch(setCampaignsLoading())
-    const config = {
-        headers: tokenConfig(getState).headers,
-        params: {location_id}
-    }
-    axios.get('/api/campaigns/location', config).then(res => {
-        dispatch({
-            type: GET_CAMPAIGNS_BY_LOCATION,
-            payload: res.data
-        })
-    })
-}
-export const getCampaignsByUser = (user) => (dispatch, getState) => {
+
+export const getCampaigns = (user) => (dispatch, getState) => {
     dispatch(setCampaignsLoading())
     const config = {
         headers: tokenConfig(getState).headers,
         params: {user}
     }
-    axios.get('/api/campaigns/user', config).then(res => {
+    axios.get('/api/campaigns/', config).then(res => {
         dispatch({
-            type: GET_CAMPAIGNS_BY_USER,
+            type: GET_CAMPAIGNS,
             payload: res.data
         })
     })
 }
 export const addCampaign = (campaign) => (dispatch, getState) => {
-    console.log(campaign)
     dispatch(setCampaignsLoading())
     axios.post('/api/campaigns/add', campaign, tokenConfig(getState)).then(res => {
         dispatch({
@@ -50,7 +37,6 @@ export const updateCampaign = (campaign) => (dispatch, getState) => {
 }
 export const deleteCampaign = (campaign) => (dispatch, getState) => {
     dispatch(setCampaignsLoading())
-    console.log(campaign)
     axios.post(`/api/campaigns/delete`, campaign, tokenConfig(getState)).then(res => {
         dispatch({
             type: DELETE_CAMPAIGN,

@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Icon, Modal} from "semantic-ui-react";
-import styles from "./location.module.css";
+import styles from "./locations.module.css";
 import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 

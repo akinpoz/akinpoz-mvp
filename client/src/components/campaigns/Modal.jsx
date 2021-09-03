@@ -6,8 +6,8 @@ import { addCampaign, updateCampaign } from "../../actions/campaignActions"
 
 function CampaignModal(props) {
     const [open, setOpen] = useState(false);
-    const [msg, setmsg] = useState();
-    const [values, setvalues] = useState(
+    const [msg, setMsg] = useState();
+    const [values, setValues] = useState(
         {
             title: props.title || "",
             description: props.description || "",
@@ -15,7 +15,7 @@ function CampaignModal(props) {
             details: props.details || { type: "Survey", options: [""] },
         });
     useEffect(() => {
-        setvalues(
+        setValues(
             {
                 title: props.title || "",
                 description: props.description || "",
@@ -38,7 +38,7 @@ function CampaignModal(props) {
         }
 
         if (!values.title || !values.description || !values.details || !values.question) {
-            setmsg("Please fill in all required fields and verify you have at least two options");
+            setMsg("Please fill in all required fields and verify you have at least two options");
         }
         else {
             props[`${props.action}Campaign`](campaignDetails);
@@ -46,11 +46,10 @@ function CampaignModal(props) {
         }
     }
     function handleChange(e) {
-        console.log(e.target.name);
-        setvalues({ ...values, [e.target.name]: e.target.value });
+        setValues({ ...values, [e.target.name]: e.target.value });
     }
     function clear() {
-        setvalues({ ...values, title: "", description: "", details: { type: "Survey" } });
+        setValues({ ...values, title: "", description: "", details: { type: "Survey" } });
     }
     function close() {
         setOpen(false);
@@ -59,22 +58,22 @@ function CampaignModal(props) {
     function handleClick(e) {
         var details = values.details
         details.type = e.target.innerHTML
-        setvalues({ ...values, question: "", details })
+        setValues({ ...values, question: "", details })
     }
     function handleOptionChange(data, index) {
         var options = values.details.options
         options[index] = data.value
-        setvalues({ ...values, details: { ...values.details, options } })
+        setValues({ ...values, details: { ...values.details, options } })
     }
     function handleOptionAdd() {
         var options = values.details.options
         options.push("")
-        setvalues({ ...values, details: { ...values.details, options } })
+        setValues({ ...values, details: { ...values.details, options } })
     }
     function handleOptionRemove(index) {
         var options = values.details.options
         options.splice(index, 1)
-        setvalues({ ...values, details: { ...values.details, options } })
+        setValues({ ...values, details: { ...values.details, options } })
     }
     const title = props.action?.substring(0, 1).toUpperCase() + props.action?.substring(1)
     return (

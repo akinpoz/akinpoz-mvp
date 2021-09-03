@@ -6,7 +6,6 @@ import { clearErrors } from '../../actions/errorActions'
 import history from '../../history'
 import styles from './Auth.module.css'
 import { Form, Message } from 'semantic-ui-react'
-import logo from '../../images/akinpoz-logo.png'
 
 
 

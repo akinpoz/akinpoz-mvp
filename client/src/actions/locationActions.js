@@ -37,7 +37,6 @@ export const updateLocation = (location) => (dispatch, getState) => {
 }
 export const deleteLocation = (location) => (dispatch, getState) => {
     dispatch(setLocationsLoading())
-    console.log(location)
     axios.post(`/api/locations/delete`, location, tokenConfig(getState)).then(res => {
         dispatch({
             type: DELETE_LOCATION,

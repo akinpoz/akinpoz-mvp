@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Card, Icon } from 'semantic-ui-react'
 import Modal from './Modal'
-import styles from './campaign.module.css'
+import styles from './campaigns.module.css'
 import { connect } from 'react-redux'
 import { deleteCampaign } from '../../actions/campaignActions'
 
 
-function CampaignLink(props) {
-    const { title, description, details, _id, user, location } = props
+function BusinessCampaign(props) {
+    const { title, description, details, _id, user, location } = props.campaign
     const [toggleList, setToggleList] = useState(false)
     function handleDelete() {
         const campaign = {
@@ -33,7 +33,7 @@ function CampaignLink(props) {
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
                 {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={handleClick}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
-                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} /></abbr>
+                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} {...props.campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
             {toggleList &&
@@ -73,8 +73,7 @@ function CampaignLink(props) {
 }
 
 const mapStateToProps = (state) => ({
-    auth: state.auth,
-    campaign: state.campaign,
+    auth: state.auth
 })
 
-export default connect(mapStateToProps, { deleteCampaign })(CampaignLink)
+export default connect(mapStateToProps, { deleteCampaign })(BusinessCampaign)

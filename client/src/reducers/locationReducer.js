@@ -17,7 +17,7 @@ export default function (state = initialState, action) {
         case ADD_LOCATION:
             return {
                 ...state, 
-                locations: [action.payload, ...state.locations]
+                locations: [...state.locations, action.payload]
             }
         case UPDATE_LOCATION:
             return {

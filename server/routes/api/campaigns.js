@@ -7,32 +7,23 @@ const User = require('../../models/User');
 const Campaign = require('../../models/Campaign');
 var auth = require('../../middleware/auth')
 
+
 /**
- * @route GET api/campaigns/location
- * @desc get all campaigns by location ID
+ * @route GET api/campaigns/
+ * @desc get all campaigns by user ID
  * @access Private
  */
-router.get('/location', auth, async function (req, res) {
+router.get('/', auth, async function (req, res) {
     try {
-        let campaigns = await Campaign.find({ location: req.query.location_id })
+        let campaigns = await Campaign.find({ user: req.query.user }) // O(1)
+
         res.status(200).send(campaigns)
     } catch (e) {
         console.error(e)
     }
 })
-/**
- * @route GET api/campaigns/campaigns
- * @desc get all campaigns by userID
- * @access Private
- */
-router.get('/user', auth, async function (req, res) {
-    try {
-        let campaigns = await Campaign.find({ user: req.user.id })
-        res.status(200).send(campaigns)
-    } catch (e) {
-        console.error(err)
-    }
-})
+
+
 /**
  * @route POST api/campaigns/add 
  * @desc post a new campaign
@@ -40,7 +31,6 @@ router.get('/user', auth, async function (req, res) {
  */
 router.post('/add', auth, (req, res) => {
     try {
-        console.log(req.body)
         var newCampaign = new Campaign(req.body);
         newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);

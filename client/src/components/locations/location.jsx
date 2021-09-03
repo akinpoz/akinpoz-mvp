@@ -1,41 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import ModalAddCampaign from '../campaign-link/Modal';
 import { Button, Card, Icon, Radio } from "semantic-ui-react";
 import { updateLocation, deleteLocation, toggleMusic, setLocation } from '../../actions/locationActions';
-import { getCampaignsByLocation, deleteCampaign, updateCampaign } from '../../actions/campaignActions'
+import { deleteCampaign, updateCampaign } from '../../actions/campaignActions'
 import Modal from './Modal'
 import { connect } from 'react-redux'
 import ShowQRCode from './show-qrcode';
-import Campaign from '../campaign-link';
+import Campaigns from '../campaigns';
 import {openAuth} from "../../actions/spotifyActions";
 
 function Location(props) {
-    const { name, description, music, _id, user } = props
+    const { name, description, music, _id, user } = props.location
     const [isEnabled, setIsEnabled] = useState(music)
-    console.log(music)
     const UpdateTrigger = <div><i className="pencil alternate icon" style={{ marginRight: 10 }} /></div>
-    const AddTrigger = <a style={{
-        display: 'flex',
-        flexDirection: 'row',
-        cursor: 'pointer',
-        color: '#4183c4',
-        fontWeight: 'bold'
-    }}
-        icon
-        labelPosition='right'
-        color='white'>
-        <i className='add icon' />
-        Add Campaign
-    </a>
-    useEffect(() => {
-        props.getCampaignsByLocation(_id)
-    }, [])
     function handleDelete() {
         const location = {
             _id,
             user,
         }
-        if (window.confirm('Are you sure you want to delete this location? \nThis action will also delete all campaigns associated with this location. This action is not reversable.')) props.deleteLocation(location)
+        if (window.confirm('Are you sure you want to delete this location? \nThis action will also delete all campaigns associated with this location. This action is not reversible.')) props.deleteLocation(location)
     }
     function handleToggle() {
         setIsEnabled(!isEnabled)
@@ -47,9 +29,8 @@ function Location(props) {
     function handleClick() {
         props.setLocation(_id)
     }
-    const campaigns = props.campaign.campaigns
-    //TODO: make responsive with actual link to real campaign
-    const url = 'http://localhost:3000/#/campaign' 
+    //TODO: make responsive with actual link to real campaign ?? QR codes are for locations, not campaigns. The URL should be the landing page for the user-location with parameter specific to the location.
+    const url = 'https://apokoz.com/user-location/?Params' 
     return (
         <div style ={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
             <Card style={{ marginBottom: 20, width: '90%', padding: 20 }}>
@@ -57,7 +38,7 @@ function Location(props) {
                     <h2 style={{ marginRight: 20, marginBottom: 0, marginTop: 0 }}>{name}</h2>
                     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                         <ShowQRCode url={url} />
-                        <Modal action={"update"} trigger={UpdateTrigger} {...props} />
+                        <Modal action={"update"} trigger={UpdateTrigger} {...props} {...props.location} />
                         <i className='red trash icon' onClick={handleDelete} />
                     </div>
 
@@ -70,17 +51,7 @@ function Location(props) {
                             <Radio toggle checked={isEnabled} onChange={handleToggle} />
                         </div>
                     </div>
-                    {campaigns.map(campaign => {
-                        return (
-                            <Campaign key={campaign._id} {...campaign} />
-                        )
-                    })}
-                    {campaigns.length === 0 &&
-                        <div style={{ display: 'grid', placeItems: 'center' }}>
-                            <h4>No Campaigns added yet, click "Add Campaign" to create your first Campaign!</h4>
-                        </div>
-                    }
-                    <ModalAddCampaign action={"add"} location={_id} trigger={AddTrigger} />
+                    <Campaigns location_id={_id} {...props}/>
                 </div>
             </Card>
         </div>
@@ -93,5 +64,5 @@ const mapStateToProps = (state) => ({
     spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, getCampaignsByLocation, deleteCampaign, updateCampaign, openAuth, setLocation })(Location)
+export default connect(mapStateToProps, { updateLocation, deleteLocation, toggleMusic, deleteCampaign, updateCampaign, openAuth, setLocation })(Location)
 

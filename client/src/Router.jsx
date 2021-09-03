@@ -2,17 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
-// import Home from './dev-components/alt-home'
+import { Loader } from 'semantic-ui-react'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import Profile from './components/profile'
-import Campaign from "./components/campaign";
-import OwnerProfile from "./dev-components/owner-profile/owner-profile";
-import Home from "./components/home";
+import Home from "./components/homes";
 import Analytics from "./components/analytics/analytics";
 import Jukebox from "./components/jukebox";
 import Results from "./components/results";
-import LocationCampaigns from "./components/location-campaigns";
 import Checkout from "./components/checkout";
 
 const components = {
@@ -39,50 +36,20 @@ function Router(props) {
         <Route exact path='/profile'>
           <PrivateRoute {...props} component={`Profile`} />
         </Route>
-
-        {/* DEV PATHS */}
-        <Route path='/campaign'>
-          <Campaign />
-        </Route>
-        <Route path='/location-campaigns'>
-          <LocationCampaigns />
-        </Route>
-        <Route path='/owner-profile'>
-          <OwnerProfile />
-        </Route>
-        <Route path='/analytics'>
-          <Analytics />
-        </Route>
         <Route path='/results'>
           <Results />
         </Route>
-
-        {/* DEV PATHS */}
-
         <Route path='/analytics'>
           <Analytics />
         </Route>
         <Route path='/jukebox'>
-          <PrivateRoute {...props} component={'Jukebox'}/>
+          <PrivateRoute {...props} component={'Jukebox'} />
         </Route>
         <Route path='/checkout'>
           <PrivateRoute {...props} component={'Checkout'} />
         </Route>
-
-        {/* DEV PATHS */}
-
         <Route path="*" component={PageNotFound} />
       </Switch>
-
-
-          <Route path='/campaigns-crud'>
-            <Home />
-          </Route>
-          <Route path='/analytics'>
-            <Analytics />
-          </Route>
-          {/* DEV PATHS */}
-
     </HashRouter>
   )
 }
@@ -95,15 +62,22 @@ const PageNotFound = () => {
 }
 
 const PrivateRoute = (props) => {
-  if (props.auth.isAuthenticated) {
+  if (props.auth.isAuthenticated === false && props.auth.isLoading === false) {
+    return (
+      <Redirect to="/login" />
+    )
+  }
+  else if (props.auth.isAuthenticated && props.auth.isLoading === false) {
     var Component = components[props.component]
     return (
       <Component />
     )
   }
-  else {
+  else if (props.auth.isLoading === true || props.auth.isAuthenticated === null) {
     return (
-      <Redirect to="/login" />
+      <div style={{display: 'grid', placeItems: 'center'}}>
+        <Loader active />
+      </div>
     )
   }
 

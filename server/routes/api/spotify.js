@@ -70,7 +70,7 @@ router.get('/callback', async function (req, res) {
     spotifyApi.authorizationCodeGrant(authorizationCode)
         .then(async (data) => {
             try {
-                const location = await Location.findOneAndUpdate({_id: req.query.state}, {
+                await Location.findOneAndUpdate({_id: req.query.state}, {
                     access_token: encrypt(data.body['access_token']),
                     refresh_token: encrypt(data.body['refresh_token'])
                 }, {useFindAndModify: false, new: true})
@@ -80,7 +80,7 @@ router.get('/callback', async function (req, res) {
                 res.status(500).send(e)
             }
         }, function(err) {
-            console.log('Something went wrong when retrieving the access token!', err.message);
+            console.error('Something went wrong when retrieving the access token!', err.message);
             res.status(500).send(err);
         });
 })

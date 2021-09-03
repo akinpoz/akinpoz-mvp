@@ -1,48 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Icon, Message, Modal } from "semantic-ui-react";
-import styles from './location.module.css'
+import styles from './locations.module.css'
 import { connect } from 'react-redux'
 
 function LocationModal(props) {
+    const {name, description, _id} = props
     const [open, setOpen] = useState(false);
-    const [values, setvalues] = useState({ name: props.name || "", description: props.description || ""});
-    // const [image, setImage] = useState();
-    // const [imageData, setImageData] = useState();
+    const [values, setValues] = useState({ name: name || "", description: description || "" });
     const [msg, setmsg] = useState();
     useEffect(() => {
-        setvalues({ ...values, name: props.name, description: props.description});
+        setValues({ ...values, name: name, description: description });
     }, [open]);
     function submit(e) {
         e.preventDefault();
-        //Location ID will be null if new location but has value if updating
         const locationDetails = {
             name: values.name,
             description: values.description,
             user: props.auth.user._id,
-            location_id: props._id
+            location_id: _id
         }
         if (values.name) {
             props[`${props.action}Location`](locationDetails)
             close()
         }
     }
-    // const handleUpload = (e) => {
-    //     var fileName = e.target.files[0].name
-    //     var extFile = fileName.split(".")[1]
-    //     if (extFile == "jpg" || extFile == "jpeg" || extFile == "png" || extFile === 'PNG') {
-    //         var file = e.target.files[0]
-    //         setImageData(URL.createObjectURL(file))
-    //         setImage(file)
-    //     } else {
-    //         setmsg("Failed: Only jpg, jpeg, png, or PNG files are allowed!");
-    //     }
-
-    // }
     function handleChange(e) {
-        setvalues({ ...values, [e.target.name]: e.target.value });
+        setValues({ ...values, [e.target.name]: e.target.value });
     }
     function clear() {
-        setvalues({ ...values, name: "", description: "" });
+        setValues({ ...values, name: "", description: "" });
     }
     function close() {
         setOpen(false);
@@ -54,7 +40,7 @@ function LocationModal(props) {
             onOpen={() => setOpen(true)}
             open={open}
             trigger={
-               props.trigger
+                props.trigger
             }>
             <Modal.Header>{title} Location</Modal.Header>
             <Modal.Content>
@@ -85,8 +71,7 @@ function LocationModal(props) {
 }
 
 const mapStateToProps = (state) => ({
-    auth: state.auth,
-    location: state.location
+    auth: state.auth
 })
 
 export default connect(mapStateToProps, null)(LocationModal)

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import globalStyles from '../../assets/global-styles/bootstrap.min.module.css'
+import styles from './Navbar.module.css'
 import cx from 'classnames'
-import logo from '../../images/akinpoz-logo.png'
+import logo from '../../assets/images/logo.png'
 import Logout from '../auth/Logout'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Button, Icon, Radio } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
 import { Fragment } from 'react'
+
 
 function MyNavbar(props) {
     const [isLoggedIn, setIsLoggedIn] = useState(props.auth.isAuthenticated)
@@ -19,8 +20,8 @@ function MyNavbar(props) {
         setIsLoggedIn(props.auth.isAuthenticated)
     }, [props])
     return (
-        <nav className={cx(globalStyles.navbar, globalStyles["navbar-expand-lg"], globalStyles["navbar-dark"], globalStyles["bg-dark"])} collapseOnSelect expand="lg" bg="dark" variant="dark">
-            <a href="#" className={cx(globalStyles["navbar-brand"])}>
+        <nav className={cx(globalStyles.navbar, globalStyles["navbar-expand-lg"], globalStyles["navbar-dark"], styles.background)} collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <a href="/#/" className={cx(globalStyles["navbar-brand"])}>
                 <img
                     alt=""
                     src={logo}
@@ -33,18 +34,17 @@ function MyNavbar(props) {
             <button onClick={toggleHamburger} aria-controls="responsive-navbar-nav" type="button" aria-label="Toggle navigation" className={cx(globalStyles["navbar-toggler"], globalStyles.collapsed)}><span className={cx(globalStyles["navbar-toggler-icon"])}></span></button>
             <div className={toggle ? cx(globalStyles["navbar-collapse"], globalStyles.collapse) : cx(globalStyles["navbar-collapse"], globalStyles.collapse, globalStyles.show)} id="responsive-navbar-nav">
                 <div className={cx(globalStyles["mr-auto"], globalStyles["navbar-nav"])}>
-                    {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>Home</a>}
+                    {/* {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>Home</a>} */}
                 </div>
                 <div className={cx(globalStyles["navbar-nav"])}>
-                    {isLoggedIn && <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])} style={{lineHeight: "25px"}}>{toggle ?  <Icon name='user' size="large" /> : <span>Profile</span>}
+                    {isLoggedIn && <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])} style={{lineHeight: "25px"}}>{toggle ?  <Icon name='user' size="large" className={styles.profile_icon}/> : <span>Profile</span>}
                     </a>}
                     {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>
                         <Logout onClick={() => { setIsLoggedIn(false) }} />
                     </a>}
                     {!isLoggedIn && <a href="/#/login" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>
-                        <Fragment><Button size="tiny">Login</Button></Fragment>
+                        <Fragment><Button className={styles.login_logout_button} size="tiny">Login</Button></Fragment>
                     </a>}
-                    {/* <div className={styles.navLink}><span style={{ color: "white" }}>Light 🌞</span> <Radio slider checked={props.theme === "App-light" ? false : true} onChange={props.changeTheme} /> <span>Dark 🌚 </span></div> */}
                 </div>
             </div>
         </nav>

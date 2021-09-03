@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { logout } from '../../actions/authActions'
 import PropTypes from 'prop-types'
 import { Button } from 'semantic-ui-react'
+import styles from '../navbar/Navbar.module.css'
 
 function Logout(props) {
     const propTypes = {
@@ -10,7 +11,7 @@ function Logout(props) {
     }
     return (
         <Fragment>
-            <Button size="mini" onClick={props.logout}>Logout</Button>
+            <Button size="mini" className={styles.login_logout_button} onClick={props.logout}>Logout</Button>
         </Fragment>
     )
 }

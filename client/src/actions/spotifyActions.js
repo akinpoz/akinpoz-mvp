@@ -21,7 +21,7 @@ export const queueSong = (location, songUri) => (dispatch, getState) => {
             dispatch({type: SPOTIFY_QUEUE_SONG})
         }
         else {
-            console.log('failed: ' + res.status)
+            console.error('failed: ' + res.status)
         }
     })
 }

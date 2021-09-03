@@ -3,6 +3,8 @@ import { Provider } from 'react-redux'
 import store from './store'
 import { loadUser } from './actions/authActions'
 import './global.css'
+import 'semantic-ui-css/semantic.min.css'
+
 
 import NavBar from './components/navbar/Navbar'
 import Router from './Router'
@@ -10,31 +12,19 @@ import Router from './Router'
 
 class App extends Component {
   constructor(props) {
-    super(props);
-    this.state = {
-      theme: localStorage.getItem("theme")
-    }
-
+    super(props)
   }
-
   componentDidMount() {
     store.dispatch(loadUser())
   }
-  changeTheme = () => {
-    this.setState({
-      theme: this.state.theme === "App-dark" ? "App-light" : "App-dark"
-    })
-    localStorage.setItem("theme", this.state.theme === "App-dark" ? "App-light" : "App-dark")
-  }
+
   render() {
     return (
       <Provider store={store}>
-        <div style={{display: "flex", flex: 1, flexDirection: "column", height: '100%'}}>
-          <NavBar changeTheme={this.changeTheme} theme={this.state.theme} />
-          <div className={'App-light'}> {/* TODO: Hard coded to light for dev purposes */}
-            {/* Create Routing Component and connect it to redux state... then use props.isLoading/isAuthenticating to build private routes */}
-            <Router />
-          </div>
+        <div style={{ display: "flex", flex: 1, flexDirection: "column", height: '100%' }} id="app-container">
+          <NavBar />
+
+          <Router />
         </div>
       </Provider>
     )

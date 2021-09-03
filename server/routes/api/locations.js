@@ -7,6 +7,7 @@ const User = require('../../models/User');
 var auth = require('../../middleware/auth');
 const Campaign = require('../../models/Campaign');
 
+
 /**
  * @route GET api/locations
  * @desc get all locations by userID

@@ -1,4 +1,4 @@
-import { GET_CAMPAIGNS_BY_LOCATION, GET_CAMPAIGNS_BY_USER, ADD_CAMPAIGN, CAMPAIGNS_LOADING, UPDATE_CAMPAIGN, DELETE_CAMPAIGN } from '../actions/types'
+import { GET_CAMPAIGNS, ADD_CAMPAIGN, CAMPAIGNS_LOADING, UPDATE_CAMPAIGN, DELETE_CAMPAIGN } from '../actions/types'
 
 const initialState = {
     campaigns: [],
@@ -7,13 +7,7 @@ const initialState = {
 
 export default function (state = initialState, action) {
     switch (action.type) {
-        case GET_CAMPAIGNS_BY_LOCATION:
-            return {
-                ...state,
-                campaigns: action.payload,
-                loading: false
-            }
-        case GET_CAMPAIGNS_BY_USER:
+        case GET_CAMPAIGNS:
             return {
                 ...state,
                 campaigns: action.payload,
