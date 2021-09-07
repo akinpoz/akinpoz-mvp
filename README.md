@@ -58,6 +58,15 @@
 
 ## Change Log
 
+- 9/7
+  - What to expect:
+    - Began adding stripe to backend, create payment intent method added -- must be requested and passed back to front end.
+    - New env variables -- stripe publishable key, stripe secret key, stripe webhook secret
+      - webhook secret generated from stripe cli -- for local testing
+  - TODO: 
+    - Add error handling and payment verification via webhooks.
+    - Set up endpoint action middleware
+
 - 9/6
   - What to expect:
     - Added Stripe to package.json (run yarn install)

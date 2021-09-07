@@ -38,6 +38,7 @@ app.use('/api/auth', require('./routes/api/auth'))
 app.use('/api/locations', require('./routes/api/locations'))
 app.use('/api/spotify', require('./routes/api/spotify'))
 app.use('/api/campaigns', require('./routes/api/campaigns'))
+app.use('/api/stripe', require('./routes/api/stripe'))
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
