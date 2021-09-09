@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser')
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -11,16 +12,15 @@ router.get('/config', (req, res) => {
 });
 
 router.post('/create-payment-intent', async function (req, res) {
-    const {paymentMethodType, currency, amount} = req.body;
-
+    const {paymentMethodType, currency, amount, transactionID} = req.body;
     try {
         const paymentIntent =  await stripe.paymentIntents.create({
             payment_method_types: [paymentMethodType],
-            amount: amount,
-            currency: currency
+            amount: Math.floor(amount * 100),
+            currency: currency,
+            statement_descriptor: 'Apokoz',
         })
-        console.log({clientSecret: paymentIntent.client_secret})
-        res.send({clientSecret: paymentIntent.client_secret})
+        res.send({clientSecret: paymentIntent.client_secret, transactionID: transactionID})
     } catch (e) {
         console.log(e.message)
         return res.status(400).send({
@@ -31,7 +31,7 @@ router.post('/create-payment-intent', async function (req, res) {
     }
 })
 
-router.post('/webhook', async (req, res) => {
+router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
     let data, eventType;
 
     // Check if webhook signing is configured.
@@ -41,12 +41,12 @@ router.post('/webhook', async (req, res) => {
         let signature = req.headers['stripe-signature'];
         try {
             event = stripe.webhooks.constructEvent(
-                req.rawBody,
+                req.body,
                 signature,
                 process.env.STRIPE_WEBHOOK_SECRET
             );
         } catch (err) {
-            console.log(`⚠️  Webhook signature verification failed.`);
+            console.log(`⚠️  Webhook signature verification failed. ` + err.message);
             return res.sendStatus(400);
         }
         data = event.data;
@@ -65,6 +65,11 @@ router.post('/webhook', async (req, res) => {
         console.log('💰 Payment captured!');
     } else if (eventType === 'payment_intent.payment_failed') {
         console.log('❌ Payment failed.');
+    } else if (eventType === 'payment_method.attached') {
+        console.log('Payment Method Attached')
+    }
+    else {
+        console.log('Unhandled event type: ' + eventType)
     }
     res.sendStatus(200);
 });

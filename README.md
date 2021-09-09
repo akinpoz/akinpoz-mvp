@@ -58,6 +58,34 @@
 
 ## Change Log
 
+- 9/9
+  - What to expect:
+    - Integrated card and google pay support to front end
+    - Needs HTTPS connection for Google Pay support
+      - Either use 'yarn https' to deploy to https on port 3000
+      - Or tunnel using 'ngrok http 3000 --host-header=rewrite' to create a dedicated domain using https (needed for apple pay)
+  - TODO:
+    - Process Success/Error responses from server and client
+      - Need to redirect users after successful payment
+      - Need to show error message and create new payment request + intent (or reset if we want to reuse it)
+      - Clear redux when appropriate
+    - The app generally does not work for safari authActions fails because the error 'e.response' is null and 'e.response.data' fails on line 13
+    - Need safari to work to test apple pay -- otherwise should work
+      - In order to test apple pay use ngrok command above and register the https domain in stripe web dashboard 
+        - stripe-->>settings-->>payment methods-->> apple pay -->> configure
+        - Add https domain (without 'https://')
+        - download config file
+        - place in 'client/public/.well-known'
+        - Click done -- should be working 
+          - (if you copy link on bottom of modal before hitting done it will download config file again if successful since it is hosted at that link in public)
+
+- 9/8
+  - What to expect:
+    - Integrated Stripe to backend
+    - Set up stripe webhook with signature verification
+      - Needed to 'shut off' parser for that command.  Made express.json conditional to whether or not it was calling stripe webhook.
+      - Run yarn install.  Needed to download body-parser dependency (no longer part of express)
+
 - 9/7
   - What to expect:
     - Began adding stripe to backend, create payment intent method added -- must be requested and passed back to front end.
