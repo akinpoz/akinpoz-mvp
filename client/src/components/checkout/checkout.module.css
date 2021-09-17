@@ -11,10 +11,20 @@
     height: 1px;
     width: 100%;
     background-color: slategray;
+    margin-bottom: 10px;
 }
 
 .itemContainer {
-    padding: 10px;
+    padding: 0 10px 10px 10px;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalContainer {
+    padding: 0 10px 0 10px;
     display: flex;
     flex-direction: row;
     flex: 1;
@@ -52,4 +62,11 @@
 
 .cardContainer:active {
     border-color: #cce2ff;
+}
+
+.termsAndConditions {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    width: 100%;
 }

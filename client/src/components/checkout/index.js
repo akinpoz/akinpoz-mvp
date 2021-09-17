@@ -10,20 +10,27 @@ import {connect} from "react-redux";
 function Checkout(props) {
     let item = props.item ?? {type: 'Queue Song', name: 'Have you ever seen the rain?', price: 0.99, transactionID: '517'}; // TODO: make this a redux field
     const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
-
+    const tabFee = 0.40;
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
                 <Card style={{padding: 15}}>
-                    <h2>Checkout</h2>
+                    <h2>Open a New Tab</h2>
                     <div className={styles.divider}/>
-                    <br/>
                     <div>
                         <h4 style={{margin: 0}}>{item.type}:</h4>
                         <br/>
                         <div className={styles.itemContainer}>
                             <p style={{margin: 0}}>{item.name}</p>
                             <p>${item.price}</p>
+                        </div>
+                        <div className={styles.itemContainer}>
+                            <p style={{margin: 0}}>Fee to open new tab</p>
+                            <p>${tabFee.toFixed(2)}</p>
+                        </div>
+                        <div className={styles.totalContainer}>
+                            <b>Subtotal</b>
+                            <b>${(item.price + tabFee).toFixed(2)}</b>
                         </div>
                     </div>
                     <br/>
@@ -73,7 +80,6 @@ function CheckoutForm(props) {
     useEffect(() => {
         if (paymentRequest) {
             paymentRequest.on('paymentmethod', async (event) => {
-                console.log('should mark processing')
                 props.markProcessing()
                 if (props.stripe.loading || props.stripe.status !== 'unfulfilled' || props.stripe.transactionID === '-1') {
                     event.complete('fail')
@@ -155,17 +161,26 @@ function CheckoutForm(props) {
             }
 
             <Form onSubmit={handleSubmit}>
-                <div>
+                <div id='nameInput' style={{marginBottom: 10}}>
                     <Form.Input required placeholder={'Name On Card'} />
                 </div>
-                <br/>
                 <div className={styles.cardContainer}> {/* TODO: Match style to semantic ui (or vice versa)*/}
                     <CardElement />
                 </div>
                 <br/>
+                <div className={styles.termsAndConditions}>
+                    <Form.Checkbox style={{marginRight: 10}}/>
+                    <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
+                </div>
+                <br/>
+                <div className={styles.termsAndConditions}>
+                    <Form.Checkbox style={{marginRight: 10}}/>
+                    <p>I understand this card will be charged in 24 hours to settle my tab.</p>
+                </div>
+                <br/>
                 <div className={styles.cardFormButtonsContainer}>
                     <Form.Button type={'button'} style={{marginRight: 5}}>Cancel</Form.Button>
-                    <Form.Button primary disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled'}>Submit</Form.Button>
+                    <Form.Button primary disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled'}>Open Tab</Form.Button>
                 </div>
             </Form>
         </div>

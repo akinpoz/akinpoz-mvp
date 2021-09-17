@@ -56,7 +56,7 @@ function Login(props) {
     }
     return (
         <div className={styles.auth}>
-            <Form className={styles.formContainer}>
+            <Form className={styles.formContainer} onSubmit={onSubmit}>
                 {msg &&
                     <Message negative className={styles.message}>
                         <Message.Header>{msg}</Message.Header>
@@ -64,12 +64,7 @@ function Login(props) {
                 }
                 <Form.Input type="email" onChange={handleChange} placeholder="Email..." label="Email" value={values.email} name="email" />
                 <Form.Input type="password" onChange={handleChange} placeholder="Password..." label="Password" value={values.password} name="password" />
-                <Form.Button content="Login" type="submit" color="blue" onClick={onSubmit} onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        onSubmit(e)
-                    }
-                }
-                } />
+                <Form.Button content="Login" color="blue"/>
                 <Message>
                     <Message.Header>Don't have an account? <a href="/#/register">Register Here</a></Message.Header>
                 </Message>

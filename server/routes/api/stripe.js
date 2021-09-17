@@ -22,7 +22,42 @@ router.post('/create-payment-intent', async function (req, res) {
         })
         res.send({clientSecret: paymentIntent.client_secret, transactionID: transactionID})
     } catch (e) {
-        console.log(e.message)
+        console.error(e.message)
+        return res.status(400).send({
+            error: {
+                message: e.message
+            }
+        })
+    }
+})
+
+router.post('/create-setup-intent', async function (req,res) {
+    try {
+        const setupIntent = await stripe.setupIntents.create()
+        res.send(setupIntent.client_secret)
+    }catch (e) {
+        console.error(e.message)
+        return res.status(400).send({
+            error: {
+                message: e.message
+            }
+        })
+    }
+})
+
+router.post('/create-customer', async function (req, res) {
+    let params = req.body;
+    try {
+        let customer;
+        if (params.paymentMethod) {
+            customer = await stripe.customers.create({payment_method: params.paymentMethod, name: params.name, email: params.email})
+        }
+        else {
+            customer = await stripe.customers.create({name: params.name, email: params.email})
+        }
+        res.status(200).send(customer.id)
+    } catch (e) {
+        console.error(e.message)
         return res.status(400).send({
             error: {
                 message: e.message
