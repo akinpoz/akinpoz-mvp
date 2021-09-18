@@ -3,12 +3,12 @@
 ## TODOS
 
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
-- [ ] Make the home link the Akopoz logo and get rid of the home nav tag
 - [ ] Decide how to implement the naming a menu item after yourself feature
 - [ ] Profile page
 - [ ] Update logo/fonts/design
+  - [x] Logo update
 - [ ] Git notifications for changes
-- [ ] Crud operations for fastpass list
+- [ ] Crud operations for fastpass list?
 
 ### Drew
 
@@ -31,15 +31,21 @@
 
 #### Currently working
 
-- [ ] File structure change
-- [ ] Check if jukebox is enabled / token is not null
-- [ ] Skip the line campaign
-  - [x] Frontend implemented
-  - [ ] connect to frontend to redux
-  - [ ] create api endpoint to remove
-  - [ ] create customer side front-end to purchase pass
-  - [ ] connect to ^^ to redux
-  - [ ] create endpoint to add user to details.option of that campaign
+- [ ] User side
+  - [ ] figure out how to QR code navigation works
+  - [ ]create customer landing page
+    - [ ] if from QR code render landing page that's location specific
+    - [ ] if no location_id param, render a location search page. Mobile first.
+  - [ ] Create each campaign card
+    - [ ] Survey
+      - [ ] Front-end
+      - [ ] CRUD operations
+    - [ ] Raffle
+      - [ ] Front-end
+      - [ ] CRUD operations
+    - [ ] FastPass
+      - [ ] Front-end
+      - [ ] CRUD operations
 
 #### Completed
 
@@ -48,8 +54,18 @@
 - [x] Merged Dependencies to top level of project
 - [x] Campaign CRUD operations
 - [x] Make location id available in the jukebox page.
+- [x] File structure change
+- [x] Check if jukebox is enabled / token is not null. Set up example for page to page status messaging
+- [x] Skip the line campaign (business side)
 
 ##### Tentative Change Log
+
+- 9/5 - 9/7
+  - What to expect:
+    - Blank Jukebox bug fix
+    - Skip the line campaign CRUD operations & example of not using redux for all actions
+  - What's left to do:
+    - Start the user side of the app.
 
 ## Known bugs
 
@@ -97,6 +113,8 @@
 ## Considerations
 
 1. React.useEffect/useState or import React, {useEffect, useState}?
+2. Don't use redux for everything (it is considered bad practice). Only use redux for things like getting all of the data.
+   - For example, getLocationsByUserID should be in the redux lifecycle as we can utilize it in the jukebox page, campaigns, etc. However, update location should probably just be a direct API called in the Modal.jsx file.
 
 ## Our Code Standards
 

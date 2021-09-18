@@ -1,38 +1,49 @@
-import { GET_LOCATIONS, ADD_LOCATION, LOCATIONS_LOADING, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC,  SET_LOCATION } from '../actions/types'
+import { GET_LOCATIONS_BY_USER_ID, ADD_LOCATION, LOCATIONS_LOADING, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC, SET_LOCATION, GET_LOCATIONS, GET_LOCATION } from '../actions/types'
 
 const initialState = {
     locations: [],
     loading: false,
-    select_location: ""
+    select_location: "",
+
 }
 
 export default function (state = initialState, action) {
     switch (action.type) {
         case GET_LOCATIONS:
+        case GET_LOCATIONS_BY_USER_ID:
             return {
                 ...state,
                 locations: action.payload,
                 loading: false
             }
+        case GET_LOCATION:
+            return {
+                ...state,
+                select_location: action.payload,
+            }
         case ADD_LOCATION:
             return {
-                ...state, 
-                locations: [...state.locations, action.payload]
+                ...state,
+                locations: [...state.locations, action.payload],
+                loading: false
             }
         case UPDATE_LOCATION:
             return {
                 ...state,
-                locations: [action.payload, ...state.locations.filter(location => location._id !== action.payload._id)]
+                locations: [action.payload, ...state.locations.filter(location => location._id !== action.payload._id)],
+                loading: false
             }
         case DELETE_LOCATION:
             return {
                 ...state,
-                locations: state.locations.filter(location => location._id !== action.payload)
+                locations: state.locations.filter(location => location._id !== action.payload),
+                loading: false
             }
         case TOGGLE_MUSIC:
             return {
                 ...state,
-                locations: [action.payload, ...state.locations.filter(location => location._id !== action.payload._id)]
+                locations: [action.payload, ...state.locations.filter(location => location._id !== action.payload._id)],
+                loading: false
             }
         case LOCATIONS_LOADING:
             return {

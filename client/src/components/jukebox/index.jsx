@@ -5,10 +5,13 @@ import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
 import {queueSong} from "../../actions/spotifyActions";
+import history from '../../history'
+import { useState } from 'react';
 
 function Jukebox(props) {
     const location_id = props.location.select_location 
     const timeoutRef = useRef()
+    const [location, setLocation] = useState(props.location.locations.find(location => location._id === location_id))
     const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
         props.startSearch(data.value)
@@ -20,7 +23,14 @@ function Jukebox(props) {
         }, 300)
     }, [])
     useEffect(() => {
-        
+        if(!location_id) {
+            history.push({
+                pathname: '/',
+                state: {
+                    msg: {status: 'yellow', text: "Please click on the location's jukebox button before navigating to the jukebox page."}
+                }
+            })
+        }
         return () => {
             clearTimeout(timeoutRef.current)
         }
@@ -40,6 +50,7 @@ function Jukebox(props) {
         <div className={styles.container}>
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
             <div className={styles.shiftUp}>
+              {location &&  <h2 style={{textAlign: 'center'}}>Playing @ {location.name}</h2> }
                 <Card fluid>
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40}}>
                         <h1>

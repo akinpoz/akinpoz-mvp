@@ -57,6 +57,14 @@ var LocationSchema = new Schema({
         type: [String],
         required: false,
         default: []
+    },
+    menu_url: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
     }
 })
 

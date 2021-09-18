@@ -11,13 +11,9 @@ import Router from './Router'
 
 
 class App extends Component {
-  constructor(props) {
-    super(props)
-  }
   componentDidMount() {
     store.dispatch(loadUser())
   }
-
   render() {
     return (
       <Provider store={store}>

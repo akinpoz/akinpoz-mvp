@@ -1,4 +1,4 @@
-import {CLEAN_QUERY, FINISH_SEARCH, SPOTIFY_SEARCH_RES, START_SEARCH, UPDATE_SELECTION} from "./types";
+import {CLEAN_QUERY, FINISH_SEARCH, START_SEARCH, UPDATE_SELECTION} from "./types";
 import {tokenConfig} from "./authActions";
 import axios from "axios";
 import {setSpotifyLoading} from "./spotifyActions";

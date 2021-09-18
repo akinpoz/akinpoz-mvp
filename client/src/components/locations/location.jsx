@@ -6,7 +6,7 @@ import Modal from './Modal'
 import { connect } from 'react-redux'
 import ShowQRCode from './show-qrcode';
 import Campaigns from '../campaigns';
-import {openAuth} from "../../actions/spotifyActions";
+import { openAuth } from "../../actions/spotifyActions";
 
 function Location(props) {
     const { name, description, music, _id, user } = props.location
@@ -30,9 +30,15 @@ function Location(props) {
         props.setLocation(_id)
     }
     //TODO: make responsive with actual link to real campaign ?? QR codes are for locations, not campaigns. The URL should be the landing page for the user-location with parameter specific to the location.
-    const url = 'https://apokoz.com/user-location/?Params' 
+    var url = ""
+    if (process.env.NODE_ENV === 'development') {
+        url = `http://localhost:3000/#/customer-home/?location_id=${_id}`
+    }
+    else {
+        url = `https://apokoz.com/#/customer-home/?location_id=${_id}`
+    }
     return (
-        <div style ={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
             <Card style={{ marginBottom: 20, width: '90%', padding: 20 }}>
                 <div style={{ display: "flex", flexDirection: 'row', alignItems: "center", marginBottom: 10 }}>
                     <h2 style={{ marginRight: 20, marginBottom: 0, marginTop: 0 }}>{name}</h2>
@@ -51,7 +57,7 @@ function Location(props) {
                             <Radio toggle checked={isEnabled} onChange={handleToggle} />
                         </div>
                     </div>
-                    <Campaigns location_id={_id} {...props}/>
+                    <Campaigns location_id={_id} {...props} />
                 </div>
             </Card>
         </div>

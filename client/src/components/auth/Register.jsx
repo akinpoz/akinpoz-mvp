@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { register } from '../../actions/authActions'
@@ -10,20 +10,14 @@ import PasswordStrengthBar from 'react-password-strength-bar';
 
 
 function Register(props) {
-    const [values, setvalues] = useState({ name: '', email: '', password: '', type: '' })
-    const [msg, setmsg] = useState(null)
+    const [values, setValues] = useState({ name: '', email: '', password: '', type: '' })
+    const [msg, setMsg] = useState(null)
     const [score, setScore] = useState(0)
     const [feedback, setFeedback] = useState(undefined)
-    const propTypes = {
-        isAuthenticated: PropTypes.bool,
-        error: PropTypes.object.isRequired,
-        register: PropTypes.func.isRequired,
-        clearErrors: PropTypes.func.isRequired
-    }
-
+ 
     useEffect(() => {
         if (props.error.id === 'REGISTER_FAIL') {
-            setmsg(props.error.msg.msg)
+            setMsg(props.error.msg.msg)
         }
     }, [props.error])
 
@@ -34,7 +28,7 @@ function Register(props) {
     }, [props.isAuthenticated])
 
     const handleChange = e => {
-        setvalues({ ...values, [e.target.name]: e.target.value })
+        setValues({ ...values, [e.target.name]: e.target.value })
     }
     const onSubmit = e => {
         e.preventDefault()
@@ -52,7 +46,7 @@ function Register(props) {
             props.register(newUser)
         }
         else {
-            setmsg('Please fill in all the fields')
+            setMsg('Please fill in all the fields')
         }
     }
     return (
@@ -82,7 +76,7 @@ function Register(props) {
                     <label>Select If you are a Business or Customer</label>
                     <Dropdown selection fluid options={[{ key: 'business', text: 'Business', value: 'business' }, { key: 'customer', text: 'Customer', value: 'customer' }]} placeholder="Are you a business or a customer" 
                     onChange={(e, data) => {
-                        setvalues({ ...values, type: data.value })
+                        setValues({ ...values, type: data.value })
                     }
                     } />
                 </Form.Field>
@@ -92,23 +86,16 @@ function Register(props) {
                 </Message>
             </Form>
         </div>
-        // <div className={styles.registerConatiner}>
-        //     <img className={styles.logo} src={logo} />
-        //     {msg &&
-        //         <Message negative className={styles.message}>
-        //             <Message.Header>{msg}</Message.Header>
-        //         </Message>
-        //     }
-
-        //     <input type="text" onChange={handleChange} value={values.name} name="name" placeholder="First and Last Name..." />
-        //     {/* <input type="text" onChange={handleChange} value={values.type} name="type" placeholder="Are you a business or a customer?" /> */}
-        //     <input type="email" onChange={handleChange} value={values.email} name="email" placeholder="Email..." />
-        //     <input type="password" onChange={handleChange} value={values.password} name="password" placeholder="Password..." />
-        //     <Button className={styles.submit} onClick={onSubmit}>Register</Button>
-        //     <p>Have An Account? <a href="/#/login">Login.</a></p>
-        // </div>
     )
 }
+
+Register.propTypes = {
+    isAuthenticated: PropTypes.bool,
+    error: PropTypes.object.isRequired,
+    register: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired
+}
+
 
 const mapStateToProps = state => ({
     isAuthenticated: state.auth.isAuthenticated,

@@ -1,24 +1,26 @@
-import React from "react";
-import {Button, Icon, Modal} from "semantic-ui-react";
-import styles from "./locations.module.css";
+import React, {useState} from "react";
+import { Button, Modal } from "semantic-ui-react";
 import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 
 function ShowQRCode(props) {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     return (
         <Modal onClose={() => setOpen(false)}
-               onOpen={() => setOpen(true)}
-               open={open}
-               trigger={
-                   <i className='qrcode icon' style={{marginRight: 20}}/>
-               }>
+            onOpen={() => setOpen(true)}
+            open={open}
+            trigger={
+                <i className='qrcode icon' style={{ marginRight: 20 }} />
+            }>
             <Modal.Header>QR Code</Modal.Header>
             <Modal.Content>
-                <div style={{display: 'flex', justifyContent: "center", padding: 15}}>
-                    <div id='QRCode' style={{padding: 5}}>
-                        <QRCode value={props.url} className="HpQrcode"/> {/* TODO: make this a real url */}
+                <div style={{ display: 'flex', justifyContent: "center", padding: 15 }}>
+                    <div id='QRCode' style={{ padding: 5 }}>
+                        <QRCode value={props.url} className="HpQrcode" />
                     </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: "center", padding: 15 }}>
+                    <h4><a href={props.url} target="_blank">{props.url}</a></h4>
                 </div>
             </Modal.Content>
             <Modal.Actions>
@@ -34,7 +36,7 @@ function ShowQRCode(props) {
 
 const downloadQR = () => {
     const element = document.getElementById('QRCode');
-    html2canvas(element, {useCORS: true}).then(function (canvas) {
+    html2canvas(element, { useCORS: true }).then(function (canvas) {
         const pngUrl = canvas
             .toDataURL("image/png")
             .replace("image/png", "image/octet-stream");
@@ -46,5 +48,4 @@ const downloadQR = () => {
         document.body.removeChild(downloadLink);
     });
 }
-
-export default ShowQRCode;
+export default ShowQRCode

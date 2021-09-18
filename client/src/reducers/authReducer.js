@@ -15,7 +15,6 @@ export default function (state = initialState, action) {
                 isLoading: true
             }
         case USER_LOADED:
-            console.log(action.payload)
             return {
                 ...state,
                 isAuthenticated: true,

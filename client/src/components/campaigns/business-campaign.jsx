@@ -4,10 +4,13 @@ import Modal from './Modal'
 import styles from './campaigns.module.css'
 import { connect } from 'react-redux'
 import { deleteCampaign } from '../../actions/campaignActions'
+import axios from 'axios'
+import { getHeaders } from '../../utils'
 
 
 function BusinessCampaign(props) {
     const { title, description, details, _id, user, location } = props.campaign
+    const [options, setOptions] = useState(details.options)
     const [toggleList, setToggleList] = useState(false)
     function handleDelete() {
         const campaign = {
@@ -21,7 +24,16 @@ function BusinessCampaign(props) {
         setToggleList(!toggleList)
     }
     function handleNameRemove(name) {
-        // TODO: create campaign action/reducer/type for name removal in redux
+        const headers = getHeaders()
+        headers["x-auth-token"] = props.auth.token
+        if (window.confirm("Are you sure you want to remove this name?")) {
+            axios.post('/api/campaigns/removeName', { name, _id, token: { headers: { ...headers } } }).then(res => {
+                setOptions(options.filter(option => option !== res.data.name))
+            }).catch(e => {
+                alert(`Failed to move name. ${e}`)
+                console.error(e)
+            })
+        }
     }
     const updateTrigger = <Icon name='pencil' />
     return (
@@ -37,34 +49,30 @@ function BusinessCampaign(props) {
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
             {toggleList &&
-                <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto'}}>
+                <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
                     <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th style={{textAlign: 'end'}}>Remove</th>
-                        </tr>
+                        {options.length > 0 &&
+                            <tr>
+                                <th>Name</th>
+                                <th style={{ textAlign: 'end' }}>Remove</th>
+                            </tr>
+                        }
                     </thead>
                     <tbody>
-                        {details.options.map(option => {
-                            if (option !== "") {
-                                return (
-                                    <tr key={option} >
-                                        <td>{option}</td>
-                                        <td style={{textAlign: 'end'}}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
-                                    </tr>
-                                )
-                            }
-                            else {
-                                return (
-                                    <tr>
-                                        <td>There are no names on the list</td>
-                                        <td style={{textAlign: 'end'}}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
-
-                                    </tr>
-                                )
-                            }
+                        {options.length > 0 && options.map(option => {
+                            return (
+                                <tr key={option} >
+                                    <td>{option}</td>
+                                    <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
+                                </tr>
+                            )
+                        })}
+                        {options.length === 0 &&
+                            <tr>
+                                <td>There are no names on the list</td>
+                            </tr>
                         }
-                        )}
+
                     </tbody>
                 </table>
             }

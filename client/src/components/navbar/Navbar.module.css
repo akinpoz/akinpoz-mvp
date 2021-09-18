@@ -1,5 +1,9 @@
-.background {
+.business_background {
   background-color: black;
+}
+.customer_background {
+  background-color: white;
+  color: black;
 }
 .profile_icon {
   color: white !important

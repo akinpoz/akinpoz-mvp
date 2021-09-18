@@ -8,21 +8,62 @@ const Campaign = require('../../models/Campaign');
 var auth = require('../../middleware/auth')
 
 
+
 /**
- * @route GET api/campaigns/
+ * @route  GET api/campaigns/
+ * @desc   Get all campaigns
+ * @access Public
+ */
+router.get('/', async function (req, res) {
+    try {
+        let campaigns = await Campaign.find()
+        res.status(200).send(campaigns)
+    }
+    catch (e) {
+        console.error(e)
+    }
+})
+
+/**
+ * @route GET api/campaigns/user_id
  * @desc get all campaigns by user ID
  * @access Private
  */
-router.get('/', auth, async function (req, res) {
+router.get('/user_id', auth, async function (req, res) {
     try {
-        let campaigns = await Campaign.find({ user: req.query.user }) // O(1)
-
+        let campaigns = await Campaign.find({ user: req.query.user })
         res.status(200).send(campaigns)
     } catch (e) {
         console.error(e)
     }
 })
+/**
+ * @route GET api/campaigns/location_id
+ * @desc get campaign by ID (customer-side)
+ * @access Public
+ */
+ router.get('/location_id', async (req, res) => {
+    try {
+        res.status(200).send(await Campaign.findOne({ location: req.query.location_id }))
+    } catch (error) {
+        console.error(error)
+        res.status(500).send(error)
+    }
+})
 
+/**
+ * @route GET api/campaigns/campaign_id
+ * @desc get campaign by ID (customer-side)
+ * @access Public
+ */
+router.get('/campaign_id', async (req, res) => {
+    try {
+        res.status(200).send(await Campaign.findOne({ _id: req.query.campaign_id }))
+    } catch (error) {
+        console.error(error)
+        res.status(500).send(error)
+    }
+})
 
 /**
  * @route POST api/campaigns/add 
@@ -102,6 +143,26 @@ router.post('/toggleMusic', auth, async (req, res) => {
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
+    }
+})
+
+/**
+ * @route POST api/campaigns/removeName
+ * @desc remove the name put on the fast pass list
+ * @access Public 
+ * @note Want to move away from over engineering hot garbage code in redux. Not everything should be a redux action. This endpoint is called directly from the business-campaign file. 
+ */
+router.post('/removeName', auth, async (req, res) => {
+    try {
+        const { name, _id } = req.body
+        const campaign = await Campaign.findOne({ _id })
+        campaign.details.options.splice(campaign.details.options.indexOf(name), 1)
+        const newNames = campaign.details.options
+        await Campaign.findOneAndUpdate({ _id }, { details: { options: newNames, type: campaign.details.type } }, { useFindAndModify: false, new: true })
+        res.status(200).send({ msg: "Successfully removed name", name })
+    } catch (e) {
+        console.error(e)
+        res.status(500).send({ msg: `Failed: ${e.message}` })
     }
 })
 

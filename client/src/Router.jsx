@@ -11,12 +11,17 @@ import Analytics from "./components/analytics/analytics";
 import Jukebox from "./components/jukebox";
 import Results from "./components/results";
 import Checkout from "./components/checkout";
+import CustomerHome from './components/homes/customer-home'
+import Slider from './components/locations/Slider'
+import Search from './components/locations/Search'
+import Campaign from './components/campaigns/customer-campaign'
 
 const components = {
   Home: Home,
   Profile: Profile,
   Jukebox: Jukebox,
-  Checkout: Checkout
+  Checkout: Checkout,
+  CustomerHome: CustomerHome
 }
 
 
@@ -25,7 +30,8 @@ function Router(props) {
     <HashRouter>
       <Switch>
         <Route exact path="/">
-          <PrivateRoute {...props} component={`Home`} />
+          {/* <PrivateRoute {...props} component={`Home`} /> */}
+          <Home />
         </Route>
         <Route exact path="/register">
           <Register />
@@ -47,6 +53,18 @@ function Router(props) {
         </Route>
         <Route path='/checkout'>
           <PrivateRoute {...props} component={'Checkout'} />
+        </Route>
+        <Route path='/customer-home'>
+          <CustomerHome />
+        </Route>
+        <Route path="/location">
+          <Slider />
+        </Route>
+        <Route path="/search">
+          <Search />
+        </Route>
+        <Route path="/campaign">
+          <Campaign />
         </Route>
         <Route path="*" component={PageNotFound} />
       </Switch>
@@ -75,7 +93,7 @@ const PrivateRoute = (props) => {
   }
   else if (props.auth.isLoading === true || props.auth.isAuthenticated === null) {
     return (
-      <div style={{display: 'grid', placeItems: 'center'}}>
+      <div style={{ display: 'grid', placeItems: 'center' }}>
         <Loader active />
       </div>
     )
@@ -88,7 +106,8 @@ Router.propTypes = {
 }
 
 const mapStateToProps = (state) => ({
-  auth: state.auth
+  auth: state.auth,
+  selected_location: state.location.selected_location
 })
 
 export default connect(mapStateToProps, null)(Router)

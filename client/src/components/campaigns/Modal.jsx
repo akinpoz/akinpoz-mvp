@@ -41,6 +41,9 @@ function CampaignModal(props) {
             setMsg("Please fill in all required fields and verify you have at least two options");
         }
         else {
+            if(values.details.type === "Fastpass") {
+                values.details.options = []
+            }
             props[`${props.action}Campaign`](campaignDetails);
             close()
         }
@@ -48,9 +51,9 @@ function CampaignModal(props) {
     function handleChange(e) {
         setValues({ ...values, [e.target.name]: e.target.value });
     }
-    function clear() {
-        setValues({ ...values, title: "", description: "", details: { type: "Survey" } });
-    }
+    // function clear() {
+    //     setValues({ ...values, title: "", description: "", details: { type: "Survey" } });
+    // }
     function close() {
         setOpen(false);
        // clear()
@@ -91,7 +94,7 @@ function CampaignModal(props) {
                 </Button.Group>}
                 <Form>
                     {msg && <Message negative>
-                        <Message.header>{msg}</Message.header>
+                        <Message.Header>{msg}</Message.Header>
                     </Message>}
                     <br />
                     <Form.Input required label={`${values.details.type} Title`} placeholder='enter title...' value={values.title} onChange={handleChange} name="title" />

@@ -4,18 +4,20 @@ import styles from './locations.module.css'
 import { connect } from 'react-redux'
 
 function LocationModal(props) {
-    const {name, description, _id} = props
+    const {name, description, _id, menu_url, address} = props
     const [open, setOpen] = useState(false);
-    const [values, setValues] = useState({ name: name || "", description: description || "" });
+    const [values, setValues] = useState({ name: name || "", description: description || "", menu_url: menu_url || "", address: address || ""  });
     const [msg, setmsg] = useState();
     useEffect(() => {
-        setValues({ ...values, name: name, description: description });
+        setValues({ ...values, name: name, description: description, menu_url: menu_url, address: address });
     }, [open]);
     function submit(e) {
         e.preventDefault();
         const locationDetails = {
             name: values.name,
             description: values.description,
+            menu_url: values.menu_url,
+            address: values.address,
             user: props.auth.user._id,
             location_id: _id
         }
@@ -53,7 +55,9 @@ function LocationModal(props) {
                         {/* <input type="file" accept="image/*" onChange={handleUpload} placeholder="Upload your logo"/> */}
                     </div>
                     <Form.Input value={values.name || ""} name="name" label='Location Name' placeholder='Enter Name' onChange={handleChange} />
-                    <Form.TextArea value={values.description || ""} name="description" label={'Location Description'} placeholder='Enter Description' onChange={handleChange} />
+                    <Form.TextArea value={values.description || ""} name="description" label={'Location Description (any notes you want to include about this location)'} placeholder='Enter Description' onChange={handleChange} />
+                    <Form.Input value={values.menu_url || ""} name="menu_url" label={'Menu URL'} placeholder='Enter Menu URL' onChange={handleChange} />
+                    <Form.Input value={values.address || ""} name="address" label={'Address'} placeholder='Enter Address' onChange={handleChange} />
                 </Form>
             </Modal.Content>
             <Modal.Actions>

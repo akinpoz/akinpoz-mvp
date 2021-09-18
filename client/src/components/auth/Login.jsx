@@ -11,18 +11,13 @@ import { Form, Message } from 'semantic-ui-react'
 
 
 function Login(props) {
-    const [values, setvalues] = useState({ email: '', password: '' })
-    const [msg, setmsg] = useState(null)
-    const propTypes = {
-        isAuthenticated: PropTypes.bool,
-        error: PropTypes.object.isRequired,
-        login: PropTypes.func.isRequired,
-        clearErrors: PropTypes.func.isRequired
-    }
+    const [values, setValues] = useState({ email: '', password: '' })
+    const [msg, setMsg] = useState(null)
+
 
     useEffect(() => {
         if (props.error.id === 'LOGIN_FAIL') {
-            setmsg(props.error.msg.msg)
+            setMsg(props.error.msg.msg)
         }
     }, [props.error])
 
@@ -33,7 +28,7 @@ function Login(props) {
     }, [props.isAuthenticated])
 
     const handleChange = e => {
-        setvalues({ ...values, [e.target.name]: e.target.value })
+        setValues({ ...values, [e.target.name]: e.target.value })
     }
     const onSubmit = e => {
         e.preventDefault();
@@ -75,23 +70,14 @@ function Login(props) {
                 </Message>
             </Form>
         </div>
-
-        // <div >
-
-        //     <div className={styles.loginContainer}>
-        //
-        //         <input type="email" onChange={handleChange} value={values.email} name="email" placeholder="Email..." />
-        //         <input type="password" onChange={handleChange} value={values.password} name="password" placeholder="Password..." onKeyPress={(e) => {
-        //             if (e.key === 'Enter') {
-        //                 onSubmit(e)
-        //             }
-        //         }} />
-        //         <button className={styles.submit} onClick={onSubmit} >Login</button>
-        //     </div>
-
-        // </div>
-
     )
+}
+
+Login.propTypes = {
+    isAuthenticated: PropTypes.bool,
+    error: PropTypes.object.isRequired,
+    login: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({

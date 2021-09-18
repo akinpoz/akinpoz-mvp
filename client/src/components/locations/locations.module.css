@@ -10,7 +10,6 @@
 
 .button {
     background-color: #5704d4 !important;
-
     /* width: 15% !important;
     margin-left: auto !important;
     margin-right: 5% !important;
@@ -29,6 +28,43 @@
     color: white !important;
 }
 
+.scroll_box {
+    position: relative;
+    width: 95%;
+    overflow: hidden;
+    margin: auto;
+}
+
+.scroll_box_wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    overflow: -moz-scrollbars-none;
+    /* Firefox */
+}
+
+.scroll_box_wrapper::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+.scroll_box_container {
+    height: 100%;
+    display: inline-flex;
+}
+
+.scroll_box__item {
+    padding: 10px;
+}
+
+.search_container {
+    display: grid;
+    place-items: center;
+    margin-top: 10px;
+}
 
 @media only screen and (max-width: 750px) {
     .button {

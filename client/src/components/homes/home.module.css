@@ -19,9 +19,65 @@ i:hover {
     font-size: 75% !important;
 }
 
+.scroll_box {
+    position: relative;
+    width: 95%;
+    overflow: hidden;
+    margin: auto;
+}
+
+.scroll_box_wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    overflow: -moz-scrollbars-none;
+    /* Firefox */
+}
+
+.scroll_box_wrapper::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+.scroll_box_container {
+    height: 100%;
+    display: inline-flex;
+}
+
+.scroll_box__item {
+    padding: 10px;
+}
+
+.search_container {
+    display: grid;
+    place-items: center;
+    margin-top: 10px;
+}
+
+.welcome_container {
+    height: 100%; 
+    width: 90%;
+    margin: auto;
+    display: grid;
+    place-items: center;
+}
+.cards_wrapper {
+    display: grid;
+    grid-template-columns: 49% 49%;
+    grid-gap: 2%;
+}
+
 @media only screen and (max-width: 750px) {
     .button {
         width: 20% !important;
+    }
+    .cards_wrapper {
+        grid-template-columns: 100%;
+        grid-template-rows: 49% 49%;
+        row-gap: 2%;
     }
 }
 
@@ -34,5 +90,17 @@ i:hover {
 @media only screen and (max-width: 400px) {
     .button {
         width: 90% !important;
+    }
+}
+
+/*Here is where the magic happens, media query listens to when screen is resized at <992px(md) and container properties change*/
+
+@media only screen and (max-width: 992px) {
+    .container {
+        display: flex;
+        flex-wrap: nowrap;
+        height: 300px;
+        overflow-x: auto;
+        width: auto;
     }
 }
