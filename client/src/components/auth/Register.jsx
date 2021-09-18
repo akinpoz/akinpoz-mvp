@@ -213,14 +213,15 @@ function RegisterForm(props) {
                     }
                 })
                 setPaymentMethod(result.setupIntent.payment_method)
+                if (result.error) {
+                    props.createCustomer(name, email)
+                    console.error(result.error)
+                } else {
+                    props.createCustomer(name, email, result.setupIntent.payment_method)
+                }
             }
-
-            // TODO: How should we handle this?
-            if (result.error) {
+            else {
                 props.createCustomer(name, email)
-                console.error(result.error)
-            } else {
-                props.createCustomer(name, email, result.setupIntent.payment_method)
             }
         }
     }

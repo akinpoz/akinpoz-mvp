@@ -60,7 +60,8 @@ export const createSetupIntent = () => (dispatch) => {
 
 export const getPaymentDetails = (userID) => (dispatch, getState) => {
     dispatch({type: REQUESTED_PAYMENT_DETAILS})
-    axios.post('/api/stripe/get-payment-details', userID, tokenConfig(getState)).then(res => {
+    let params = {userID}
+    axios.post('/api/stripe/get-payment-details/', params, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
             dispatch({type: RETRIEVED_PAYMENT_DETAILS, paymentDetails: res.data})
         }

@@ -72,9 +72,14 @@ router.post('/create-customer', async function (req, res) {
     }
 })
 
-router.post('/get-payment-details', async function (req, res) {
-    let userID = req.body;
-    User.findOne(userID).then(user => {
+router.post('/get-payment-details/', async function (req, res) {
+    let params = req.body;
+    User.findOne({ _id: params.userID }).then(user => {
+
+        if (!user.paymentMethod || user.paymentMethod === []) {
+            res.status(200).send("null")
+        }
+
         let paymentMethod = decrypt(user.paymentMethod)
 
         stripe.paymentMethods.retrieve(paymentMethod).then((payment, err) => {
@@ -100,36 +105,41 @@ router.post('/get-payment-details', async function (req, res) {
 
 router.post('/update-payment', async function (req, res) {
     let {userID, paymentMethod} = req.body;
-    User.findOne(userID).then(user => {
-        let customerID = decrypt(user.customerID)
-        let oldPm = decrypt(user.paymentMethod)
-        stripe.paymentMethods.detach(oldPm).then((pm, error) => {
-            if (error) {
-                console.error(error.message)
-            }
-            else {
-                stripe.paymentMethods.attach(paymentMethod, {customer: customerID}).then((newPm, e) => {
-                    if (e) {
-                        res.status(400).send({
-                            error: e.message
-                        })
-                    }
-                    let pm = {
-                        name: newPm.billing_details.name,
-                        last4: newPm.card.last4,
-                        expMonth: newPm.card.exp_month,
-                        expYear: newPm.card.exp_year,
-                        brand: newPm.card.brand
-                    }
-                    User.findOneAndUpdate(userID, {paymentMethod: encrypt(newPm.id)}).then((user, err) => {
-                        if (error) {
-                            res.status(400).send({error: err.message})
-                        }
-                        res.status(200).send(pm)
-                    })
+    let user = await User.findOne({_id: userID})
 
-                })
+    if (!user) {
+        console.error('User not found')
+        res.status(400).send('User not found')
+        return;
+    }
+    let customerID = decrypt(user.customerID)
+    let oldPm = decrypt(user.paymentMethod)
+
+    if (oldPm && oldPm !== '') {
+        try {
+            let {pm, error} = await stripe.paymentMethods.detach(oldPm)
+        } catch (e) {
+            console.error(e.message)
+        }
+    }
+    stripe.paymentMethods.attach(paymentMethod, {customer: customerID}).then((newPm, e) => {
+        if (e) {
+            res.status(400).send({
+                error: e.message
+            })
+        }
+        let pm = {
+            name: newPm.billing_details.name,
+            last4: newPm.card.last4,
+            expMonth: newPm.card.exp_month,
+            expYear: newPm.card.exp_year,
+            brand: newPm.card.brand
+        }
+        User.findOneAndUpdate({_id: userID}, {paymentMethod: encrypt(newPm.id)}).then((user, err) => {
+            if (err) {
+                res.status(400).send({error: err.message})
             }
+            res.status(200).send(pm)
         })
     })
 })

@@ -39,7 +39,6 @@ router.post('/', function (req, res) {
                         { expiresIn: 3600 },
                         (err, token) => {
                             if (err) throw err;
-                            console.log(user.customerID + ', ' + user.paymentMethod)
                             res.json({
                                 token,
                                 user: {

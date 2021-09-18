@@ -146,7 +146,7 @@ function PaymentOptions(props) {
                         }
                     } else {
                         console.log('successful')
-                        props.updatePaymentMethod(props.auth.user.id, result.setupIntent.payment_method)
+                        props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
                         props.markComplete('success')
                         // TODO: Success Logic
                     }
@@ -154,6 +154,14 @@ function PaymentOptions(props) {
             })
         }
     }, [paymentRequest, props.stripe])
+
+    useEffect(() => {
+        if (elements) {
+            setNameOnCard('')
+            props.createSetupIntent()
+            elements.getElement(CardElement).clear()
+        }
+    }, [elements, props.stripe.paymentDetails])
 
     useEffect(() => {
         if (stripe && elements) {
@@ -180,7 +188,7 @@ function PaymentOptions(props) {
 
     useEffect(() => {
         if (props.auth.user) {
-            props.getPaymentDetails(props.auth.user.id)
+            props.getPaymentDetails(props.auth.user._id)
         }
     }, [props.auth])
 
@@ -195,7 +203,7 @@ function PaymentOptions(props) {
             // TODO: Handle this
         }
         else {
-            props.updatePaymentMethod(props.auth.user.id, result.setupIntent.payment_method)
+            props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
         }
     }
 
