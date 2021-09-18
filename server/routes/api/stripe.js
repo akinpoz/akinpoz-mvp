@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser')
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+var User = require('../../models/User');
+const {decrypt, encrypt} = require("./encryption");
+
 
 router.get('/config', (req, res) => {
     res.send({
@@ -14,7 +17,7 @@ router.get('/config', (req, res) => {
 router.post('/create-payment-intent', async function (req, res) {
     const {paymentMethodType, currency, amount, transactionID} = req.body;
     try {
-        const paymentIntent =  await stripe.paymentIntents.create({
+        const paymentIntent = await stripe.paymentIntents.create({
             payment_method_types: [paymentMethodType],
             amount: Math.floor(amount * 100),
             currency: currency,
@@ -31,11 +34,11 @@ router.post('/create-payment-intent', async function (req, res) {
     }
 })
 
-router.post('/create-setup-intent', async function (req,res) {
+router.post('/create-setup-intent', async function (req, res) {
     try {
         const setupIntent = await stripe.setupIntents.create()
         res.send(setupIntent.client_secret)
-    }catch (e) {
+    } catch (e) {
         console.error(e.message)
         return res.status(400).send({
             error: {
@@ -50,9 +53,12 @@ router.post('/create-customer', async function (req, res) {
     try {
         let customer;
         if (params.paymentMethod) {
-            customer = await stripe.customers.create({payment_method: params.paymentMethod, name: params.name, email: params.email})
-        }
-        else {
+            customer = await stripe.customers.create({
+                payment_method: params.paymentMethod,
+                name: params.name,
+                email: params.email
+            })
+        } else {
             customer = await stripe.customers.create({name: params.name, email: params.email})
         }
         res.status(200).send(customer.id)
@@ -64,6 +70,68 @@ router.post('/create-customer', async function (req, res) {
             }
         })
     }
+})
+
+router.post('/get-payment-details', async function (req, res) {
+    let userID = req.body;
+    User.findOne(userID).then(user => {
+        let paymentMethod = decrypt(user.paymentMethod)
+
+        stripe.paymentMethods.retrieve(paymentMethod).then((payment, err) => {
+            if (err) {
+                console.error(err.message)
+                res.status(400).send({
+                    error: {
+                        message: err.message
+                    }
+                })
+            }
+            let pm = {
+                name: payment.billing_details.name,
+                last4: payment.card.last4,
+                expMonth: payment.card.exp_month,
+                expYear: payment.card.exp_year,
+                brand: payment.card.brand
+            }
+            res.status(200).send(pm)
+        })
+    })
+})
+
+router.post('/update-payment', async function (req, res) {
+    let {userID, paymentMethod} = req.body;
+    User.findOne(userID).then(user => {
+        let customerID = decrypt(user.customerID)
+        let oldPm = decrypt(user.paymentMethod)
+        stripe.paymentMethods.detach(oldPm).then((pm, error) => {
+            if (error) {
+                console.error(error.message)
+            }
+            else {
+                stripe.paymentMethods.attach(paymentMethod, {customer: customerID}).then((newPm, e) => {
+                    if (e) {
+                        res.status(400).send({
+                            error: e.message
+                        })
+                    }
+                    let pm = {
+                        name: newPm.billing_details.name,
+                        last4: newPm.card.last4,
+                        expMonth: newPm.card.exp_month,
+                        expYear: newPm.card.exp_year,
+                        brand: newPm.card.brand
+                    }
+                    User.findOneAndUpdate(userID, {paymentMethod: encrypt(newPm.id)}).then((user, err) => {
+                        if (error) {
+                            res.status(400).send({error: err.message})
+                        }
+                        res.status(200).send(pm)
+                    })
+
+                })
+            }
+        })
+    })
 })
 
 router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
@@ -102,8 +170,7 @@ router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, 
         console.log('❌ Payment failed.');
     } else if (eventType === 'payment_method.attached') {
         console.log('Payment Method Attached')
-    }
-    else {
+    } else {
         console.log('Unhandled event type: ' + eventType)
     }
     res.sendStatus(200);

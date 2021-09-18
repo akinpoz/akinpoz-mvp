@@ -62,11 +62,7 @@ function RegisterForm(props) {
             // Check the availability of the Payment Request API.
             pr.canMakePayment().then(result => {
                 if (result) {
-                    console.log('can make payment')
                     setPaymentRequest(pr);
-                }
-                else {
-                    console.log('cant make payment')
                 }
             });
         }
@@ -137,7 +133,7 @@ function RegisterForm(props) {
     useEffect(() => {
         if (elements) {
             elements.getElement(CardElement).on("change", (event) => {
-                if (event.complete) {
+                if (event.complete && !event.error) {
                     if (!values.cardApproved) {
                         setValues({...values, cardApproved: true})
                     }
