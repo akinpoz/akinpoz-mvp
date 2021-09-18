@@ -6,10 +6,13 @@
         "client": "npm start --prefix client",
         "server": "npm run nodemon --prefix server",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "https": "export HTTPS=true&&SSL_CRT_FILE=./cert/cert.pem&&SSL_KEY_FILE=./cert/key.pem npm run dev",
         "prod_test": "cd server && node bin/www",
         "deploy": "sh deploy.sh"
     },
     "dependencies": {
+        "@stripe/react-stripe-js": "^1.4.1",
+        "@stripe/stripe-js": "^1.17.1",
         "@testing-library/jest-dom": "^5.11.4",
         "@testing-library/react": "^11.1.0",
         "@testing-library/user-event": "^12.1.10",

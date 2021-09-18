@@ -16,6 +16,7 @@
 
 - [ ] Payment wall
   - [x] frontend implemented
+  - [ ] implement stripe
   - [ ] design history management - CRUD
   - [ ] connect history to redux (front / back)
   - [ ] add to jukebox, raffle and survey
@@ -73,6 +74,16 @@
 
 ## Change Log
 
+- 9/6
+  - What to expect:
+    - Added Stripe to package.json (run yarn install)
+    - Added https script in package.json (run yarn https so stripe features work)
+      - yarn https just includes self-signed certs (generate 'certificate.pem', 'csr.pem' and 'private-key.pem' and put in root/cert) then runs yarn dev
+    - Added responsive google/apple pay button
+    - Working to fully implement stripe api
+  - Left to do:
+    - Finish implementing Stripe and store relevant information in our db
+
 - 8/31 - 9/3
   - What to expect:
     - When you reload the page you now see a loader instead the login page.
@@ -89,32 +100,34 @@
     - Left to do:
       - Connect to backend and incorporate redux actions
       - Incorporate Stripe
-  - 8/30
-    - What to expect:
-      - Location ID 500 server bug fix
-      - README updates: merged considerations, updated todos
+- 8/30
+  - What to expect:
+    - Location ID 500 server bug fix
+    - README updates: merged considerations, updated todos
 
-  - 8/25: Began payment wall
-    - What to expect:
-      - Payment wall UI (started)
-    - Left to do:
-      - design history management - CRUD
-      - connect history to redux (front / back)
-      - add to jukebox, raffle and survey
+- 8/25: Began payment wall
+  - What to expect:
+    - Payment wall UI (started)
+  - Left to do:
+    - design history management - CRUD
+    - connect history to redux (front / back)
+    - add to jukebox, raffle and survey
 
-  - 8/23: Added Spotify integration
-    - How to use:
-      - Spotify account must be active (playing music from intended device)
-      - Jukebox must be enabled and authenticated via spotify account associated with device playing music
-      - The spotify client_id, client_secret and authentication_key must all be present in the .env file in server
-    - What is left to do:
-      - Server error handling
+- 8/23: Added Spotify integration
+  - How to use:
+    - Spotify account must be active (playing music from intended device)
+    - Jukebox must be enabled and authenticated via spotify account associated with device playing music
+    - The spotify client_id, client_secret and authentication_key must all be present in the .env file in server
+  - What is left to do:
+    - Server error handling
 
 ## Considerations
 
 1. React.useEffect/useState or import React, {useEffect, useState}?
 2. Don't use redux for everything (it is considered bad practice). Only use redux for things like getting all of the data.
    - For example, getLocationsByUserID should be in the redux lifecycle as we can utilize it in the jukebox page, campaigns, etc. However, update location should probably just be a direct API called in the Modal.jsx file.
+3. Add toggle for allowing explicit songs on jukebox?
+4. Should the price for jukebox be fixed or should the establishment set the price?
 
 ## Our Code Standards
 
