@@ -76,8 +76,9 @@ router.post('/get-payment-details/', async function (req, res) {
     let params = req.body;
     User.findOne({ _id: params.userID }).then(user => {
 
-        if (!user.paymentMethod || user.paymentMethod === []) {
+        if (!user.paymentMethod || user.paymentMethod.length === 0) {
             res.status(200).send("null")
+            return;
         }
 
         let paymentMethod = decrypt(user.paymentMethod)
