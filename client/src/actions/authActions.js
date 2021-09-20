@@ -7,17 +7,18 @@ export const loadUser = () => (dispatch, getState) => {
     // User loading
     dispatch({ type: USER_LOADING })
     // Fetch user
-    axios.get('/api/auth/user', tokenConfig(getState)).then(res => {
+    axios.get('/api/auth/user/', tokenConfig(getState)).then(res => {
         dispatch({ type: USER_LOADED, payload: res.data })
     }).catch(e => {
-       dispatch(returnErrors(e.response.data, e.response.status))
+        console.log(JSON.stringify(e));
+       dispatch(returnErrors(e.message, e.status))
        dispatch({ type: AUTH_ERROR })
     })
 }
 
 // Register User
 
-export const register = ({ name, email, password, type }) => dispatch => {
+export const register = ({ name, email, password, type, customerID, paymentMethod }) => dispatch => {
     // Headers
     const config = {
         headers: {
@@ -25,8 +26,8 @@ export const register = ({ name, email, password, type }) => dispatch => {
         }
     }
     // Request body
-    const body = JSON.stringify({ name, email, password, type })
-    axios.post('/api/users', body, config).then(res => {
+    const body = JSON.stringify({ name, email, password, type, customerID, paymentMethod })
+    axios.post('/api/users/', body, config).then(res => {
         dispatch({
             type: REGISTER_SUCCESS,
             payload: res.data
@@ -67,13 +68,15 @@ export const login = ({ email, password }) => dispatch => {
     // Request body
     const body = JSON.stringify({ email, password })
 
-    axios.post('/api/auth', body, config).then(res => {
+    axios.post('/api/auth/', body, config).then(res => {
+        console.log('success')
         dispatch({
             type: LOGIN_SUCCESS,
             payload: res.data
         })
     }).catch(e => {
-        dispatch(returnErrors(e.response.data, e.response.status, 'LOGIN_FAIL'))
+        console.log('error: ' + e.message)
+        dispatch(returnErrors(e.message, e.status, 'LOGIN_FAIL'))
         dispatch({
             type: LOGIN_FAIL
         })

@@ -11,10 +11,20 @@
     height: 1px;
     width: 100%;
     background-color: slategray;
+    margin-bottom: 10px;
 }
 
 .itemContainer {
-    padding: 10px;
+    padding: 0 10px 10px 10px;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalContainer {
+    padding: 0 10px 0 10px;
     display: flex;
     flex-direction: row;
     flex: 1;
@@ -39,4 +49,24 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+}
+
+.cardContainer {
+    padding: .67857143em 1em;
+    border-color: rgba(34,36,38,.15);
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 1em;
+}
+
+.cardContainer:active {
+    border-color: #cce2ff;
+}
+
+.termsAndConditions {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    width: 100%;
 }
