@@ -15,11 +15,11 @@
 }
 
 .userAccountSettings {
-    height: 400px;
+    height: 500px;
     padding: 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /*justify-content: center;*/
     flex-direction: column;
     margin: 0;
 }
@@ -27,9 +27,27 @@
 .divider {
     height: 1px;
     background-color: lightgray;
-    width: 70%;
+    width: 100%;
 }
 
 ui.card {
     margin: 0;
+}
+
+.cardDetails {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.paymentInput {
+    width: 100%;
+}
+
+.buttonContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
 }

@@ -57,6 +57,13 @@ input {
     border: 1px solid #dbdbdb;
 }
 
+.divider {
+    height: 1px;
+    width: 100%;
+    background-color: slategray;
+    margin-bottom: 10px;
+}
+
 @media screen and (max-width: 800px) {
     .loginContainer {width: 80%;}
     .registerConatiner {width: 80%;}

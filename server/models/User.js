@@ -50,6 +50,16 @@ var UserSchema = new Schema({
             default: Date.now()
         }
     },
+    customerID: {
+        type: [String],
+        required: true,
+        default: []
+    },
+    paymentMethod: {
+        type: [String],
+        required: false,
+        default: []
+    }
 })
 
 module.exports = User = mongoose.model('user', UserSchema)

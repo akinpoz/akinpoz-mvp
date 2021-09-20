@@ -7,6 +7,7 @@ import spotifyReducer from "./spotifyReducer";
 import searchReducer from "./searchReducer";
 
 import campaignReducer from './campaignReducer'
+import stripeReducer from "./stripeReducer";
 
 export default combineReducers({
     error: errorReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
     location: locationsReducer,
     spotify: spotifyReducer,
     search: searchReducer,
-    campaign: campaignReducer
+    campaign: campaignReducer,
+    stripe: stripeReducer
 })
