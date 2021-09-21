@@ -51,6 +51,9 @@ function Router(props) {
         <Route path='/jukebox'>
           <PrivateRoute {...props} component={'Jukebox'} />
         </Route>
+        <Route path='/customer-jukebox'>
+          <Route component={Jukebox} />
+        </Route>
         <Route path='/checkout'>
           <PrivateRoute {...props} component={'Checkout'} />
         </Route>

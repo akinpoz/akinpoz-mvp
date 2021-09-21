@@ -126,7 +126,7 @@ function Slider(props) {
                         </a>
                     </div>
                     {location && location.music && <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-jukebox`}>
-                        <a target="_blank" href="/#/jukebox">
+                        <a href="/#/customer-jukebox">
                             <Card>
                                 <Image src={JukeboxImage} wrapped ui={false} />
                                 <Card.Content>

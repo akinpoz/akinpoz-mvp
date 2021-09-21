@@ -7,8 +7,9 @@
 - [ ] Profile page
 - [ ] Update logo/fonts/design
   - [x] Logo update
+  - [ ] bootstrap global styles still in effect
 - [ ] Git notifications for changes
-- [ ] Crud operations for fastpass list?
+- [ ] Check Github
 
 ### Drew
 
@@ -27,26 +28,20 @@
 - [x] Profile UI Framing
 - [x] Jukebox UI Framing
 - [x] Generate QR Code Feature
+- [x] Crud operations for fastpass list?
 
 ### Paul
 
 #### Currently working
 
 - [ ] User side
-  - [ ] figure out how to QR code navigation works
-  - [ ]create customer landing page
-    - [ ] if from QR code render landing page that's location specific
-    - [ ] if no location_id param, render a location search page. Mobile first.
-  - [ ] Create each campaign card
-    - [ ] Survey
-      - [ ] Front-end
-      - [ ] CRUD operations
-    - [ ] Raffle
-      - [ ] Front-end
-      - [ ] CRUD operations
-    - [ ] FastPass
-      - [ ] Front-end
-      - [ ] CRUD operations
+  - [x] figure out how to QR code navigation works
+  - [x]create customer landing page
+    - [x] if from QR code render landing page that's location specific
+    - [x] if no location_id param, render a location search page. Mobile first.
+  - [x] Create each campaign card
+  - [ ] Continue to payment
+  - [ ] Check github
 
 #### Completed
 

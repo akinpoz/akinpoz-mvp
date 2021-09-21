@@ -24,6 +24,8 @@ function CustomerCampaign(props) {
     function handleSubmit() {
         // Check for auth state here. Set redux store with info. If not logged in, redirect to login page. If logged in redirect to payment page.
         // At payment page access the info from the redux store
+        // Add the name/number of tickets to the select campaign redux object
+        // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
     }
     return (
         <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
@@ -61,10 +63,11 @@ function View(props) {
                 </div>
             )
         case "Fastpass":
+            return (<div></div>)
         case "Raffle":
             return (
                 <div>
-                    <Input type="text" placeholder="What's Your Name?" onChange={props.handleChange} value={props.info}/>
+                    <Input type="number" placeholder="How many Tickets do you want to purchase?" onChange={props.handleChange} value={props.info}/>
                 </div>
             )
     }

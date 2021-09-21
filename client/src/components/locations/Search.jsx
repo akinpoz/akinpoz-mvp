@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styles from './locations.module.css'
 import history from '../../history'
 import { connect } from 'react-redux'
-import { getLocations } from '../../actions/locationActions'
+import { getLocations, setLocation } from '../../actions/locationActions'
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
@@ -22,6 +22,7 @@ function Search(props) {
         }
     }
     function handleClick(location) {
+        setLocation(location)
         history.push(`/location/?location_id=${location._id}`)
     }
     return (
@@ -45,4 +46,4 @@ const mapStateToProps = (state) => ({
     locations: state.location.locations
 })
 
-export default connect(mapStateToProps, { getLocations })(Search)
+export default connect(mapStateToProps, { getLocations, setLocation })(Search)

@@ -10,12 +10,12 @@ dotenv.config();
 const redirectUri = 'http://localhost:8001/api/spotify/callback';
 
 /**
- * searches for song based on query.  Uses access token retreived from client credentials flow through the spotify api
+ * searches for song based on query.  Uses access token retrieved from client credentials flow through the spotify api
  *
  * @param query query string
  * @return resultsArray -- song results in the format: {name, artist, uri}
  */
-router.get('/search', auth, async function (req, res) {
+router.get('/search', async function (req, res) {
     const credentials = {
         clientId: process.env.SPOTIFY_CLIENT_ID,
         clientSecret: process.env.SPOTIFY_SECRET,

@@ -178,7 +178,7 @@ function RegisterForm(props) {
         const {name, email, password, type, nameOnCard, cardApproved} = values
         const paymentValid = nameOnCard !== '' && cardApproved
         const cardConsidered = !paymentActive || paymentValid || paymentAuthenticatedByMobile
-        return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '' && cardConsidered);
+        return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '');
     }
 
     const onSubmit = async e => {

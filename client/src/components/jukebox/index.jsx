@@ -1,17 +1,20 @@
-import React, {useEffect, useRef, useCallback} from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import styles from './jukebox.module.css'
-import {Button, Card, Search} from "semantic-ui-react";
-import {connect} from "react-redux";
+import { Button, Card, Search, Message } from "semantic-ui-react";
+import { connect } from "react-redux";
 import PropTypes from 'prop-types';
-import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
-import {queueSong} from "../../actions/spotifyActions";
+import { cleanQuery, startSearch, updateSelection } from "../../actions/searchActions";
+import { queueSong } from "../../actions/spotifyActions";
 import history from '../../history'
 import { useState } from 'react';
 
 function Jukebox(props) {
-    const location_id = props.location.select_location 
+    // Searching should be allowed for customers
+    // Queueing needs to check for auth state first
+    const location_id = props.location.select_location || props.location.select_location._id
     const timeoutRef = useRef()
-    const [location, setLocation] = useState(props.location.locations.find(location => location._id === location_id))
+    const [location, setLocation] = useState({ name: "" })
+    const [msg, setMsg] = useState()
     const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
         props.startSearch(data.value)
@@ -23,20 +26,25 @@ function Jukebox(props) {
         }, 300)
     }, [])
     useEffect(() => {
-        if(!location_id) {
+        if (!location_id) {
             history.push({
                 pathname: '/',
                 state: {
-                    msg: {status: 'yellow', text: "Please click on the location's jukebox button before navigating to the jukebox page."}
+                    msg: { status: 'yellow', text: "Please click on the location's jukebox button before navigating to the jukebox page." }
                 }
             })
         }
+        if (props.isAuthenticated) {
+            if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
+        }
+        if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
+        setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
         return () => {
             clearTimeout(timeoutRef.current)
         }
     }, [])
 
-    const handleSelectionChange = React.useCallback((e, data) => {
+    const handleSelectionChange = useCallback((e, data) => {
         props.updateSelection(data.result);
     }, [])
 
@@ -48,15 +56,20 @@ function Jukebox(props) {
     )
     return (
         <div className={styles.container}>
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
             <div className={styles.shiftUp}>
-              {location &&  <h2 style={{textAlign: 'center'}}>Playing @ {location.name}</h2> }
+                {msg &&
+                    <Message color="red">
+                        <Message.Header>{msg}</Message.Header>
+                    </Message>
+                }
+                {location && <h2 style={{ textAlign: 'center' }}>Playing @ {location.name}</h2>}
                 <Card fluid>
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40}}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40 }}>
                         <h1>
                             Search For a Song
                         </h1>
-                        <br/>
+                        <br />
                         <Search
                             loading={props.search.loading}
                             size='large'
@@ -66,15 +79,21 @@ function Jukebox(props) {
                             resultRenderer={resultRender}
                             onResultSelect={handleSelectionChange}
                         />
-                        <br/>
-                        <div style={{flexDirection: "row-reverse", display: "flex"}}>
-                            <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>
-                            <Button style={{marginRight: 10}} onClick={() => props.cleanQuery()}>Clear Selection</Button>
+                        <br />
+                        <div style={{ flexDirection: "row-reverse", display: "flex" }}>
+                            {props.auth.isAuthenticated && <div>
+                                {props.auth.user.paymentMethod.length > 0 && <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>}
+                                {props.auth.user.paymentMethod.length === 0 && <Button primary onClick={() => {
+                                    history.push({ pathname: '/profile' })
+                                }}>Click here to add a payment method</Button>}
+                            </div>}
+                            {!props.auth.isAuthenticated && <Button primary onClick={() => { history.push({ pathname: '/login' }) }}>Login to Queue a Song</Button>}
+                            <Button style={{ marginRight: 10 }} onClick={() => props.cleanQuery()}>Clear Selection</Button>
                         </div>
                     </div>
                 </Card>
             </div>
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
         </div>
     )
 }
@@ -87,7 +106,8 @@ Jukebox.propTypes = {
 }
 const mapStateToProps = (state) => ({
     search: state.search,
-    location: state.location
+    location: state.location,
+    auth: state.auth
 })
 
-export default connect(mapStateToProps, {startSearch, cleanQuery, updateSelection, queueSong})(Jukebox);
+export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong })(Jukebox);
