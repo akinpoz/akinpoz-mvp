@@ -84,6 +84,20 @@ export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getStat
     })
 }
 
+export const getOpenInvoice = (userID) => (dispatch, getState) => {
+    let params = {userID}
+    axios.post('/api/stripe/get-open-invoice', params, tokenConfig(getState)).then(res => {
+        console.log(res.data);
+    })
+}
+
+export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
+    let params = {userID, item}
+    axios.post('/api/stripe/add-invoice-item', params, tokenConfig(getState)).then(res => {
+        console.log(res.data)
+    })
+}
+
 export const markProcessing = () => (dispatch, getState) => {
     dispatch({type: PROCESSING_PAYMENT})
 }

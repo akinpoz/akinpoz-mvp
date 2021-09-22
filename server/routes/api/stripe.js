@@ -145,6 +145,84 @@ router.post('/update-payment', async function (req, res) {
     })
 })
 
+router.post('/get-open-invoice', async function (req, res) {
+    let params = req.body;
+
+    let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
+
+    if (!customerID || customerID === '') {
+        return;
+    }
+
+    let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
+
+    console.log('invoices: ' + JSON.stringify(invoices))
+
+    let invoice = invoices.data.pop();
+
+    if (invoices.data.length > 0) {
+        invoices.data.forEach(i => {
+            stripe.invoices.finalizeInvoice(i.id)
+        })
+    }
+
+    console.log(JSON.stringify(invoice));
+    //TODO what do i send back?
+})
+
+router.post('/add-invoice-item', async function (req, res) {
+    let params = req.body;
+    // Fee in cents (usd)
+    const feeAmount = 40;
+    const feeDescription = 'Tab fee'
+
+    let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
+    if (!customerID || customerID === '') {
+        return
+    }
+
+    console.log(params.item.amount, params.item.description)
+    let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
+
+    if (invoices.data && invoices.data.length !== 0) {
+        console.log('invoice was already created')
+        let item = await stripe.invoiceItems.create({
+            customer: customerID,
+            invoice: invoices.data.pop().id,
+            amount: params.item.amount,
+            description: params.item.description
+        })
+        if (item.invoice === invoices.data.pop().id) {
+            res.status(200).send('Success')
+        }
+        else {
+            res.status(400).send({error: 'Could not add invoice item to invoice'})
+        }
+    }
+    else {
+        console.log('invoice created')
+        let item = await stripe.invoiceItems.create({
+            customer: customerID,
+            amount: params.item.amount,
+            description: params.item.description,
+            currency: 'usd',
+        })
+        let fee = await stripe.invoiceItems.create({
+            customer: customerID,
+            amount: feeAmount,
+            description: feeDescription,
+            currency: 'usd'
+        })
+        let invoice = await stripe.invoices.create({customer: customerID, collection_method: 'charge_automatically', auto_advance: false, default_payment_method: paymentID})
+
+        setTimeout(closeTab, 50000, invoice.id)
+
+        if (invoice && item && fee) {
+            res.status(200).send('Success')
+        }
+    }
+})
+
 router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
     let data, eventType;
 
@@ -186,5 +264,37 @@ router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, 
     }
     res.sendStatus(200);
 });
+
+async function getCustomerAndPaymentID(userID, res) {
+    let user = await User.findOne({_id: userID})
+    if (!user) {
+        console.error('Can\'t find user')
+        res.status(400).send({error: 'Can\'t find user'});
+        return ''
+    }
+    let customerID = decrypt(user.customerID)
+    if (!customerID || customerID.length === 0) {
+        console.error('Can\'t find customerID')
+        res.status(400).send({error: 'Can\'t find customerID'});
+        return ''
+    }
+    let paymentID = decrypt(user.paymentMethod)
+    if (!paymentID || paymentID === '') {
+        console.error('No payment method')
+        res.status(400).send({error: 'No Payment Method'})
+    }
+    return {customerID, paymentID};
+}
+
+function closeTab(invoiceID) {
+    stripe.invoices.pay(invoiceID).then(r => {
+        if (r.last_finalization_error) {
+            console.error(r.last_finalization_error.message);
+        }
+        else {
+            console.log('Closed tab: ' + r.id);
+        }
+    })
+}
 
 module.exports = router;

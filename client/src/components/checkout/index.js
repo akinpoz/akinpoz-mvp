@@ -3,7 +3,13 @@ import {Button, ButtonGroup, Card, Form, Icon, Input} from "semantic-ui-react";
 import styles from './checkout.module.css'
 import {loadStripe} from "@stripe/stripe-js";
 import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {createPaymentIntent, markComplete, markProcessing} from "../../actions/stripeActions";
+import {
+    addInvoiceItem,
+    createPaymentIntent,
+    getOpenInvoice,
+    markComplete,
+    markProcessing
+} from "../../actions/stripeActions";
 import {connect} from "react-redux";
 
 
@@ -117,6 +123,12 @@ function CheckoutForm(props) {
         }
     }, [paymentRequest, props.stripe])
 
+    useEffect(() => {
+        if (props.auth.user) {
+            props.addInvoiceItem(props.auth.user._id, {amount: 100, description: 'item'})
+        }
+    }, [props.auth.user])
+
     // Handles submit logic for manually entering credit cards
     const handleSubmit = async (event) => {
         // Block native form submission.
@@ -188,7 +200,8 @@ function CheckoutForm(props) {
 }
 
 const mapStateToProps = (state) => ({
-    stripe: state.stripe
+    stripe: state.stripe,
+    auth: state.auth
 })
 
-export default connect(mapStateToProps, {createPaymentIntent, markProcessing, markComplete})(Checkout);
+export default connect(mapStateToProps, {createPaymentIntent, markProcessing, markComplete, getOpenInvoice, addInvoiceItem})(Checkout);
