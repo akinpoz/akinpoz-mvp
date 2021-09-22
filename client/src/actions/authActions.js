@@ -11,8 +11,8 @@ export const loadUser = () => (dispatch, getState) => {
         dispatch({ type: USER_LOADED, payload: res.data })
     }).catch(e => {
         console.log(JSON.stringify(e));
-       dispatch(returnErrors(e.message, e.status))
-       dispatch({ type: AUTH_ERROR })
+        dispatch(returnErrors(e.message, e.status))
+        dispatch({ type: AUTH_ERROR })
     })
 }
 
@@ -79,6 +79,26 @@ export const login = ({ email, password }) => dispatch => {
         dispatch({
             type: LOGIN_FAIL
         })
+    })
+}
+
+export const updateUser = (modifiedUser) => (dispatch, getState) => {
+    dispatch({ type: USER_LOADING })
+    const body = JSON.stringify(modifiedUser)
+    axios.post('/api/users/update', body, tokenConfig(getState)).then(res => {
+        dispatch({
+            type: USER_LOADED,
+            payload: res.data
+        })
+    }).catch(e => {
+        dispatch(returnErrors(e.message, e.status))
+    })
+}
+export const deleteUser = (_id) => (dispatch, getState) => {
+    axios.post('/api/users/delete', _id, tokenConfig(getState)).then(res => {
+        logout()
+    }).catch(e => {
+        dispatch(returnErrors(e.message, e.status))
     })
 }
 
