@@ -12,6 +12,7 @@ import {
 } from "../../actions/stripeActions";
 import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
+import {updateUser} from "../../actions/authActions";
 
 function Profile(props) {
     const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
@@ -34,7 +35,7 @@ function EndUserDashboard(props) {
             </div>
             <br/>
             <Card.Group className={styles.endUserDashboardContainer}>
-                <AccountSettings/>
+                <AccountSettings {...props}/>
                 <PaymentOptions {...props}/>
                 <History/>
             </Card.Group>
@@ -42,27 +43,48 @@ function EndUserDashboard(props) {
     )
 }
 
-function AccountSettings() {
-    // TODO: Make these inputs update user in backend
+function AccountSettings(props) {
+    const [name, setName] = useState(props.auth.user.name)
+    const [email, setEmail] = useState(props.auth.user.email)
+    function handleChange(e, data) {
+        if (data.name === 'name') {
+            setName(data.value)
+        } else if (data.name === 'email') {
+            setEmail(data.value)
+        }
+    }
+    function handleSave() {
+        const modifiedUser = {
+            name: name,
+            email: email,
+            _id: props.auth.user._id
+        }
+        props.updateUser(modifiedUser)
+    }
+    function handleDelete() {
+        window.confirm("Are you sure you want to delete your account? \nThis action is irreversible. \nAll your campaigns and locations will also be deleted")
+    }
     return (
         <Card>
             <div className={styles.userAccountSettings}>
-                <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
+                <h2>Account Info</h2>
+                {/* <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
                     Profile Pic
-                </div>
+                </div> */}
                 <br/>
                 <Form style={{width: '90%'}}>
-                    <Form.Input placeholder="Email" required />
-                    <Form.Input placeholder='Username' required />
-                    <Form.Input placeholder='Password' required />
+                    <Form.Input placeholder="Email" name="email" required value={email} onChange={handleChange}/>
+                    <Form.Input placeholder='Name' name="name" required value={name} onChange={handleChange}/>
                 </Form>
                 <br/>
                 <div className={styles.buttonContainer}>
                     {/* TODO: Make Buttons work, reset fields */}
-                    <Button primary>Save</Button>
+                    <Button primary onClick={handleSave}>Save</Button>
                     <Button style={{marginRight: 10}}>Cancel</Button>
                 </div>
             </div>
+            <Button style={{width: '90%', marginRight: 'auto', marginLeft: 'auto', marginBottom: '10px'}} basic color="red" onClick={handleDelete}>Delete Account</Button>
+
         </Card>
     )
 }
@@ -273,4 +295,4 @@ const mapStateToProps = (state) => ({
     auth: state.auth,
     stripe: state.stripe
 })
-export default connect(mapStateToProps, {getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent})(Profile)
+export default connect(mapStateToProps, {getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent, updateUser})(Profile)

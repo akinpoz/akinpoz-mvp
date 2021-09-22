@@ -6,7 +6,9 @@ const dotenv = require('dotenv');
 dotenv.config();
 // Item Model
 var User = require('../../models/User');
-const {encrypt} = require("./encryption");
+const { encrypt } = require("./encryption");
+var auth = require('../../middleware/auth')
+
 
 /**
  * @route POST api/users
@@ -59,6 +61,35 @@ router.post('/', function (req, res) {
     }).catch(e => {
         console.error(e);
     })
+})
+
+/**
+ * @route POST api/users/update
+ * @desc Update user name or email
+ * @access Private
+ */
+router.post('/update', auth, function (req, res) {
+    var { name, email } = req.body
+    User.findOneAndUpdate({ _id: req.body._id }, { name, email }, { new: true })
+        .then(user => res.json(user))
+        .catch(e => {
+            console.error(e);
+            res.status(500).send('Server Error')
+        })
+})
+
+/**
+ * @route POST api/users/delete
+ * @desc Delete user
+ * @access Private
+ */
+router.post('/delete', auth, function (req, res) {
+    User.findOneAndDelete({ _id: req.body._id })
+        .then(user => res.status(200).json({ msg: `${user._id} deleted` }))
+        .catch(e => {
+            console.error(e);
+            res.status(500).send('Server Error')
+        })
 })
 
 module.exports = router
