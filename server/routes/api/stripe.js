@@ -74,7 +74,7 @@ router.post('/create-customer', async function (req, res) {
 
 router.post('/get-payment-details/', async function (req, res) {
     let params = req.body;
-    User.findOne({ _id: params.userID }).then(user => {
+    User.findOne({_id: params.userID}).then(user => {
 
         if (!user.paymentMethod || user.paymentMethod.length === 0) {
             res.status(200).send("null")
@@ -145,18 +145,18 @@ router.post('/update-payment', async function (req, res) {
     })
 })
 
-router.post('/get-open-invoice', async function (req, res) {
+router.post('/get-draft-invoice', async function (req, res) {
     let params = req.body;
 
-    let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
+    let customerID = await getCustomerID(params.userID, res)
 
     if (!customerID || customerID === '') {
+        console.error('Could not get customer ID')
+        res.status(400).send('Could not get customer ID')
         return;
     }
 
     let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
-
-    console.log('invoices: ' + JSON.stringify(invoices))
 
     let invoice = invoices.data.pop();
 
@@ -166,61 +166,160 @@ router.post('/get-open-invoice', async function (req, res) {
         })
     }
 
-    console.log(JSON.stringify(invoice));
-    //TODO what do i send back?
+    if (invoice !== undefined) {
+        let items = []
+        for (let line of invoice.lines.data) {
+            items.push({
+                amount: line.amount,
+                description: line.description,
+                createdAt: line.metadata['createdAt'],
+                data: {
+                    timestamp: line.metadata['timestamp'],
+                    type: line.metadata['type'],
+                    campaignID: line.metadata['campaignID'],
+                    locationID: line.metadata['locationID'],
+                    transactionID: line.metadata['transactionID'],
+                    name: line.metadata['name']
+                }
+            })
+        }
+        const tab = {
+            amount: invoice.total,
+            timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
+            items: items,
+            fromOnline: true
+        }
+        res.status(200).send(tab)
+    } else {
+        res.status(200).send(null)
+    }
 })
 
 router.post('/add-invoice-item', async function (req, res) {
     let params = req.body;
+    console.log(JSON.stringify(params))
     // Fee in cents (usd)
     const feeAmount = 40;
     const feeDescription = 'Tab fee'
+    const timeout = 200000
 
     let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
     if (!customerID || customerID === '') {
+        console.error('User has no customer ID')
+        res.status(400).send('User has no customer ID')
         return
     }
 
-    console.log(params.item.amount, params.item.description)
     let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
+    let invoice
 
     if (invoices.data && invoices.data.length !== 0) {
-        console.log('invoice was already created')
+        invoice = invoices.data.pop()
         let item = await stripe.invoiceItems.create({
             customer: customerID,
-            invoice: invoices.data.pop().id,
+            invoice: invoice.id,
             amount: params.item.amount,
-            description: params.item.description
+            description: params.item.description,
+            currency: 'usd',
+            metadata: {
+                'timestamp': params.item.data.timestamp.toString(),
+                'type': params.item.data.type.toString(),
+                'campaignID': params.item.data.campaignID.toString(),
+                'locationID': params.item.data.locationID.toString(),
+                'transactionID': params.item.data.transactionID.toString(),
+                'fee': 'false',
+                'name': params.item.data.name.toString()
+            }
         })
-        if (item.invoice === invoices.data.pop().id) {
+        if (item.invoice === invoice.id) {
             res.status(200).send('Success')
+        } else {
+            // should this be different? (still invoice item, just on next invoice)
+            res.status(400).send({error: 'Could not add invoice item to current invoice'})
         }
-        else {
-            res.status(400).send({error: 'Could not add invoice item to invoice'})
-        }
-    }
-    else {
-        console.log('invoice created')
+    } else {
         let item = await stripe.invoiceItems.create({
             customer: customerID,
             amount: params.item.amount,
             description: params.item.description,
             currency: 'usd',
+            metadata: {
+                'timestamp': '' + params.item.data.timestamp.toString(),
+                'type': params.item.data.type.toString(),
+                'campaignID': params.item.data.campaignID.toString(),
+                'locationID': params.item.data.locationID.toString(),
+                'transactionID': params.item.data.transactionID.toString(),
+                'name': params.item.data.name.toString()
+            }
         })
         let fee = await stripe.invoiceItems.create({
             customer: customerID,
             amount: feeAmount,
             description: feeDescription,
-            currency: 'usd'
-        })
-        let invoice = await stripe.invoices.create({customer: customerID, collection_method: 'charge_automatically', auto_advance: false, default_payment_method: paymentID})
+            currency: 'usd',
+            metadata: {
+                'name': 'Tab Fee'
+            }
 
-        setTimeout(closeTab, 50000, invoice.id)
+        })
+        invoice = await stripe.invoices.create({
+            customer: customerID,
+            collection_method: 'charge_automatically',
+            auto_advance: false,
+            default_payment_method: paymentID,
+            metadata: {
+                'timeWillBeSubmitted': (Date.now() + timeout).toString(),
+            }
+        })
 
         if (invoice && item && fee) {
-            res.status(200).send('Success')
+            setTimeout(closeTab, timeout, invoice.id)
+            let items = []
+            for (let line of invoice.lines.data) {
+                items.push({
+                    amount: line.amount,
+                    description: line.description,
+                    data: line.metadata
+                })
+            }
+            const tab = {
+                amount: invoice.total,
+                metadata: invoice.metadata,
+                items: items,
+                fromOnline: true
+            }
+            res.status(200).send(tab)
+        } else if (item && fee) {
+            res.status(200).send('Added Items to customer, could not create invoice')
+        } else {
+            res.status(400).send('Could not add items to account')
         }
     }
+})
+
+router.post('/close-tab', async function(req, res) {
+    let params = req.body;
+    let customerID = await getCustomerID(params.userID);
+    stripe.invoices.list({customer: customerID, status: 'draft'}).then(async invoices => {
+        let paid = true;
+        let errors = [];
+        if (!invoices.data ||invoices.data.length === 0) {
+            res.status(400).send('No Tab to Close')
+        }
+        for (const invoice of invoices.data) {
+            const invoiceRes = await stripe.invoices.pay(invoice.id)
+            paid = paid && invoiceRes.status === 'paid'
+            if (invoiceRes.status !== 'paid') {
+                errors.push(invoiceRes.status)
+            }
+        }
+        if (paid) {
+            res.status(200).send('Invoices paid')
+        }
+        else {
+            res.status(400).send(errors)
+        }
+    })
 })
 
 router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
@@ -286,12 +385,27 @@ async function getCustomerAndPaymentID(userID, res) {
     return {customerID, paymentID};
 }
 
+async function getCustomerID(userID, res) {
+    let user = await User.findOne({_id: userID})
+    if (!user) {
+        console.error('Can\'t find user')
+        res.status(400).send({error: 'Can\'t find user'});
+        return ''
+    }
+    let customerID = decrypt(user.customerID)
+    if (!customerID || customerID.length === 0) {
+        console.error('Can\'t find customerID')
+        res.status(400).send({error: 'Can\'t find customerID'});
+        return ''
+    }
+    return customerID;
+}
+
 function closeTab(invoiceID) {
     stripe.invoices.pay(invoiceID).then(r => {
         if (r.last_finalization_error) {
             console.error(r.last_finalization_error.message);
-        }
-        else {
+        } else {
             console.log('Closed tab: ' + r.id);
         }
     })

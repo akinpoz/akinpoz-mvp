@@ -7,6 +7,7 @@ import { cleanQuery, startSearch, updateSelection } from "../../actions/searchAc
 import { queueSong } from "../../actions/spotifyActions";
 import history from '../../history'
 import { useState } from 'react';
+import {getDraftInvoice} from "../../actions/stripeActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
@@ -34,19 +35,33 @@ function Jukebox(props) {
                 }
             })
         }
-        if (props.isAuthenticated) {
-            if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
-        }
-        if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
-        setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
-        return () => {
-            clearTimeout(timeoutRef.current)
-        }
     }, [])
+
+    useEffect(() => {
+        if (props.auth) {
+            if (props.auth.isAuthenticated && props.auth.user.paymentMethod) {
+                if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
+                props.getDraftInvoice()
+            }
+            if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
+            setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
+            return () => {
+                clearTimeout(timeoutRef.current)
+            }
+        }
+    }, [props.auth])
 
     const handleSelectionChange = useCallback((e, data) => {
         props.updateSelection(data.result);
     }, [])
+
+    const handleQueueClick = () => {
+
+    }
+
+    const hasPaymentMethod = () => {
+        return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
+    }
 
     const resultRender = (item) => (
         <div>
@@ -82,10 +97,10 @@ function Jukebox(props) {
                         <br />
                         <div style={{ flexDirection: "row-reverse", display: "flex" }}>
                             {props.auth.isAuthenticated && <div>
-                                {props.auth.user.paymentMethod.length > 0 && <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>}
-                                {props.auth.user.paymentMethod.length === 0 && <Button primary onClick={() => {
+                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>}
+                                {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({ pathname: '/profile' })
-                                }}>Click here to add a payment method</Button>}
+                                }}>Add a Payment Method</Button>}
                             </div>}
                             {!props.auth.isAuthenticated && <Button primary onClick={() => { history.push({ pathname: '/login' }) }}>Login to Queue a Song</Button>}
                             <Button style={{ marginRight: 10 }} onClick={() => props.cleanQuery()}>Clear Selection</Button>
@@ -110,4 +125,4 @@ const mapStateToProps = (state) => ({
     auth: state.auth
 })
 
-export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong })(Jukebox);
+export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong, getDraftInvoice })(Jukebox);

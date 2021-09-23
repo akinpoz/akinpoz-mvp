@@ -15,7 +15,16 @@ import {
     REQUESTED_PAYMENT_DETAILS,
     REQUESTED_SETUP_INTENT,
     RETRIEVED_PAYMENT_DETAILS,
-    REQUEST_PAYMENT_UPDATE
+    REQUEST_PAYMENT_UPDATE,
+    REQUESTED_DRAFT_INVOICE,
+    RETRIEVED_DRAFT_INVOICE,
+    ERROR_RETRIEVING_DRAFT_INVOICE,
+    REQUESTED_ADD_INVOICE_ITEM,
+    ERROR_ADDING_INVOICE_ITEM,
+    ADD_INVOICE_ITEM_SUCCESSFUL,
+    SET_LOCAL_TAB,
+    REQUEST_CLOSE_TAB,
+    SUCCESSFULLY_CLOSED_TAB, ERROR_CLOSING_TAB
 } from "./types";
 
 export const createPaymentIntent = (paymentMethodType, currency, amount, transactionID) => (dispatch, getState) => {
@@ -84,24 +93,61 @@ export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getStat
     })
 }
 
-export const getOpenInvoice = (userID) => (dispatch, getState) => {
+export const getDraftInvoice = (userID) => (dispatch, getState) => {
     let params = {userID}
-    axios.post('/api/stripe/get-open-invoice', params, tokenConfig(getState)).then(res => {
-        console.log(res.data);
+    dispatch({type: REQUESTED_DRAFT_INVOICE})
+    axios.post('/api/stripe/get-draft-invoice', params, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            dispatch({type: RETRIEVED_DRAFT_INVOICE, hasOpenTab: res.data !== '', tab: res.data})
+        }
+        else {
+            dispatch({type: ERROR_RETRIEVING_DRAFT_INVOICE})
+        }
     })
 }
 
 export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
+    dispatch({type: REQUESTED_ADD_INVOICE_ITEM})
     let params = {userID, item}
     axios.post('/api/stripe/add-invoice-item', params, tokenConfig(getState)).then(res => {
-        console.log(res.data)
+        if (res.status !== 200) {
+            dispatch({type: ERROR_ADDING_INVOICE_ITEM})
+            console.error(res.data)
+        }
+        else {
+            dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, tab: res.data})
+        }
     })
 }
 
-export const markProcessing = () => (dispatch, getState) => {
+export const setupNewTab = (item) => (dispatch) => {
+    const feeAmt = 40
+    const tab = {
+        amount: item.amount + feeAmt,
+        item: item,
+        fromOnline: false
+    }
+    dispatch({type: SET_LOCAL_TAB, tab: tab})
+}
+
+export const closeTab = (userID) => (dispatch, getState) => {
+    dispatch({type: REQUEST_CLOSE_TAB})
+    const params = {userID}
+    axios.post('/api/stripe/close-tab', params, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            dispatch({type: SUCCESSFULLY_CLOSED_TAB})
+        }
+        else {
+            console.error('Tabs Outstanding: ' + res.data)
+            dispatch({type: ERROR_CLOSING_TAB})
+        }
+    })
+}
+
+export const markProcessing = () => (dispatch) => {
     dispatch({type: PROCESSING_PAYMENT})
 }
 
-export const markComplete = (status) => (dispatch, getState) => {
+export const markComplete = (status) => (dispatch) => {
     dispatch({type: PAYMENT_COMPLETE, status: status})
 }

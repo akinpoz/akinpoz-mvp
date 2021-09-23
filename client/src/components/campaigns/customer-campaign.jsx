@@ -1,45 +1,112 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import history from '../../history'
-import { connect } from 'react-redux'
-import { getCampaign } from '../../actions/campaignActions'
-import { Button, Card, Input } from 'semantic-ui-react'
+import {connect} from 'react-redux'
+import {getCampaign} from '../../actions/campaignActions'
+import {Button, Card, Input} from 'semantic-ui-react'
+import {addInvoiceItem, getDraftInvoice, setupNewTab} from "../../actions/stripeActions";
 
 function CustomerCampaign(props) {
     const campaign_id = history.location.search.split('=')[1]
     const [campaign, setCampaign] = useState(props.campaign)
-    const [info, setInfo] = useState()
+    const [info, setInfo] = useState('')
+    const [buttonLabel, setButtonLabel] = useState('Open New Tab')
+
+    useEffect(() => {
+        // On render
+        if (props.stripe && props.stripe.hasOpenTab) {
+            setButtonLabel('Add To Tab')
+        }
+    })
+
     useEffect(() => {
         if (props.campaign === "") {
             props.getCampaign(campaign_id)
         }
         setCampaign(props.campaign)
     }, [props.campaign])
+
+    useEffect(() => {
+        if (props.auth && props.auth.user) {
+            props.getDraftInvoice(props.auth.user._id)
+        }
+    }, [props.auth])
+
+    useEffect(() => {
+        if (props.stripe.hasOpenTab) {
+            setButtonLabel('Add To Tab')
+        } else {
+            setButtonLabel('Open New Tab')
+        }
+    }, [props.stripe.hasOpenTab])
+
     function handleChange(e, data) {
         setInfo(data.value)
     }
+
     function handleClick(e) {
         setInfo(e.target.value)
     }
+
     function handleSubmit() {
         // Check for auth state here. Set redux store with info. If not logged in, redirect to login page. If logged in redirect to payment page.
         // At payment page access the info from the redux store
         // Add the name/number of tickets to the select campaign redux object
         // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
+
+        console.log(campaign)
+        const item = {
+            amount: 100,
+            description: campaign.details.type,
+            data: {
+                timestamp: Date.now(),
+                type: campaign.details.type,
+                campaignID: campaign._id,
+                locationID: campaign.location,
+                transactionID: props.auth.user._id + Date.now(),
+                name: campaign.title
+            }
+
+        }
+        if (props.stripe.hasOpenTab) {
+            if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
+                props.addInvoiceItem(props.auth.user._id, item)
+            }
+        } else {
+            props.setupNewTab(item)
+            history.push('/checkout')
+        }
+
+    }
+
+    const hasPaymentMethod = () => {
+        return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
     }
     return (
-        <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
+        <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
             {campaign && <Card>
                 <Card.Content>
                     <Card.Header>{campaign.title}</Card.Header>
                     <Card.Meta>{campaign.details.type}</Card.Meta>
                     <p>
                         {campaign.details.type === "Survey" ? campaign.question : `Cost: $ ${campaign.question}`}
-                        <View type={campaign.details.type} campaign={campaign} handleChange={handleChange} handleClick={handleClick} info={info}/>
+                        <View type={campaign.details.type} campaign={campaign} handleChange={handleChange}
+                              handleClick={handleClick} info={info}/>
                     </p>
                 </Card.Content>
                 <Card.Content extra>
-                    <Button fluid onClick={handleSubmit}>Continue to Payment</Button>
+                    <div style={{flexDirection: "row-reverse", display: "flex"}}>
+                        {props.auth.isAuthenticated && <div>
+                            {hasPaymentMethod() && <Button primary onClick={handleSubmit}
+                                                           disabled={props.campaign.details.type !== 'Fastpass' && info === ''}>{buttonLabel}</Button>}
+                            {!hasPaymentMethod() && <Button primary onClick={() => {
+                                history.push({pathname: '/profile'})
+                            }}>Add a Payment Method</Button>}
+                        </div>}
+                        {!props.auth.isAuthenticated && <Button primary onClick={() => {
+                            history.push({pathname: '/login'})
+                        }}>Login</Button>}
+                    </div>
                 </Card.Content>
             </Card>}
         </div>
@@ -67,7 +134,8 @@ function View(props) {
         case "Raffle":
             return (
                 <div>
-                    <Input type="number" placeholder="How many Tickets do you want to purchase?" onChange={props.handleChange} value={props.info}/>
+                    <Input type="number" placeholder="How many Tickets do you want to purchase?"
+                           onChange={props.handleChange} value={props.info}/>
                 </div>
             )
     }
@@ -75,7 +143,9 @@ function View(props) {
 
 
 const mapStateToProps = state => ({
-    campaign: state.campaign.select_campaign
+    campaign: state.campaign.select_campaign,
+    auth: state.auth,
+    stripe: state.stripe
 })
 
-export default connect(mapStateToProps, { getCampaign })(CustomerCampaign)
+export default connect(mapStateToProps, {getCampaign, getDraftInvoice, addInvoiceItem, setupNewTab})(CustomerCampaign)
