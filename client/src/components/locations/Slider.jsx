@@ -139,7 +139,7 @@ function Slider(props) {
                     {location && location.campaigns.length > 0 && location.campaigns.map(campaign => {
                         return (
                             <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-${campaign._id}`}>
-                                <a onClick={handleClick.bind(null, campaign)}>
+                                <a style={{cursor: 'pointer'}} onClick={handleClick.bind(null, campaign)}>
                                     <Card>
                                         <Image src={icons[campaign.details["type"]]} wrapped ui={false} />
                                         <Card.Content>
@@ -152,7 +152,7 @@ function Slider(props) {
                         )
                     })}
                     <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-menumarket`}>
-                        <a target="_blank" href="https://apok0z.webflow.io/">
+                        <a target="_blank" href="https://apokoz.com/">
                             <Card>
                                 <Image src={MenuMarketImage} wrapped ui={false} />
                                 <Card.Content>

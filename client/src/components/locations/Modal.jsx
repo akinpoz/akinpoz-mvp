@@ -13,6 +13,7 @@ function LocationModal(props) {
     }, [open]);
     function submit(e) {
         e.preventDefault();
+        //Location ID will be null if new location but has value if updating
         const locationDetails = {
             name: values.name,
             description: values.description,

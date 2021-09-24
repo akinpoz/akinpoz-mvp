@@ -10,23 +10,22 @@ var auth = require('../../middleware/auth')
 
 
 /**
- * @route  GET api/campaigns/
- * @desc   Get all campaigns
- * @access Public
+ * @route GET api/campaigns/location
+ * @desc get all campaigns by location ID
+ * @access Private
  */
-router.get('/', async function (req, res) {
+router.get('/location', auth, async function (req, res) {
     try {
-        let campaigns = await Campaign.find()
+        let campaigns = await Campaign.find({ location: req.query.location_id })
         res.status(200).send(campaigns)
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
     }
 })
 
 /**
- * @route GET api/campaigns/user_id
- * @desc get all campaigns by user ID
+ * @route GET api/campaigns/campaigns
+ * @desc get all campaigns by userID
  * @access Private
  */
 router.get('/user_id', auth, async function (req, res) {
@@ -93,17 +92,8 @@ router.post('/add', auth, (req, res) => {
  */
 router.post('/update', auth, async (req, res) => {
     try {
-
-        const campaign = await Campaign.findOneAndUpdate(
-            { _id: req.body.campaign_id },
-            {
-                title: req.body.title,
-                description: req.body.description,
-                question: req.body.question,
-                details: req.body.details,
-            },
-            { useFindAndModify: false, new: true })
-        res.status(200).send(campaign);
+        const campaign = await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, { name: req.body.name, description: req.body.description }, { useFindAndModify: false, new: true })
+        res.status(200).send(campaign)
     } catch (e) {
         console.error(e)
         res.status(500).send(e)

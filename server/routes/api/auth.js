@@ -23,7 +23,6 @@ router.post('/', function (req, res) {
     // Check for existing user
     User.findOne({ email }).then(user => {
         if (!user) return res.status(400).json({ msg: 'User does not exists' })
-
         // Validate password
         bcrypt.compare(password.toString(), user.password).then(isMatch => {
             if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' })

@@ -35,6 +35,14 @@ function Jukebox(props) {
                 }
             })
         }
+        if (props.auth.isAuthenticated) {
+            if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
+        }
+        if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
+        setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
+        return () => {
+            clearTimeout(timeoutRef.current)
+        }
     }, [])
 
     useEffect(() => {

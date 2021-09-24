@@ -45,39 +45,42 @@ function BusinessCampaign(props) {
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
                 {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={handleClick}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
+                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><a onClick={handleClick}>Results</a></abbr>}
                 <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} {...props.campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
-            {toggleList &&
-                <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
-                    <thead>
-                        {options.length > 0 &&
-                            <tr>
-                                <th>Name</th>
-                                <th style={{ textAlign: 'end' }}>Remove</th>
-                            </tr>
-                        }
-                    </thead>
-                    <tbody>
-                        {options.length > 0 && options.map(option => {
-                            return (
-                                <tr key={option} >
-                                    <td>{option}</td>
-                                    <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
-                                </tr>
-                            )
-                        })}
-                        {options.length === 0 &&
-                            <tr>
-                                <td>There are no names on the list</td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            }
+            {toggleList && <ExtraContent options={options} handleNameRemove={handleNameRemove}/>}
         </Card >
     )
+}
+
+// a component that displays the list of names/results that are in the campaign
+function ExtraContent(props) {
+    <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
+        <thead>
+            {props.options.length > 0 &&
+                <tr>
+                    <th>Name</th>
+                    <th style={{ textAlign: 'end' }}>Remove</th>
+                </tr>
+            }
+        </thead>
+        <tbody>
+            {props.options.length > 0 && props.options.map(option => {
+                return (
+                    <tr key={option} >
+                        <td>{option}</td>
+                        <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
+                    </tr>
+                )
+            })}
+            {props.options.length === 0 &&
+                <tr>
+                    <td>There are no names on the list</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 const mapStateToProps = (state) => ({

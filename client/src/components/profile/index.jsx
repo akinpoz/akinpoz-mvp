@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
-import {Button, Card, Form} from "semantic-ui-react";
+import { Button, Card, Form } from "semantic-ui-react";
 import {
     createSetupIntent,
     getPaymentDetails,
@@ -10,9 +10,9 @@ import {
     markProcessing,
     updatePaymentMethod
 } from "../../actions/stripeActions";
-import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {loadStripe} from "@stripe/stripe-js";
-import {updateUser} from "../../actions/authActions";
+import { CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { updateUser, deleteUser } from "../../actions/authActions";
 
 function Profile(props) {
     const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
@@ -28,16 +28,16 @@ function Profile(props) {
 function EndUserDashboard(props) {
     return (
         <div>
-            <br/>
-            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                <h1 style={{textAlign: "center"}}>Welcome, {props.auth.user.name}!</h1>
-                <div className={styles.divider}/>
+            <br />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h1 style={{ textAlign: "center" }}>Welcome, {props.auth.user.name}!</h1>
+                <div className={styles.divider} />
             </div>
-            <br/>
+            <br />
             <Card.Group className={styles.endUserDashboardContainer}>
-                <AccountSettings {...props}/>
-                <PaymentOptions {...props}/>
-                <History/>
+                <AccountSettings {...props} />
+                <PaymentOptions {...props} />
+                <History />
             </Card.Group>
         </div>
     )
@@ -62,7 +62,7 @@ function AccountSettings(props) {
         props.updateUser(modifiedUser)
     }
     function handleDelete() {
-        window.confirm("Are you sure you want to delete your account? \nThis action is irreversible. \nAll your campaigns and locations will also be deleted")
+       if(window.confirm("Are you sure you want to delete your account? \nThis action is irreversible and will result in a lose of data.")) props.deleteUser(props.auth.user._id)
     }
     return (
         <Card>
@@ -71,19 +71,19 @@ function AccountSettings(props) {
                 {/* <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
                     Profile Pic
                 </div> */}
-                <br/>
-                <Form style={{width: '90%'}}>
-                    <Form.Input placeholder="Email" name="email" required value={email} onChange={handleChange}/>
-                    <Form.Input placeholder='Name' name="name" required value={name} onChange={handleChange}/>
+                <br />
+                <Form style={{ width: '90%' }}>
+                    <Form.Input placeholder="Email" name="email" required value={email} onChange={handleChange} />
+                    <Form.Input placeholder='Name' name="name" required value={name} onChange={handleChange} />
                 </Form>
-                <br/>
+                <br />
                 <div className={styles.buttonContainer}>
                     {/* TODO: Make Buttons work, reset fields */}
                     <Button primary onClick={handleSave}>Save</Button>
-                    <Button style={{marginRight: 10}}>Cancel</Button>
+                    <Button style={{ marginRight: 10 }}>Cancel</Button>
                 </div>
             </div>
-            <Button style={{width: '90%', marginRight: 'auto', marginLeft: 'auto', marginBottom: '10px'}} basic color="red" onClick={handleDelete}>Delete Account</Button>
+            <Button style={{ width: '90%', marginRight: 'auto', marginLeft: 'auto', marginBottom: '10px' }} basic color="red" onClick={handleDelete}>Delete Account</Button>
 
         </Card>
     )
@@ -96,13 +96,13 @@ function History() {
         <Card>
             <div className={styles.userAccountSettings}>
                 <h2>History</h2>
-                <br/>
-                <div className={styles.divider}/>
-                <br/>
+                <br />
+                <div className={styles.divider} />
+                <br />
                 <LocationHistory name='Restaurant 1' />
-                <br/>
-                <div className={styles.divider}/>
-                <br/>
+                <br />
+                <div className={styles.divider} />
+                <br />
                 <LocationHistory name='Restaurant 2' />
             </div>
         </Card>
@@ -146,7 +146,7 @@ function PaymentOptions(props) {
 
                 const result = await stripe.confirmCardSetup(
                     props.stripe.clientSecret,
-                    {payment_method: event.paymentMethod.id}
+                    { payment_method: event.paymentMethod.id }
                 );
                 if (result.error) {
                     event.complete('fail')
@@ -156,7 +156,7 @@ function PaymentOptions(props) {
                     event.complete('success')
                     if (result.setupIntent.status === 'requires_action') {
                         // can redirect to bank for further action / confirmation, etc.
-                        const {error} = await stripe.confirmCardSetup(props.stripe.clientSecret);
+                        const { error } = await stripe.confirmCardSetup(props.stripe.clientSecret);
                         if (error) {
                             console.error(error.message)
                             props.markComplete('fail')
@@ -218,7 +218,7 @@ function PaymentOptions(props) {
         e.preventDefault()
         const result = await stripe.confirmCardSetup(props.stripe.clientSecret, {
             payment_method: {
-                card: elements.getElement(CardElement), billing_details: {name: nameOnCard}
+                card: elements.getElement(CardElement), billing_details: { name: nameOnCard }
             }
         })
         if (result.error) {
@@ -242,25 +242,25 @@ function PaymentOptions(props) {
                 </Card>}
 
                 <h4>Change Payment</h4>
-                <br/>
+                <br />
                 <div className={styles.paymentInput}>
                     {paymentRequest &&
-                    <div id='browser-card-support'>
-                        <PaymentRequestButtonElement options={{paymentRequest}} type='button'/>
-                        <br/>
-                        <div className={styles.divider}/>
-                        <br/>
-                    </div>
+                        <div id='browser-card-support'>
+                            <PaymentRequestButtonElement options={{ paymentRequest }} type='button' />
+                            <br />
+                            <div className={styles.divider} />
+                            <br />
+                        </div>
                     }
                     <Form onSubmit={onSubmit}>
                         <Form.Field>
                             <Form.Input name='nameOnCard' value={nameOnCard} onChange={(e) => setNameOnCard(e.target.value)} required placeholder='Name On Card' />
                         </Form.Field>
-                        <Card style={{padding: 10}} >
+                        <Card style={{ padding: 10 }} >
                             <CardElement />
                         </Card>
                         <div className={styles.buttonContainer}>
-                            <Form.Button primary content='Submit' disabled={nameOnCard === '' || !cardApproved}/>
+                            <Form.Button primary content='Submit' disabled={nameOnCard === '' || !cardApproved} />
                         </div>
                     </Form>
                 </div>
@@ -295,4 +295,4 @@ const mapStateToProps = (state) => ({
     auth: state.auth,
     stripe: state.stripe
 })
-export default connect(mapStateToProps, {getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent, updateUser})(Profile)
+export default connect(mapStateToProps, { getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent, updateUser, deleteUser })(Profile)

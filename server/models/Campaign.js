@@ -4,10 +4,10 @@ var Schema = mongoose.Schema
 
 /**
  * @Schema Campaign
- * @desc A schmea for the Campaign used for CRUD operations on the campaign of each business/user.
+ * @desc A schema for the Campaign used for CRUD operations on the campaign of each business/user.
  * @property {String} name* - The name of the location.
  * @property {String} description - The description of the location.
- * @property {Array[String]} campaings - The campaings that belong to the location.
+ * @property {Array[String]} campaigns - The campaigns that belong to the location.
  * @property {String} user* - The user that created the location.
  */
 var CampaignSchema = new Schema({
@@ -40,11 +40,17 @@ var CampaignSchema = new Schema({
         required: true,
         options: {
             type: [String],
+        },
+        result: {
+            type: String,
         }
     },
     question: {
         type: String,
         required: true
+    },
+    active: {
+        type: Boolean,
     }
 })
 

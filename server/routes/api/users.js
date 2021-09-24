@@ -4,10 +4,11 @@ var router = express.Router()
 var jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
 dotenv.config();
-// Item Model
-var User = require('../../models/User');
+const User = require('../../models/User');
 const { encrypt } = require("./encryption");
-var auth = require('../../middleware/auth')
+var auth = require('../../middleware/auth');
+const Campaign = require('../../models/Campaign');
+const Location = require('../../models/Location');
 
 
 /**
@@ -82,14 +83,13 @@ router.post('/update', auth, function (req, res) {
  * @route POST api/users/delete
  * @desc Delete user
  * @access Private
+ * @param {string} _id
  */
-router.post('/delete', auth, function (req, res) {
-    User.findOneAndDelete({ _id: req.body._id })
-        .then(user => res.status(200).json({ msg: `${user._id} deleted` }))
-        .catch(e => {
-            console.error(e);
-            res.status(500).send('Server Error')
-        })
+router.post('/delete', auth, async function (req, res) {
+    await Location.deleteMany({ user: req.body._id })
+    await Campaign.deleteMany({ user: req.body._id })
+    await User.remove({ _id: req.body._id }, { useFindAndModify: false })
+    res.status(200).send(`User ${req.body._id} deleted`)
 })
 
 module.exports = router
