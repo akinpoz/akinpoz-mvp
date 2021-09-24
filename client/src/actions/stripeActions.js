@@ -27,19 +27,13 @@ import {
     SUCCESSFULLY_CLOSED_TAB, ERROR_CLOSING_TAB
 } from "./types";
 
-export const createPaymentIntent = (paymentMethodType, currency, amount, transactionID) => (dispatch, getState) => {
-    const params = {paymentMethodType: paymentMethodType, currency: currency, amount: amount, transactionID: transactionID};
-    dispatch({type: REQUESTED_PAYMENT_INTENT, transactionID: transactionID})
-    axios.post('/api/stripe/create-payment-intent', params, tokenConfig(getState)).then(res => {
-        if (res.status === 200) {
-            dispatch({type: CREATED_PAYMENT_INTENT, paymentIntent: res.data})
-        }
-        else {
-            dispatch({type: ERROR_CREATING_PAYMENT_INTENT})
-        }
-    })
-}
-
+/**
+ * Creates stripe customer object to save and process payment
+ * @param name
+ * @param email
+ * @param paymentMethod payment id for saved payment info in stripe api
+ * @return {(function(*): void)|*}
+ */
 export const createCustomer = (name, email, paymentMethod) => (dispatch) => {
     dispatch({type: REQUESTED_CUSTOMER})
     const params = {
@@ -55,6 +49,11 @@ export const createCustomer = (name, email, paymentMethod) => (dispatch) => {
     })
 }
 
+/**
+ * Returns a wrapped intent for users to save payment for future use without making an
+ * imminent payment
+ * @return {(function(*): void)|*}
+ */
 export const createSetupIntent = () => (dispatch) => {
     dispatch({type: REQUESTED_SETUP_INTENT})
     axios.post('/api/stripe/create-setup-intent').then(res => {
@@ -67,6 +66,11 @@ export const createSetupIntent = () => (dispatch) => {
     })
 }
 
+/**
+ * Gets (non-sensitive) saved payment info from the customer object referenced in user
+ * @param userID
+ * @return {(function(*, *=): void)|*}
+ */
 export const getPaymentDetails = (userID) => (dispatch, getState) => {
     dispatch({type: REQUESTED_PAYMENT_DETAILS})
     let params = {userID}
@@ -80,6 +84,12 @@ export const getPaymentDetails = (userID) => (dispatch, getState) => {
     })
 }
 
+/**
+ * Changes the current payment method (or adds one if one isnt already saved)
+ * @param userID
+ * @param paymentMethod
+ * @return {(function(*, *=): void)|*}
+ */
 export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getState) => {
     dispatch({type: REQUEST_PAYMENT_UPDATE})
     let params = {userID, paymentMethod}
@@ -93,6 +103,11 @@ export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getStat
     })
 }
 
+/**
+ * Gets the current invoice that is a 'draft' ie editable
+ * @param userID
+ * @return {(function(*, *=): void)|*}
+ */
 export const getDraftInvoice = (userID) => (dispatch, getState) => {
     let params = {userID}
     dispatch({type: REQUESTED_DRAFT_INVOICE})
@@ -106,6 +121,12 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
     })
 }
 
+/**
+ * Adds an item to be invoiced via either adding to a current invoice or creating a new one
+ * @param userID
+ * @param item
+ * @return {(function(*, *=): void)|*}
+ */
 export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
     dispatch({type: REQUESTED_ADD_INVOICE_ITEM})
     let params = {userID, item}
@@ -120,6 +141,13 @@ export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
     })
 }
 
+/**
+ * Adds prospective item to a 'local tab' before adding it as an invoice item.
+ * Structured in a way that will resemble more (batched) items if we end up making
+ * a 'cart' to do multiple things at the same time.
+ * @param item
+ * @return {(function(*): void)|*}
+ */
 export const setupNewTab = (item) => (dispatch) => {
     const feeAmt = 40
     const tab = {
@@ -130,6 +158,11 @@ export const setupNewTab = (item) => (dispatch) => {
     dispatch({type: SET_LOCAL_TAB, tab: tab})
 }
 
+/**
+ * Closes the tab that would be a 'draft' under the customer object
+ * @param userID
+ * @return {(function(*, *=): void)|*}
+ */
 export const closeTab = (userID) => (dispatch, getState) => {
     dispatch({type: REQUEST_CLOSE_TAB})
     const params = {userID}
@@ -144,10 +177,50 @@ export const closeTab = (userID) => (dispatch, getState) => {
     })
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// THESE ARE METHODS THAT MIGHT BE USED LATER.  THEY INVOLVE MAKING CURRENT TRANSACTIONS NOT MAKING A TAB //////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Only will be used if a customer wants to close a tab using a different form of payment
+ * (Not Being Used Right Now)
+ *
+ * @param paymentMethodType (card)
+ * @param currency (usd)
+ * @param amount
+ * @param transactionID
+ * @return {(function(*, *=): void)|*}
+ */
+export const createPaymentIntent = (paymentMethodType, currency, amount, transactionID) => (dispatch, getState) => {
+    const params = {paymentMethodType: paymentMethodType, currency: currency, amount: amount, transactionID: transactionID};
+    dispatch({type: REQUESTED_PAYMENT_INTENT, transactionID: transactionID})
+    axios.post('/api/stripe/create-payment-intent', params, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            dispatch({type: CREATED_PAYMENT_INTENT, paymentIntent: res.data})
+        }
+        else {
+            dispatch({type: ERROR_CREATING_PAYMENT_INTENT})
+        }
+    })
+}
+
+/**
+ * Marks processing payment -- used for payment intents.
+ * (not being used right now)
+ * @return {(function(*): void)|*}
+ */
 export const markProcessing = () => (dispatch) => {
     dispatch({type: PROCESSING_PAYMENT})
 }
 
+/**
+ * Marks completed payment -- used for processing payments.
+ * (not being used right now)
+ * @param status
+ * @return {(function(*): void)|*}
+ */
 export const markComplete = (status) => (dispatch) => {
     dispatch({type: PAYMENT_COMPLETE, status: status})
 }

@@ -15,10 +15,8 @@
 
 #### Currently working on
 
-- [ ] Payment wall
-  - [x] frontend implemented
-  - [ ] implement stripe
-  - [ ] design history management - CRUD
+- [ ] Transaction Handling
+  - [ ] design history management - pull from stripe
   - [ ] connect history to redux (front / back)
   - [ ] add to jukebox, raffle and survey
 
@@ -29,6 +27,9 @@
 - [x] Jukebox UI Framing
 - [x] Generate QR Code Feature
 - [x] Crud operations for fastpass list?
+- [x] Payment wall
+  - [x] frontend implemented
+  - [x] implement stripe
 
 ### Paul
 
@@ -68,6 +69,25 @@
 - [ ] JWT token expires too quickly and makes actions like add fail. When those actions fail, they crash the site. Either extend the token to infinite or handle the 400 user not found error and redirect to the login for all actions.
 
 ## Change Log
+
+- 9/24
+  - What to expect:
+    - WOWZA that was a tough one...
+    - Added tab logic
+    - Participating in a campaign will either:
+      - if you have a tab open this will prompt window.confirm to add to your tab
+      - if you dont you will be taken to the open tab screen where you will have to confirm
+        you have read the terms and conditions and agree that your saved card will be charged in 24
+        hours (unless they close it sooner).
+    - As of right now, there is no way to change your payment method after opening a tab.
+      - In the case that payment fails we can send them an invoice through the stripe dashboard.  
+        I believe it is sent automatically when payment fails.
+  - TODO:
+    - Go through edge cases
+      - What if draft exists but time has expired?
+      - Others
+    - Do we want to let users open / close tab using different payment
+    - Make adding to tab trigger campaign fulfilment
 
 - 9/9
   - What to expect:

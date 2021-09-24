@@ -34,34 +34,6 @@ const initialState = {
 
 export default function ( state = initialState, action) {
     switch (action.type) {
-        case CREATED_PAYMENT_INTENT:
-            return {
-                ...state,
-                clientSecret: action.paymentIntent.clientSecret,
-                loading: false,
-                transactionID: action.paymentIntent.transactionID
-            }
-        case ERROR_CREATING_PAYMENT_INTENT:
-            return initialState;
-
-        case REQUESTED_PAYMENT_INTENT:
-            return {
-                ...state,
-                clientSecret: '',
-                loading: true,
-                transactionID: action.transactionID
-            }
-        case PROCESSING_PAYMENT:
-            return {
-                ...state,
-                loading: true
-            }
-        case PAYMENT_COMPLETE:
-            return {
-                ...state,
-                loading: false,
-                status: action.status
-            }
         case CREATED_SETUP_INTENT:
             return {
                 ...state,
@@ -162,6 +134,41 @@ export default function ( state = initialState, action) {
         case ERROR_CLOSING_TAB:
             return {
                 ...state
+            }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// THESE ARE METHODS THAT MIGHT BE USED LATER.  THEY INVOLVE MAKING CURRENT TRANSACTIONS NOT MAKING A TAB //////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        case CREATED_PAYMENT_INTENT:
+            return {
+                ...state,
+                clientSecret: action.paymentIntent.clientSecret,
+                loading: false,
+                transactionID: action.paymentIntent.transactionID
+            }
+        case ERROR_CREATING_PAYMENT_INTENT:
+            return initialState;
+
+        case REQUESTED_PAYMENT_INTENT:
+            return {
+                ...state,
+                clientSecret: '',
+                loading: true,
+                transactionID: action.transactionID
+            }
+        case PROCESSING_PAYMENT:
+            return {
+                ...state,
+                loading: true
+            }
+        case PAYMENT_COMPLETE:
+            return {
+                ...state,
+                loading: false,
+                status: action.status
             }
 
         default:
