@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { deleteCampaign } from '../../actions/campaignActions'
 import axios from 'axios'
 import { getHeaders } from '../../utils'
+import ResultsModal from './results-modal'
 
 
 function BusinessCampaign(props) {
@@ -20,9 +21,6 @@ function BusinessCampaign(props) {
         }
         if (window.confirm("Are you sure you want to delete this campaign?")) props.deleteCampaign(campaign)
     }
-    function handleClick() {
-        setToggleList(!toggleList)
-    }
     function handleNameRemove(name) {
         const headers = getHeaders()
         headers["x-auth-token"] = props.auth.token
@@ -35,7 +33,8 @@ function BusinessCampaign(props) {
             })
         }
     }
-    const updateTrigger = <Icon name='pencil' />
+    const UpdateTrigger = <Icon name='pencil' />
+    const ResultsTrigger = <a>View Results</a>
     return (
         <Card fluid>
             <Card.Content>
@@ -44,18 +43,18 @@ function BusinessCampaign(props) {
             </Card.Content>
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
-                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={handleClick}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
-                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><a onClick={handleClick}>Results</a></abbr>}
-                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} {...props.campaign} /></abbr>
+                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={() => setToggleList(!toggleList)}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
+                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><ResultsModal trigger={ResultsTrigger} {...props.campaign} /></abbr>}
+                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={UpdateTrigger} {...props} {...props.campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
-            {toggleList && <ExtraContent options={options} handleNameRemove={handleNameRemove}/>}
+            {toggleList && <FastPassList options={options} handleNameRemove={handleNameRemove}/>}
         </Card >
     )
 }
 
 // a component that displays the list of names/results that are in the campaign
-function ExtraContent(props) {
+function FastPassList(props) {
     <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
         <thead>
             {props.options.length > 0 &&

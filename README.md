@@ -53,15 +53,11 @@
 - [x] File structure change
 - [x] Check if jukebox is enabled / token is not null. Set up example for page to page status messaging
 - [x] Skip the line campaign (business side)
+- [x] Results page
 
 ##### Tentative Change Log
 
-- 9/5 - 9/7
-  - What to expect:
-    - Blank Jukebox bug fix
-    - Skip the line campaign CRUD operations & example of not using redux for all actions
-  - What's left to do:
-    - Start the user side of the app.
+
 
 ## Known bugs
 
@@ -69,6 +65,15 @@
 
 ## Change Log
 
+- 9/24
+  - What to expect:
+    - Bug Fixes
+    - Logic updates for customer side
+    - Results page on the business side
+  - TODO:
+    - Continue to payment/submit choices for each campaign
+    - Update Design
+    - Fix login message bug
 - 9/9
   - What to expect:
     - Integrated card and google pay support to front end
@@ -115,7 +120,12 @@
     - Working to fully implement stripe api
   - Left to do:
     - Finish implementing Stripe and store relevant information in our db
-
+- 9/5 - 9/7
+  - What to expect:
+    - Blank Jukebox bug fix
+    - Skip the line campaign CRUD operations & example of not using redux for all actions
+  - What's left to do:
+    - Start the user side of the app.
 - 8/31 - 9/3
   - What to expect:
     - When you reload the page you now see a loader instead the login page.
@@ -160,6 +170,7 @@
    - For example, getLocationsByUserID should be in the redux lifecycle as we can utilize it in the jukebox page, campaigns, etc. However, update location should probably just be a direct API called in the Modal.jsx file.
 3. Add toggle for allowing explicit songs on jukebox?
 4. Should the price for jukebox be fixed or should the establishment set the price?
+5. In next version, we need to decide on a single way to pass data through to components. My fault as I pass data through multiple different ways. Makes refracturing that much harder
 
 ## Our Code Standards
 

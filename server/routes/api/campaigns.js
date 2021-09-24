@@ -92,7 +92,8 @@ router.post('/add', auth, (req, res) => {
  */
 router.post('/update', auth, async (req, res) => {
     try {
-        const campaign = await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, { name: req.body.name, description: req.body.description }, { useFindAndModify: false, new: true })
+        const campaign = await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, req.body, { useFindAndModify: false, new: true })
+        console.log(campaign)
         res.status(200).send(campaign)
     } catch (e) {
         console.error(e)

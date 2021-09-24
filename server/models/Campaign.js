@@ -41,8 +41,8 @@ var CampaignSchema = new Schema({
         options: {
             type: [String],
         },
-        result: {
-            type: String,
+        results: {
+            type: Object,
         }
     },
     question: {
@@ -52,6 +52,6 @@ var CampaignSchema = new Schema({
     active: {
         type: Boolean,
     }
-})
+}, {minimize: false})
 
 module.exports = User = mongoose.model('campaigns', CampaignSchema)
