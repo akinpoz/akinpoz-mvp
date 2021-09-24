@@ -4,7 +4,7 @@ import history from '../../history'
 import {connect} from 'react-redux'
 import {getCampaign} from '../../actions/campaignActions'
 import {Button, Card, Input} from 'semantic-ui-react'
-import {addInvoiceItem, getDraftInvoice, setupNewTab} from "../../actions/stripeActions";
+import {getDraftInvoice, setupNewTab, submitCampaignData} from "../../actions/stripeActions";
 
 function CustomerCampaign(props) {
     const campaign_id = history.location.search.split('=')[1]
@@ -17,7 +17,7 @@ function CustomerCampaign(props) {
         if (props.stripe && props.stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
         }
-    })
+    }, [])
 
     useEffect(() => {
         if (props.campaign === "") {
@@ -70,7 +70,7 @@ function CustomerCampaign(props) {
         }
         if (props.stripe.hasOpenTab) {
             if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
-                props.addInvoiceItem(props.auth.user._id, item)
+                props.submitCampaignData(props.auth.user._id, item)
             }
         } else {
             props.setupNewTab(item)
@@ -148,4 +148,4 @@ const mapStateToProps = state => ({
     stripe: state.stripe
 })
 
-export default connect(mapStateToProps, {getCampaign, getDraftInvoice, addInvoiceItem, setupNewTab})(CustomerCampaign)
+export default connect(mapStateToProps, {getCampaign, getDraftInvoice, setupNewTab, submitCampaignData})(CustomerCampaign)

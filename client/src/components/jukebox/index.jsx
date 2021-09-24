@@ -7,7 +7,7 @@ import { cleanQuery, startSearch, updateSelection } from "../../actions/searchAc
 import { queueSong } from "../../actions/spotifyActions";
 import history from '../../history'
 import { useState } from 'react';
-import {getDraftInvoice} from "../../actions/stripeActions";
+import {getDraftInvoice, setupNewTab, submitCampaignData} from "../../actions/stripeActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
@@ -16,6 +16,7 @@ function Jukebox(props) {
     const timeoutRef = useRef()
     const [location, setLocation] = useState({ name: "" })
     const [msg, setMsg] = useState()
+    const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
         props.startSearch(data.value)
@@ -26,6 +27,13 @@ function Jukebox(props) {
             }
         }, 300)
     }, [])
+    useEffect(() => {
+        if (props.stripe.hasOpenTab) {
+            setButtonLabel('Add To Tab')
+        } else {
+            setButtonLabel('Open New Tab')
+        }
+    }, [props.stripe.hasOpenTab])
     useEffect(() => {
         if (!location_id) {
             history.push({
@@ -40,16 +48,19 @@ function Jukebox(props) {
         }
         if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
         setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
+        if (props.stripe && props.stripe.hasOpenTab) {
+            setButtonLabel('Add To Tab')
+        }
         return () => {
             clearTimeout(timeoutRef.current)
         }
     }, [])
 
     useEffect(() => {
-        if (props.auth) {
+        if (props.auth.user) {
             if (props.auth.isAuthenticated && props.auth.user.paymentMethod) {
                 if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
-                props.getDraftInvoice()
+                props.getDraftInvoice(props.auth.user._id)
             }
             if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
             setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
@@ -63,10 +74,6 @@ function Jukebox(props) {
         props.updateSelection(data.result);
     }, [])
 
-    const handleQueueClick = () => {
-
-    }
-
     const hasPaymentMethod = () => {
         return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
     }
@@ -77,6 +84,38 @@ function Jukebox(props) {
             <p>{item.artist}</p>
         </div>
     )
+
+    function handleSubmit() {
+        // Check for auth state here. Set redux store with info. If not logged in, redirect to login page. If logged in redirect to payment page.
+        // At payment page access the info from the redux store
+        // Add the name/number of tickets to the select campaign redux object
+        // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
+
+        const item = {
+            amount: 100,
+            description: 'song',
+            data: {
+                timestamp: Date.now(),
+                type: 'song',
+                campaignID: 'jukebox_' + props.location._id,
+                locationID: props.location._id,
+                transactionID: props.auth.user._id + Date.now(),
+                name: props.search.selection.name,
+                songUri: props.search.selection.songUri
+            }
+
+        }
+        if (props.stripe.hasOpenTab) {
+            if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
+                props.submitCampaignData(props.auth.user._id, item)
+            }
+        } else {
+            props.setupNewTab(item)
+            history.push('/checkout')
+        }
+
+    }
+
     return (
         <div className={styles.container}>
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
@@ -105,7 +144,7 @@ function Jukebox(props) {
                         <br />
                         <div style={{ flexDirection: "row-reverse", display: "flex" }}>
                             {props.auth.isAuthenticated && <div>
-                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null} onClick={() => props.queueSong(location_id, props.search.selection.uri)}>Queue Song</Button>}
+                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null} onClick={handleSubmit}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({ pathname: '/profile' })
                                 }}>Add a Payment Method</Button>}
@@ -130,7 +169,8 @@ Jukebox.propTypes = {
 const mapStateToProps = (state) => ({
     search: state.search,
     location: state.location,
-    auth: state.auth
+    auth: state.auth,
+    stripe: state.stripe
 })
 
-export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong, getDraftInvoice })(Jukebox);
+export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong, getDraftInvoice, setupNewTab, submitCampaignData })(Jukebox);

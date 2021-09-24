@@ -321,8 +321,13 @@ router.post('/close-tab', async function(req, res) {
     })
 })
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// THESE ARE HELPER FUNCTIONS. /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+//gets customer and payment id (dont want to tax the backend a second time)
 async function getCustomerAndPaymentID(userID, res) {
     let user = await User.findOne({_id: userID})
     if (!user) {
@@ -344,6 +349,7 @@ async function getCustomerAndPaymentID(userID, res) {
     return {customerID, paymentID};
 }
 
+// Just gets customerID
 async function getCustomerID(userID, res) {
     let user = await User.findOne({_id: userID})
     if (!user) {
@@ -360,11 +366,13 @@ async function getCustomerID(userID, res) {
     return customerID;
 }
 
+// abstracts close tab logic -- part of automated close tab logic
 function closeTab(invoiceID) {
     stripe.invoices.pay(invoiceID).then(r => {
         if (r.last_finalization_error) {
             console.error(r.last_finalization_error.message);
         } else {
+            // This is automated so I want to leave this in
             console.log('Closed tab: ' + r.id);
         }
     })

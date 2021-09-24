@@ -4,11 +4,11 @@ import styles from './checkout.module.css'
 import {loadStripe} from "@stripe/stripe-js";
 import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {
-    addInvoiceItem, closeTab,
+    closeTab,
     createPaymentIntent, // NOT BEING USED
     getDraftInvoice,
     markComplete, // NOT BEING USED
-    markProcessing // NOT BEING USED
+    markProcessing, submitCampaignData // NOT BEING USED
 } from "../../actions/stripeActions";
 import {connect} from "react-redux";
 import history from '../../history'
@@ -69,7 +69,7 @@ function NewTab(props) {
         event.preventDefault();
 
         if (tac && payAgreement) {
-            props.addInvoiceItem(props.auth.user._id, props.stripe.localTab.item)
+            props.submitCampaignData(props.auth.user._id, props.stripe.localTab.item)
         }
     }
 
@@ -270,8 +270,8 @@ export default connect(mapStateToProps, {
     markProcessing, // NOT BEING USED
     markComplete, // NOT BEING USED
     getDraftInvoice,
-    addInvoiceItem,
-    closeTab
+    closeTab,
+    submitCampaignData
 })(Checkout);
 
 
@@ -376,7 +376,7 @@ function CheckoutForm(props) {
         event.preventDefault();
 
         if (tac && payAgreement) {
-            props.addInvoiceItem(props.auth.user._id, item)
+            props.submitCampaignData(props.auth.user._id, item)
         }
 
         if (!stripe || !elements || props.stripe.loading || props.stripe.status === 'succeeded') {
