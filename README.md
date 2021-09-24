@@ -15,8 +15,10 @@
 
 #### Currently working on
 
-- [ ] Transaction Handling
-  - [ ] design history management - pull from stripe
+- [ ] Payment wall
+  - [x] frontend implemented
+  - [ ] implement stripe
+  - [ ] design history management - CRUD
   - [ ] connect history to redux (front / back)
   - [ ] add to jukebox, raffle and survey
 
@@ -27,9 +29,6 @@
 - [x] Jukebox UI Framing
 - [x] Generate QR Code Feature
 - [x] Crud operations for fastpass list?
-- [x] Payment wall
-  - [x] frontend implemented
-  - [x] implement stripe
 
 ### Paul
 
@@ -70,7 +69,16 @@
 
 ## Change Log
 
-- 9/24
+- 9/24 (paul)
+  - What to expect:
+    - Bug Fixes
+    - Logic updates for customer side
+    - Results page on the business side
+  - TODO:
+    - Continue to payment/submit choices for each campaign
+    - Update Design
+    - Fix login message bug
+- 9/24 (drew)
   - What to expect:
     - WOWZA that was a tough one...
     - Added tab logic

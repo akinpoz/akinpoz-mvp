@@ -9,7 +9,6 @@ import Profile from './components/profile'
 import Home from "./components/homes";
 import Analytics from "./components/analytics/analytics";
 import Jukebox from "./components/jukebox";
-import Results from "./components/results";
 import Checkout from "./components/checkout";
 import CustomerHome from './components/homes/customer-home'
 import Slider from './components/locations/Slider'
@@ -41,9 +40,6 @@ function Router(props) {
         </Route>
         <Route exact path='/profile'>
           <PrivateRoute {...props} component={`Profile`} />
-        </Route>
-        <Route path='/results'>
-          <Results />
         </Route>
         <Route path='/analytics'>
           <Analytics />

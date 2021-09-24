@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { deleteCampaign } from '../../actions/campaignActions'
 import axios from 'axios'
 import { getHeaders } from '../../utils'
+import ResultsModal from './results-modal'
 
 
 function BusinessCampaign(props) {
@@ -20,9 +21,6 @@ function BusinessCampaign(props) {
         }
         if (window.confirm("Are you sure you want to delete this campaign?")) props.deleteCampaign(campaign)
     }
-    function handleClick() {
-        setToggleList(!toggleList)
-    }
     function handleNameRemove(name) {
         const headers = getHeaders()
         headers["x-auth-token"] = props.auth.token
@@ -35,7 +33,8 @@ function BusinessCampaign(props) {
             })
         }
     }
-    const updateTrigger = <Icon name='pencil' />
+    const UpdateTrigger = <Icon name='pencil' />
+    const ResultsTrigger = <a>View Results</a>
     return (
         <Card fluid>
             <Card.Content>
@@ -44,40 +43,43 @@ function BusinessCampaign(props) {
             </Card.Content>
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
-                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={handleClick}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
-                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={updateTrigger} {...props} {...props.campaign} /></abbr>
+                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={() => setToggleList(!toggleList)}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
+                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><ResultsModal trigger={ResultsTrigger} {...props.campaign} /></abbr>}
+                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={UpdateTrigger} {...props} {...props.campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
-            {toggleList &&
-                <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
-                    <thead>
-                        {options.length > 0 &&
-                            <tr>
-                                <th>Name</th>
-                                <th style={{ textAlign: 'end' }}>Remove</th>
-                            </tr>
-                        }
-                    </thead>
-                    <tbody>
-                        {options.length > 0 && options.map(option => {
-                            return (
-                                <tr key={option} >
-                                    <td>{option}</td>
-                                    <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
-                                </tr>
-                            )
-                        })}
-                        {options.length === 0 &&
-                            <tr>
-                                <td>There are no names on the list</td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            }
+            {toggleList && <FastPassList options={options} handleNameRemove={handleNameRemove}/>}
         </Card >
     )
+}
+
+// a component that displays the list of names/results that are in the campaign
+function FastPassList(props) {
+    <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
+        <thead>
+            {props.options.length > 0 &&
+                <tr>
+                    <th>Name</th>
+                    <th style={{ textAlign: 'end' }}>Remove</th>
+                </tr>
+            }
+        </thead>
+        <tbody>
+            {props.options.length > 0 && props.options.map(option => {
+                return (
+                    <tr key={option} >
+                        <td>{option}</td>
+                        <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
+                    </tr>
+                )
+            })}
+            {props.options.length === 0 &&
+                <tr>
+                    <td>There are no names on the list</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 const mapStateToProps = (state) => ({

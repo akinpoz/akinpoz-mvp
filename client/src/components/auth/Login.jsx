@@ -12,21 +12,18 @@ import { Form, Message } from 'semantic-ui-react'
 
 function Login(props) {
     const [values, setValues] = useState({ email: '', password: '' })
-    const [msg, setMsg] = useState(null)
-
-
+    const [msg, setMsg] = useState()
     useEffect(() => {
+    console.log(props)
         if (props.error.id === 'LOGIN_FAIL') {
-            setMsg(props.error.msg.msg)
+            setMsg(props.error.msg)
         }
     }, [props.error])
-
     useEffect(() => {
         if (props.isAuthenticated) {
             history.push(history.location.pathname)
         }
     }, [props.isAuthenticated])
-
     const handleChange = e => {
         setValues({ ...values, [e.target.name]: e.target.value })
     }

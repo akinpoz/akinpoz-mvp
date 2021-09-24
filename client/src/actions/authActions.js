@@ -58,7 +58,7 @@ export const tokenConfig = (getState) => {
 }
 
 // Login User
-export const login = ({ email, password }) => dispatch => {
+export const login =({ email, password }) => async dispatch => {
     // Headers
     const config = {
         headers: {
@@ -67,14 +67,14 @@ export const login = ({ email, password }) => dispatch => {
     }
     // Request body
     const body = JSON.stringify({ email, password })
-
     axios.post('/api/auth/', body, config).then(res => {
+        console.log(res.json)
         dispatch({
             type: LOGIN_SUCCESS,
             payload: res.data
         })
     }).catch(e => {
-        console.log('error: ' + e.message)
+        console.log('error: ' + e)
         dispatch(returnErrors(e.message, e.status, 'LOGIN_FAIL'))
         dispatch({
             type: LOGIN_FAIL
@@ -95,9 +95,13 @@ export const updateUser = (modifiedUser) => (dispatch, getState) => {
     })
 }
 export const deleteUser = (_id) => (dispatch, getState) => {
-    axios.post('/api/users/delete', _id, tokenConfig(getState)).then(res => {
-        logout()
+    const body = JSON.stringify({ _id })
+    axios.post('/api/users/delete', body, tokenConfig(getState)).then(res => {
+        if(res.status === 200) {
+            dispatch({ type: LOGOUT_SUCCESS })
+        }
     }).catch(e => {
+        console.error(e)
         dispatch(returnErrors(e.message, e.status))
     })
 }

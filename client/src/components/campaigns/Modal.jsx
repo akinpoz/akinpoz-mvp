@@ -12,7 +12,8 @@ function CampaignModal(props) {
             title: props.title || "",
             description: props.description || "",
             question: props.question || "",
-            details: props.details || { type: "Survey", options: [""] },
+            details: props.details || { type: "Survey", options: [""], results: new Map() },
+
         });
     useEffect(() => {
         setValues(
@@ -20,13 +21,13 @@ function CampaignModal(props) {
                 title: props.title || "",
                 description: props.description || "",
                 question: props.question || "",
-                details: props.details || { type: "Survey", options: [""] },
+                details: props.details || { type: "Survey", options: [""], results: new Map() },
+
             }
         );
     }, [open]);
     function submit(e) {
         e.preventDefault();
-        //campaign ID will be null if new location but has value if updating
         const campaignDetails = {
             title: values.title,
             description: values.description,
@@ -35,13 +36,14 @@ function CampaignModal(props) {
             user: props.auth.user._id,
             location: props.location,
             campaign_id: props._id,
+            active: true
         }
 
         if (!values.title || !values.description || !values.details || !values.question) {
             setMsg("Please fill in all required fields and verify you have at least two options");
         }
         else {
-            if(values.details.type === "Fastpass") {
+            if (values.details.type === "Fastpass") {
                 values.details.options = []
             }
             props[`${props.action}Campaign`](campaignDetails);
@@ -51,12 +53,8 @@ function CampaignModal(props) {
     function handleChange(e) {
         setValues({ ...values, [e.target.name]: e.target.value });
     }
-    // function clear() {
-    //     setValues({ ...values, title: "", description: "", details: { type: "Survey" } });
-    // }
     function close() {
         setOpen(false);
-       // clear()
     }
     function handleClick(e) {
         var details = values.details
