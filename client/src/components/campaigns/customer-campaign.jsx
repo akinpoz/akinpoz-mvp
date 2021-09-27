@@ -5,11 +5,13 @@ import { getCampaign } from '../../actions/campaignActions'
 import { Button, Card, Input, Message } from 'semantic-ui-react'
 import { getDraftInvoice, setupNewTab, submitCampaignData } from "../../actions/stripeActions";
 
+
 function CustomerCampaign(props) {
     const campaign_id = history.location.search.split('=')[1]
     const [campaign, setCampaign] = useState(props.campaign)
     const [info, setInfo] = useState('')
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
+    const [msg, setMsg] = useState(props.stripe.msg)
 
     useEffect(() => {
         // On render
@@ -29,6 +31,9 @@ function CustomerCampaign(props) {
             props.getDraftInvoice(props.auth.user._id)
         }
     }, [props.auth])
+    useEffect(() => {
+        setMsg(props.stripe.msg)
+    }, [props.stripe.msg])
     useEffect(() => {
         if (props.stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
@@ -50,7 +55,7 @@ function CustomerCampaign(props) {
         // Add the name/number of tickets to the select campaign redux object
         // - TODO: Determine if we will send the user back to this page after payment set up/login.
         const item = {
-            amount: 100,
+            amount: campaign.details.type === "Raffle" ? 100 * parseInt(info) : 100,
             user: props.auth.user,
             description: campaign.details.type,
             data: {
@@ -64,7 +69,7 @@ function CustomerCampaign(props) {
             }
         }
         if (props.stripe.hasOpenTab) {
-            if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
+            if (window.confirm('Your tab is at $' + parseFloat(props.stripe.tab.amount / 100).toFixed(2) + '.  Would you like to add this to your tab?')) {
                 props.submitCampaignData(item)
             }
         } else {
@@ -80,6 +85,7 @@ function CustomerCampaign(props) {
     return (
         <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
             {campaign && <Card>
+                {msg && <Message><Message.Header>{msg.msg}<br></br><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
                 <Card.Content>
                     <Card.Header>{campaign.title}</Card.Header>
                     <Card.Meta>{campaign.details.type}</Card.Meta>
@@ -140,7 +146,8 @@ function View(props) {
 const mapStateToProps = state => ({
     campaign: state.campaign.select_campaign,
     auth: state.auth,
-    stripe: state.stripe
+    stripe: state.stripe,
+    location: state.location
 })
 
 export default connect(mapStateToProps, { getCampaign, getDraftInvoice, setupNewTab, submitCampaignData })(CustomerCampaign)

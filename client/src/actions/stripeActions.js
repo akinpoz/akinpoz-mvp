@@ -134,6 +134,10 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
  * @return {(function(*, *=): void)|*}
  */
 export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
+    _addInvoiceItem(userID, item, dispatch, getState)
+}
+
+function _addInvoiceItem (userID, item, dispatch, getState) {
     dispatch({type: REQUESTED_ADD_INVOICE_ITEM})
     let params = {userID, item}
     axios.post('/api/stripe/add-invoice-item', params, tokenConfig(getState)).then(res => {
@@ -153,7 +157,7 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
         axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
-                addInvoiceItem(item.user._id, item)
+                _addInvoiceItem(item.user._id, item, dispatch, getState)
             }
             else {
                 dispatch({type: SUBMIT_CAMPAIGN_ERROR})

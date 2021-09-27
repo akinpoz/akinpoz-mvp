@@ -14,7 +14,6 @@
   - [x] Logo update
   - [ ] bootstrap global styles still in effect
 - [ ] Git notifications for changes
-- [ ] Check Github
 - [ ] Should submit payment button take you back to your previous window?
 
 ### Drew
@@ -46,8 +45,8 @@
     - [x] if from QR code render landing page that's location specific
     - [x] if no location_id param, render a location search page. Mobile first.
   - [x] Create each campaign card
-  - [ ] Continue to payment
-  - [ ] Check github
+  - [x] Continue to payment
+  - [x] Check github
 
 #### Completed
 

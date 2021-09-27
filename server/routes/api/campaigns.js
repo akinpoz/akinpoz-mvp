@@ -183,6 +183,7 @@ router.post('/submitData', auth, async (req, res) => {
                 console.error(error)
                 res.status(400).send({ msg: error.message })
             }
+            break
         case "Fastpass":
             try {
                 var campaign = await Campaign.findOne({ _id: data.campaignID })
@@ -195,6 +196,7 @@ router.post('/submitData', auth, async (req, res) => {
                 console.error(error)
                 res.status(400).send({ msg: error.message })
             }
+            break
         case "Raffle":
             try {
                 var campaign = await Campaign.findOne({ _id: data.campaignID })
@@ -212,6 +214,7 @@ router.post('/submitData', auth, async (req, res) => {
                 console.error(error)
                 res.status(400).send({ msg: error.message })
             }
+            break
     }
 })
 

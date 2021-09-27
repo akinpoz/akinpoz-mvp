@@ -30,7 +30,7 @@ function Checkout(props) {
     }, [props.auth])
     useEffect(() => {
         setMsg(props.stripe.msg)
-    }, [props.stripe])
+    }, [props.stripe.msg])
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
@@ -116,8 +116,8 @@ function NewTab(props) {
                     </div>
                     <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        <Form.Button type={'button'} style={{ marginRight: 5 }}
-                            onClick={() => history.push('/')}>Cancel</Form.Button>
+                        {/* <Form.Button type={'button'} style={{ marginRight: 5 }}
+                            onClick={() => history.push('/')}>Home</Form.Button> */}
                         <Form.Button primary
                             disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement}>Open
                             Tab</Form.Button>
