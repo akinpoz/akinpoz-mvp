@@ -1,5 +1,10 @@
 # akinpoz-mvp
 
+## Stripe
+
+- For testing adding a payment method get a testing card from here: https://stripe.com/docs/testing
+  - Error received: ```Your card was declined. Your request was in test mode, but used a non test (live) card. For a list of valid test cards, visit: https://stripe.com/docs/testing```
+
 ## TODOS
 
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs
@@ -10,6 +15,7 @@
   - [ ] bootstrap global styles still in effect
 - [ ] Git notifications for changes
 - [ ] Check Github
+- [ ] Should submit payment button take you back to your previous window?
 
 ### Drew
 
@@ -188,6 +194,7 @@
    - For example, getLocationsByUserID should be in the redux lifecycle as we can utilize it in the jukebox page, campaigns, etc. However, update location should probably just be a direct API called in the Modal.jsx file.
 3. Add toggle for allowing explicit songs on jukebox?
 4. Should the price for jukebox be fixed or should the establishment set the price?
+5. Figure out a method for message handling (including errors). if an error occurs. What happens? On success, should a message always be sent? Or never be sent? If never, what should happen instead. How do we communicate things?
 
 ## Our Code Standards
 
@@ -195,3 +202,4 @@
 2. functional components unless absolutely necessary (i.e. chart.js)
 3. use console.error for printing errors. use console.log for temporary debugging (delete afterwards)
 4. There should be no nameless divs. Give each div an id that describes what it does
+5. Every action should handle it's errors with messages and easy to decipher codes.

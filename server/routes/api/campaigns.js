@@ -41,7 +41,7 @@ router.get('/user_id', auth, async function (req, res) {
  * @desc get campaign by ID (customer-side)
  * @access Public
  */
- router.get('/location_id', async (req, res) => {
+router.get('/location_id', async (req, res) => {
     try {
         res.status(200).send(await Campaign.findOne({ location: req.query.location_id }))
     } catch (error) {
@@ -154,6 +154,64 @@ router.post('/removeName', auth, async (req, res) => {
     } catch (e) {
         console.error(e)
         res.status(500).send({ msg: `Failed: ${e.message}` })
+    }
+})
+
+/**
+ * @route POST api/campaigns/submitData
+ * @desc submit data to a campaign
+ * @access Private 
+ */
+router.post('/submitData', auth, async (req, res) => {
+    const { user, data, description } = req.body
+    switch (description) {
+        case "Survey":
+            try {
+                var campaign = await Campaign.findOne({ _id: data.campaignID })
+                var results = campaign.details.results
+                // Basic map update/add logic. If the results object has votes for the item, simply increment the vote count. Otherwise initialize the count to 1.
+                if (results[data.info]) {
+                    results[data.info]++
+                }
+                else {
+                    results[data.info] = 1
+                }
+                const newResults = results
+                await Campaign.findOneAndUpdate({ _id: data.campaignID }, { details: { options: campaign.details.options, type: campaign.details.type, results: newResults } }, { useFindAndModify: false, new: true })
+                res.status(200).send({ msg: "Thanks for your vote!" })
+            } catch (error) {
+                console.error(error)
+                res.status(400).send({ msg: error.message })
+            }
+        case "Fastpass":
+            try {
+                var campaign = await Campaign.findOne({ _id: data.campaignID })
+                var options = campaign.details.options
+                options.push(user.name)
+                const newOptions = options
+                await Campaign.findOneAndUpdate({ _id: data.campaignID }, { details: { options: newOptions, type: campaign.details.type, results: campaign.details.results } }, { useFindAndModify: false, new: true })
+                res.status(200).send({ msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment." })
+            } catch (error) {
+                console.error(error)
+                res.status(400).send({ msg: error.message })
+            }
+        case "Raffle":
+            try {
+                var campaign = await Campaign.findOne({ _id: data.campaignID })
+                var results = campaign.details.results
+                if (results[user.name]) {
+                    results[user.name] = results[user.name] + parseInt(data.info)
+                }
+                else {
+                    results[user.name] = parseInt(data.info)
+                }
+                const newResults = results
+                await Campaign.findOneAndUpdate({ _id: data.campaignID }, { details: { options: campaign.details.options, type: campaign.details.type, results: newResults } }, { useFindAndModify: false, new: true })
+                res.status(200).send({ msg: "Thanks for participating in our raffle! We will let you know if you won." })
+            } catch (error) {
+                console.error(error)
+                res.status(400).send({ msg: error.message })
+            }
     }
 })
 

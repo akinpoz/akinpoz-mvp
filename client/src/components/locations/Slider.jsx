@@ -137,19 +137,24 @@ function Slider(props) {
                         </a>
                     </div>}
                     {location && location.campaigns.length > 0 && location.campaigns.map(campaign => {
-                        return (
-                            <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-${campaign._id}`}>
-                                <a style={{cursor: 'pointer'}} onClick={handleClick.bind(null, campaign)}>
-                                    <Card>
-                                        <Image src={icons[campaign.details["type"]]} wrapped ui={false} />
-                                        <Card.Content>
-                                            <Card.Header>{campaign.title}</Card.Header>
-                                            <Card.Meta>{campaign.details.type}</Card.Meta>
-                                        </Card.Content>
-                                    </Card>
-                                </a>
-                            </div>
-                        )
+                        if (campaign.active) {
+                            return (
+                                <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-${campaign._id}`}>
+                                    <a style={{ cursor: 'pointer' }} onClick={handleClick.bind(null, campaign)}>
+                                        <Card>
+                                            <Image src={icons[campaign.details["type"]]} wrapped ui={false} />
+                                            <Card.Content>
+                                                <Card.Header>{campaign.title}</Card.Header>
+                                                <Card.Meta>{campaign.details.type}</Card.Meta>
+                                            </Card.Content>
+                                        </Card>
+                                    </a>
+                                </div>
+                            )
+                        }
+                        else {
+                            return <div></div>
+                        }
                     })}
                     <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-menumarket`}>
                         <a target="_blank" href="https://apokoz.com/">

@@ -17,7 +17,7 @@ import {
     REQUESTED_PAYMENT_INTENT,
     REQUESTED_SETUP_INTENT,
     RETRIEVED_DRAFT_INVOICE,
-    RETRIEVED_PAYMENT_DETAILS, SET_LOCAL_TAB, SUCCESSFULLY_CLOSED_TAB
+    RETRIEVED_PAYMENT_DETAILS, SET_LOCAL_TAB, SUCCESSFULLY_CLOSED_TAB, SUBMITTED_CAMPAIGN, CLEAR_MSG
 } from '../actions/types';
 
 const initialState = {
@@ -29,7 +29,8 @@ const initialState = {
     paymentDetails: null,
     hasOpenTab: false,
     tab: null,
-    localTab: null
+    localTab: null,
+    msg: null
 }
 
 export default function ( state = initialState, action) {
@@ -134,6 +135,18 @@ export default function ( state = initialState, action) {
         case ERROR_CLOSING_TAB:
             return {
                 ...state
+            }
+        case SUBMITTED_CAMPAIGN:
+            return {
+                ...state,
+                msg: action.payload,
+                status: 'fulfilled',
+                loading: false
+            }
+        case CLEAR_MSG:
+            return {
+                ...state,
+                msg: null
             }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,7 +29,7 @@ import {
     SPOTIFY_QUEUE_SONG,
     SPOTIFY_LOADING,
     SPOTIFY_ERROR,
-    SUBMIT_CAMPAIGN_ERROR, SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN
+    SUBMIT_CAMPAIGN_ERROR, SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, CLEAR_MSG
 } from "./types";
 import {queueSong} from "./spotifyActions";
 
@@ -147,29 +147,27 @@ export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
     })
 }
 
-export const submitCampaignData = (userID, item) => (dispatch, getState) => {
-
-    if (item.data.type !== 'Song') {
-        const params = {userID, item}
+export const submitCampaignData = (item) => (dispatch, getState) => {
+    if (item.data.type !== 'song') {
         dispatch({type: SUBMITTING_CAMPAIGN})
-        axios.post('/api/campaigns/submitData', params, tokenConfig(getState)).then(res => {
+        axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
-                dispatch({type: SUBMITTED_CAMPAIGN})
-                addInvoiceItem(userID, item)
+                dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
+                addInvoiceItem(item.user._id, item)
             }
             else {
                 dispatch({type: SUBMIT_CAMPAIGN_ERROR})
-                console.error('failed: ' + res.status)
+                console.error('failed: ' + res.data.msg)
             }
         })
     }
     else {
         dispatch({type: SPOTIFY_LOADING})
-        const params = {location: item.data.locationID, songUri: item.data.songUri}
-        axios.post('/api/spotify/queueSong', params, tokenConfig(getState)).then(res => {
+      //  const params = {location: item.data.locationID, songUri: item.data.songUri}
+        axios.post('/api/spotify/queueSong', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SPOTIFY_QUEUE_SONG})
-                addInvoiceItem(userID, item)
+                addInvoiceItem(item.user._id, item)
             }
             else {
                 dispatch({type: SPOTIFY_ERROR})
@@ -194,6 +192,7 @@ export const setupNewTab = (item) => (dispatch) => {
         fromOnline: false
     }
     dispatch({type: SET_LOCAL_TAB, tab: tab})
+    dispatch({type: CLEAR_MSG})
 }
 
 /**

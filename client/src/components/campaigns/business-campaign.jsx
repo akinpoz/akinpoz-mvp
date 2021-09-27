@@ -48,38 +48,40 @@ function BusinessCampaign(props) {
                 <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={UpdateTrigger} {...props} {...props.campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
-            {toggleList && <FastPassList options={options} handleNameRemove={handleNameRemove}/>}
+            {toggleList && <FastPassList options={options} handleNameRemove={handleNameRemove} />}
         </Card >
     )
 }
 
 // a component that displays the list of names/results that are in the campaign
 function FastPassList(props) {
-    <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
-        <thead>
-            {props.options.length > 0 &&
-                <tr>
-                    <th>Name</th>
-                    <th style={{ textAlign: 'end' }}>Remove</th>
-                </tr>
-            }
-        </thead>
-        <tbody>
-            {props.options.length > 0 && props.options.map(option => {
-                return (
-                    <tr key={option} >
-                        <td>{option}</td>
-                        <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
+    return (
+        <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
+            <thead>
+                {props.options.length > 0 &&
+                    <tr>
+                        <th>Name</th>
+                        <th style={{ textAlign: 'end' }}>Remove</th>
                     </tr>
-                )
-            })}
-            {props.options.length === 0 &&
-                <tr>
-                    <td>There are no names on the list</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                }
+            </thead>
+            <tbody>
+                {props.options.length > 0 && props.options.map(option => {
+                    return (
+                        <tr key={option} >
+                            <td>{option}</td>
+                            <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
+                        </tr>
+                    )
+                })}
+                {props.options.length === 0 &&
+                    <tr>
+                        <td>There are no names on the list</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    )
 }
 
 const mapStateToProps = (state) => ({

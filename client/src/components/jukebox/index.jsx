@@ -93,21 +93,22 @@ function Jukebox(props) {
 
         const item = {
             amount: 100,
+            user: props.auth.user,
             description: 'song',
             data: {
-                timestamp: Date.now(),
+                timestamp: new Date().toLocaleDateString("en-US"),
                 type: 'song',
-                campaignID: 'jukebox_' + props.location._id,
-                locationID: props.location._id,
+                campaignID: 'jukebox_' + props.location.select_location._id,
+                locationID: props.location.select_location._id,
                 transactionID: props.auth.user._id + Date.now(),
                 name: props.search.selection.name,
-                songUri: props.search.selection.songUri
+                songUri: props.search.selection.uri
             }
 
         }
         if (props.stripe.hasOpenTab) {
             if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
-                props.submitCampaignData(props.auth.user._id, item)
+                props.submitCampaignData(item)
             }
         } else {
             props.setupNewTab(item)

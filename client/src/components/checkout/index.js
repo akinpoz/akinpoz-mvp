@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Button, ButtonGroup, Card, Form, Icon, Input} from "semantic-ui-react";
+import React, { useEffect, useState } from 'react';
+import { Button, ButtonGroup, Card, Form, Icon, Input, Message } from "semantic-ui-react";
 import styles from './checkout.module.css'
-import {loadStripe} from "@stripe/stripe-js";
-import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import {
     closeTab,
     createPaymentIntent, // NOT BEING USED
@@ -10,7 +10,7 @@ import {
     markComplete, // NOT BEING USED
     markProcessing, submitCampaignData // NOT BEING USED
 } from "../../actions/stripeActions";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import history from '../../history'
 
 /**
@@ -21,24 +21,28 @@ import history from '../../history'
  */
 function Checkout(props) {
     const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
+    const [msg, setMsg] = useState(props.stripe.msg)
     // Needs to get open invoice if exists
     useEffect(() => {
         if (props.auth.user) {
             props.getDraftInvoice(props.auth.user._id)
         }
-
     }, [props.auth])
+    useEffect(() => {
+        setMsg(props.stripe.msg)
+    }, [props.stripe])
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
+                {msg && <Message><Message.Header>{msg.msg}<br></br><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
                 {props.stripe.tab &&
-                <ExistingTab {...props} />
+                    <ExistingTab {...props} />
                 }
                 {!props.stripe.tab && props.stripe.localTab &&
-                <NewTab {...props} />
+                    <NewTab {...props} />
                 }
                 {!props.stripe.tab && !props.stripe.localTab &&
-                <NoTab/>
+                    <NoTab />
                 }
 
                 {/*NEED TO INCLUDE THE FOLLOWING IF WANT ALTERNATE PAYMENT*/}
@@ -69,24 +73,24 @@ function NewTab(props) {
         event.preventDefault();
 
         if (tac && payAgreement) {
-            props.submitCampaignData(props.auth.user._id, props.stripe.localTab.item)
+            props.submitCampaignData(props.stripe.localTab.item)
         }
     }
 
     return (
         <div>
-            <Card style={{padding: 15}}>
+            <Card style={{ padding: 15 }}>
                 <h2>Open a New Tab</h2>
-                <div className={styles.divider}/>
+                <div className={styles.divider} />
                 <div>
                     {props.stripe.localTab.item &&
-                    <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>{props.stripe.localTab.item.data.name}</p>
-                        <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
-                    </div>
+                        <div className={styles.itemContainer}>
+                            <p style={{ margin: 0 }}>{props.stripe.localTab.item.data.name}</p>
+                            <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
+                        </div>
                     }
                     <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>Fee to open new tab</p>
+                        <p style={{ margin: 0 }}>Fee to open new tab</p>
                         <p>${feePrice.toFixed(2)}</p>
                     </div>
                     <div className={styles.totalContainer}>
@@ -94,28 +98,28 @@ function NewTab(props) {
                         <b>${((props.stripe.localTab.item.amount + feePrice * 100) / 100).toFixed(2)}</b>
                     </div>
                 </div>
-                <br/>
-                <b style={{textAlign: "center"}}>*Payment will be captured in 24 hours from the card stored in
+                <br />
+                <b style={{ textAlign: "center" }}>*Payment will be captured in 24 hours from the card stored in
                     profile*</b>
-                <br/>
+                <br />
 
                 <Form onSubmit={handleSubmit}>
                     <div className={styles.termsAndConditions}>
-                        <Form.Checkbox style={{marginRight: 10}} checked={tac} onChange={() => setTac(!tac)}/>
+                        <Form.Checkbox style={{ marginRight: 10 }} checked={tac} onChange={() => setTac(!tac)} />
                         <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.termsAndConditions}>
-                        <Form.Checkbox style={{marginRight: 10}} checked={payAgreement}
-                                       onChange={() => setPayAgreement(!payAgreement)}/>
+                        <Form.Checkbox style={{ marginRight: 10 }} checked={payAgreement}
+                            onChange={() => setPayAgreement(!payAgreement)} />
                         <p>I understand my saved card will be charged in 24 hours to settle my tab.</p>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        <Form.Button type={'button'} style={{marginRight: 5}}
-                                     onClick={() => history.push('/')}>Cancel</Form.Button>
+                        <Form.Button type={'button'} style={{ marginRight: 5 }}
+                            onClick={() => history.push('/')}>Cancel</Form.Button>
                         <Form.Button primary
-                                     disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement}>Open
+                            disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement}>Open
                             Tab</Form.Button>
                     </div>
                 </Form>
@@ -149,7 +153,7 @@ function ExistingTab(props) {
         }
 
         if (timeLeftComponents.hours > 0) {
-            timeLeft += timeLeftComponents.hours.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+            timeLeft += timeLeftComponents.hours.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })
             timeLeft += ':'
         }
         if (timeLeftComponents.minutes > 0 || timeLeft !== '') {
@@ -209,36 +213,36 @@ function ExistingTab(props) {
 
     return (
         <div>
-            <Card style={{padding: 15}}>
+            <Card style={{ padding: 15 }}>
                 <h2>Current Tab</h2>
-                <div className={styles.divider}/>
+                <div className={styles.divider} />
                 <div>
                     {props.stripe?.tab?.items && props.stripe.tab.items.map(item => (
                         <div className={styles.itemContainer}>
-                            <p style={{margin: 0}}>{item.data.name}</p>
+                            <p style={{ margin: 0 }}>{item.data.name}</p>
                             <p>${(item.amount / 100).toFixed(2)}</p>
                         </div>
                     ))}
                     {props.stripe?.localTab?.items &&
-                    <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>{props.stripe.localTab.item.data.name}</p>
-                        <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
-                    </div>
+                        <div className={styles.itemContainer}>
+                            <p style={{ margin: 0 }}>{props.stripe.localTab.item.data.name}</p>
+                            <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
+                        </div>
                     }
                     <div className={styles.totalContainer}>
                         <b>Subtotal</b>
                         <b>${(sum / 100).toFixed(2)}</b>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.timerBox}>
                         <b>{timeLeft}</b>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        <Button type={'button'} style={{marginRight: 5}}
-                                onClick={() => history.push('/')}>Cancel</Button>
+                        <Button type={'button'} style={{ marginRight: 5 }}
+                            onClick={() => history.push('/')}>Cancel</Button>
                         <Button primary disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled'}
-                                onClick={() => props.closeTab(props.auth.user._id)}>Close
+                            onClick={() => props.closeTab(props.auth.user._id)}>Close
                             Tab</Button>
                     </div>
                 </div>
@@ -262,7 +266,8 @@ function NoTab() {
 
 const mapStateToProps = (state) => ({
     stripe: state.stripe,
-    auth: state.auth
+    auth: state.auth,
+    location: state.location
 })
 
 export default connect(mapStateToProps, {
@@ -333,10 +338,10 @@ function CheckoutForm(props) {
                     return;
                 }
 
-                const {error, paymentIntent} = await stripe.confirmCardPayment(
+                const { error, paymentIntent } = await stripe.confirmCardPayment(
                     props.stripe.clientSecret,
-                    {payment_method: event.paymentMethod.id},
-                    {handleActions: false}
+                    { payment_method: event.paymentMethod.id },
+                    { handleActions: false }
                 );
                 if (error) {
                     event.complete('fail')
@@ -346,7 +351,7 @@ function CheckoutForm(props) {
                     event.complete('success')
                     if (paymentIntent.status === 'requires_action') {
                         // can redirect to bank for further action / confirmation, etc.
-                        const {error} = await stripe.confirmCardPayment(props.stripe.clientSecret);
+                        const { error } = await stripe.confirmCardPayment(props.stripe.clientSecret);
                         if (error) {
                             console.error(error.message)
                             props.markComplete('fail')
@@ -374,9 +379,9 @@ function CheckoutForm(props) {
     const handleSubmit = async (event) => {
         // Block native form submission.
         event.preventDefault();
-
+        // TODO: Make sure item object here has the redux state user object (needed for stripe: see submitCampaignData for usage)
         if (tac && payAgreement) {
-            props.submitCampaignData(props.auth.user._id, item)
+            props.submitCampaignData(item)
         }
 
         if (!stripe || !elements || props.stripe.loading || props.stripe.status === 'succeeded') {
@@ -391,12 +396,12 @@ function CheckoutForm(props) {
         }
 
         props.markProcessing()
-        const {paymentIntent} = await stripe.confirmCardPayment(
+        const { paymentIntent } = await stripe.confirmCardPayment(
             props.stripe.clientSecret, {
-                payment_method: {
-                    card: elements.getElement(CardElement)
-                }
+            payment_method: {
+                card: elements.getElement(CardElement)
             }
+        }
         )
         props.markComplete(paymentIntent?.status ?? 'error');
         console.log('payment intent status: ' + paymentIntent?.status ?? 'error');
@@ -409,39 +414,39 @@ function CheckoutForm(props) {
     return (
         <div>
             {paymentRequest &&
-            <div id='browser-card-support'>
-                <PaymentRequestButtonElement options={{paymentRequest}}/>
-                <br/>
-                <div className={styles.divider}/>
-                <br/>
-            </div>
+                <div id='browser-card-support'>
+                    <PaymentRequestButtonElement options={{ paymentRequest }} />
+                    <br />
+                    <div className={styles.divider} />
+                    <br />
+                </div>
             }
 
             <Form onSubmit={handleSubmit}>
-            <div id='nameInput' style={{marginBottom: 10}}>
-                <Form.Input required placeholder={'Name On Card'} />
-            </div>
-            <div className={styles.cardContainer}> {/* TODO: Match style to semantic ui (or vice versa)*/}
-                <CardElement />
-            </div>
-            <br/>
-            <div className={styles.termsAndConditions}>
-                <Form.Checkbox style={{marginRight: 10}} checked={tac} onChange={() => setTac(!tac)}/>
-                <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
-            </div>
-            <br/>
-            <div className={styles.termsAndConditions}>
-                <Form.Checkbox style={{marginRight: 10}} checked={payAgreement}
-                               onChange={() => setPayAgreement(!payAgreement)}/>
-                <p>I understand my saved card will be charged in 24 hours to settle my tab.</p>
-            </div>
-            <br/>
-            <div className={styles.cardFormButtonsContainer}>
-                <Form.Button type={'button'} style={{marginRight: 5}}>Cancel</Form.Button>
-                <Form.Button primary
-                             disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement}>Open
-                    Tab</Form.Button>
-            </div>
+                <div id='nameInput' style={{ marginBottom: 10 }}>
+                    <Form.Input required placeholder={'Name On Card'} />
+                </div>
+                <div className={styles.cardContainer}> {/* TODO: Match style to semantic ui (or vice versa)*/}
+                    <CardElement />
+                </div>
+                <br />
+                <div className={styles.termsAndConditions}>
+                    <Form.Checkbox style={{ marginRight: 10 }} checked={tac} onChange={() => setTac(!tac)} />
+                    <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
+                </div>
+                <br />
+                <div className={styles.termsAndConditions}>
+                    <Form.Checkbox style={{ marginRight: 10 }} checked={payAgreement}
+                        onChange={() => setPayAgreement(!payAgreement)} />
+                    <p>I understand my saved card will be charged in 24 hours to settle my tab.</p>
+                </div>
+                <br />
+                <div className={styles.cardFormButtonsContainer}>
+                    <Form.Button type={'button'} style={{ marginRight: 5 }}>Cancel</Form.Button>
+                    <Form.Button primary
+                        disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement}>Open
+                        Tab</Form.Button>
+                </div>
             </Form>
         </div>
     )

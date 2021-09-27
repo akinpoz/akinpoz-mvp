@@ -93,7 +93,9 @@ router.get('/callback', async function (req, res) {
  * @return songUri (if successful)
  */
 router.post('/queueSong', async function (req, res) {
-    Location.findById(req.body.location).then((location) => {
+    const location_id = req.body.location || req.body.data.locationID
+    const songUri = req.body.songUri || req.body.data.songUri
+    Location.findOne({_id: location_id}).then((location) => {
         const credentials = {
             clientId: process.env.SPOTIFY_CLIENT_ID,
             clientSecret: process.env.SPOTIFY_SECRET,
@@ -108,8 +110,8 @@ router.post('/queueSong', async function (req, res) {
             access_token = data.body['access_token'];
             spotifyApi.setAccessToken(access_token);
             Location.findOneAndUpdate(location._id, {access_token: encrypt(access_token)}, {useFindAndModify: false, new: true});
-            spotifyApi.addToQueue(req.body.songUri).then(() => {
-                res.status(200).send(req.body.songUri)
+            spotifyApi.addToQueue(songUri).then(() => {
+                res.status(200).send(songUri)
             },
                 (err) => {
                 res.status(500).send(err)

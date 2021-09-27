@@ -13,7 +13,7 @@ export const getLocations = () => (dispatch, getState) => {
         })
     }).catch(err => {
         console.error(err)
-        dispatch({GET_ERRORS, payload: err})
+        dispatch({type: GET_ERRORS, payload: err})
     })
 }
 export const getLocationsByUserID = (user) => (dispatch, getState) => {
