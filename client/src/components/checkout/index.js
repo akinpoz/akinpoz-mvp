@@ -21,7 +21,7 @@ import history from '../../history'
  */
 function Checkout(props) {
     const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
-    const [msg, setMsg] = useState(props.stripe.msg)
+    const [msg, setMsg] = useState()
     // Needs to get open invoice if exists
     useEffect(() => {
         if (props.auth.user) {
@@ -31,10 +31,14 @@ function Checkout(props) {
     useEffect(() => {
         setMsg(props.stripe.msg)
     }, [props.stripe.msg])
+
+    useEffect(() => {
+        setMsg(props.spotify.error)
+    }, [props.spotify.error])
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
-                {msg && <Message><Message.Header>{msg.msg}<br></br><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
+                {msg && <Message><Message.Header>{msg}<br></br><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
                 {props.stripe.tab &&
                     <ExistingTab {...props} />
                 }
@@ -217,7 +221,7 @@ function ExistingTab(props) {
                 <h2>Current Tab</h2>
                 <div className={styles.divider} />
                 <div>
-                    {props.stripe?.tab?.items && props.stripe.tab.items.map(item => (
+                    {(props.stripe?.tab?.items ?? false) && props.stripe.tab.items.length > 0 && props.stripe.tab.items.map(item => (
                         <div className={styles.itemContainer}>
                             <p style={{ margin: 0 }}>{item.data.name}</p>
                             <p>${(item.amount / 100).toFixed(2)}</p>
@@ -267,7 +271,8 @@ function NoTab() {
 const mapStateToProps = (state) => ({
     stripe: state.stripe,
     auth: state.auth,
-    location: state.location
+    location: state.location,
+    spotify: state.spotify
 })
 
 export default connect(mapStateToProps, {

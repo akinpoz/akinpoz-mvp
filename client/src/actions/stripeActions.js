@@ -184,6 +184,11 @@ export const submitCampaignData = (item, locationName) => (dispatch, getState) =
                         '  If you would like to use this feature, please report the error to this location.'})
                 console.error('failed: ' + res.status)
             }
+        }).catch(err => {
+                dispatch({
+                    type: SPOTIFY_ERROR,
+                    error: 'Looks like the jukebox feature is experiencing some issues.' +
+                        '  If you would like to use this feature, please report the error to this location.'})
         })
     }
 }
