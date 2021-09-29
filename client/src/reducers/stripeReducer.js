@@ -2,22 +2,31 @@ import {
     ADD_INVOICE_ITEM_SUCCESSFUL,
     CREATED_CUSTOMER,
     CREATED_PAYMENT_INTENT,
-    CREATED_SETUP_INTENT, ERROR_ADDING_INVOICE_ITEM, ERROR_CLOSING_TAB,
+    CREATED_SETUP_INTENT,
+    ERROR_ADDING_INVOICE_ITEM,
+    ERROR_CLOSING_TAB,
     ERROR_CREATING_CUSTOMER,
     ERROR_CREATING_PAYMENT_INTENT,
     ERROR_CREATING_SETUP_INTENT,
     ERROR_RETRIEVING_DRAFT_INVOICE,
     ERROR_RETRIEVING_PAYMENT_DETAILS,
     PAYMENT_COMPLETE,
-    PROCESSING_PAYMENT, REQUEST_CLOSE_TAB,
-    REQUEST_PAYMENT_UPDATE, REQUESTED_ADD_INVOICE_ITEM,
+    PROCESSING_PAYMENT,
+    REQUEST_CLOSE_TAB,
+    REQUEST_PAYMENT_UPDATE,
+    REQUESTED_ADD_INVOICE_ITEM,
     REQUESTED_CUSTOMER,
     REQUESTED_DRAFT_INVOICE,
     REQUESTED_PAYMENT_DETAILS,
     REQUESTED_PAYMENT_INTENT,
     REQUESTED_SETUP_INTENT,
     RETRIEVED_DRAFT_INVOICE,
-    RETRIEVED_PAYMENT_DETAILS, SET_LOCAL_TAB, SUCCESSFULLY_CLOSED_TAB, SUBMITTED_CAMPAIGN, CLEAR_MSG
+    RETRIEVED_PAYMENT_DETAILS,
+    SET_LOCAL_TAB,
+    SUCCESSFULLY_CLOSED_TAB,
+    SUBMITTED_CAMPAIGN,
+    CLEAR_MSG,
+    REQUESTED_PAST_TABS, RETRIEVED_PAST_INVOICES, ERROR_PAST_INVOICES
 } from '../actions/types';
 
 const initialState = {
@@ -30,7 +39,8 @@ const initialState = {
     hasOpenTab: false,
     tab: null,
     localTab: null,
-    msg: null
+    msg: null,
+    pastTabs: []
 }
 
 export default function ( state = initialState, action) {
@@ -148,6 +158,26 @@ export default function ( state = initialState, action) {
                 ...state,
                 msg: null
             }
+        case REQUESTED_PAST_TABS:
+            return {
+                ...state,
+                loading: true,
+                pastTabs: []
+            }
+        case RETRIEVED_PAST_INVOICES:
+            return {
+                ...state,
+                loading: false,
+                pastTabs: action.pastTabs,
+                error: action.error
+            }
+        case ERROR_PAST_INVOICES:
+            return {
+                ...state,
+                loading: false,
+                msg: action.error
+            }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,6 +6,7 @@ dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 var User = require('../../models/User');
 const {decrypt, encrypt} = require("./encryption");
+const open = require("open");
 
 
 router.get('/config', (req, res) => {
@@ -105,6 +106,7 @@ router.post('/update-payment', async function (req, res) {
         res.status(400).send('User not found')
         return;
     }
+
     let customerID = decrypt(user.customerID)
     let oldPm = decrypt(user.paymentMethod)
 
@@ -160,7 +162,6 @@ router.post('/get-draft-invoice', async function (req, res) {
             stripe.invoices.finalizeInvoice(i.id)
         })
     }
-
     if (invoice !== undefined) {
         let items = []
         for (let line of invoice.lines.data) {
@@ -182,7 +183,8 @@ router.post('/get-draft-invoice', async function (req, res) {
             amount: invoice.total,
             timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
             items: items,
-            fromOnline: true
+            fromOnline: true,
+            locationName: invoice.metadata['locationName']
         }
         res.status(200).send(tab)
     } else {
@@ -267,6 +269,7 @@ router.post('/add-invoice-item', async function (req, res) {
             default_payment_method: paymentID,
             metadata: {
                 'timeWillBeSubmitted': (Date.now() + timeout).toString(),
+                locationName: params.locationName
             }
         })
 
@@ -284,7 +287,8 @@ router.post('/add-invoice-item', async function (req, res) {
                 amount: invoice.total,
                 timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
                 items: items,
-                fromOnline: true
+                fromOnline: true,
+                locationName: invoice.metadata['locationName']
             }
             res.status(200).send(tab)
         } else if (item && fee) {
@@ -319,6 +323,67 @@ router.post('/close-tab', async function(req, res) {
             res.status(400).send(errors)
         }
     })
+})
+
+router.post('/get-past-tabs', async function(req, res) {
+    let params = req.body;
+    let customerID = await getCustomerID(params.userID);
+    let errorOpen, openInvoices = await stripe.invoices.list({customer: customerID, status: 'open'})
+    let errorPaid, paidInvoices = await stripe.invoices.list({customer: customerID, status: 'paid'})
+
+    if (errorOpen || errorPaid) {
+        console.error('Could Not get Invoices')
+        res.status(400).send('Could Not Get Invoices')
+        return
+    }
+
+    let tabs = []
+
+    // Includes open invoices and marks the tab as 'open' so a message can be displayed that the account is locked until they pay their invoice.
+    if (openInvoices && openInvoices.data && openInvoices.data.length > 0) {
+        for (let invoice of openInvoices.data) {
+            let items = []
+            for (let line of invoice.lines.data) {
+                items.push({
+                    amount: line.amount,
+                    description: line.description,
+                    data: line.metadata
+                })
+            }
+            const tab = {
+                amount: invoice.total,
+                timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
+                items: items,
+                fromOnline: true,
+                open: true,
+                locationName: invoice.metadata['locationName']
+            }
+            tabs.push(tab)
+        }
+    }
+
+    if (paidInvoices && paidInvoices.data && paidInvoices.data.length > 0) {
+        for (let invoice of paidInvoices.data) {
+            let items = []
+            for (let line of invoice.lines.data) {
+                items.push({
+                    amount: line.amount,
+                    description: line.description,
+                    data: line.metadata
+                })
+            }
+            const tab = {
+                amount: invoice.total,
+                timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
+                items: items,
+                fromOnline: true,
+                open: false,
+                locationName: invoice.metadata['locationName']
+            }
+            tabs.push(tab)
+        }
+    }
+    res.status(200).send(tabs)
 })
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

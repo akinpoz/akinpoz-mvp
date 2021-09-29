@@ -73,7 +73,7 @@ function NewTab(props) {
         event.preventDefault();
 
         if (tac && payAgreement) {
-            props.submitCampaignData(props.stripe.localTab.item)
+            props.submitCampaignData(props.stripe.localTab.item, props.location.select_location.name)
         }
     }
 
@@ -381,7 +381,7 @@ function CheckoutForm(props) {
         event.preventDefault();
         // TODO: Make sure item object here has the redux state user object (needed for stripe: see submitCampaignData for usage)
         if (tac && payAgreement) {
-            props.submitCampaignData(item)
+            props.submitCampaignData(item, props.location.select_location.name)
         }
 
         if (!stripe || !elements || props.stripe.loading || props.stripe.status === 'succeeded') {

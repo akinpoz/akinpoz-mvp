@@ -5,10 +5,11 @@ var jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
 dotenv.config();
 const User = require('../../models/User');
-const { encrypt } = require("./encryption");
+const { encrypt, decrypt} = require("./encryption");
 var auth = require('../../middleware/auth');
 const Campaign = require('../../models/Campaign');
 const Location = require('../../models/Location');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 /**
@@ -72,7 +73,18 @@ router.post('/', function (req, res) {
 router.post('/update', auth, function (req, res) {
     var { name, email } = req.body
     User.findOneAndUpdate({ _id: req.body._id }, { name, email }, { new: true })
-        .then(user => res.json(user))
+        .then(user => {
+            const customerID = decrypt(user.customerID)
+            stripe.customers.update(customerID, {email: email}).then((r, error) => {
+                if (error) {
+                    console.error(error.msg)
+                }
+                else {
+                    console.log('Stripe Object Updated')
+                }
+                res.json(user)
+            })
+        })
         .catch(e => {
             console.error(e);
             res.status(500).send('Server Error')

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
-import { Button, Card, Form } from "semantic-ui-react";
+import {Button, Card, Form, Message} from "semantic-ui-react";
 import {
     createSetupIntent,
     getPaymentDetails,
     markComplete,
     markProcessing,
-    updatePaymentMethod
+    updatePaymentMethod,
+    getPastTabs
 } from "../../actions/stripeActions";
 import { CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -26,6 +27,12 @@ function Profile(props) {
 }
 
 function EndUserDashboard(props) {
+    const [msg, setMsg] = useState()
+    useEffect(() => {
+        if (props.stripe) {
+            setMsg(props.stripe.error)
+        }
+    }, [props.stripe])
     return (
         <div>
             <br />
@@ -34,10 +41,15 @@ function EndUserDashboard(props) {
                 <div className={styles.divider} />
             </div>
             <br />
+            {msg &&
+            <Message negative className={styles.message}>
+                <Message.Header>{msg}</Message.Header>
+            </Message>
+            }
             <Card.Group className={styles.endUserDashboardContainer}>
                 <AccountSettings {...props} />
                 <PaymentOptions {...props} />
-                <History />
+                <History {...props} />
             </Card.Group>
         </div>
     )
@@ -89,21 +101,44 @@ function AccountSettings(props) {
     )
 }
 
-function History() {
+function History(props) {
 
-    // TODO: Figure out what exactly we want to report here.  What information do we need to display?
+    useEffect(() => {
+        console.log('should be getting logs')
+        if (props.auth?.user) {
+            console.log('getting tabs')
+            props.getPastTabs(props.auth.user._id)
+        }
+    }, [props.auth])
+
     return (
         <Card>
             <div className={styles.userAccountSettings}>
                 <h2>History</h2>
-                <br />
                 <div className={styles.divider} />
-                <br />
-                <LocationHistory name='Restaurant 1' />
-                <br />
-                <div className={styles.divider} />
-                <br />
-                <LocationHistory name='Restaurant 2' />
+                <br/>
+                {(props.stripe?.pastTabs?.length ?? 0) > 0 &&
+                    props.stripe.pastTabs.map(tab => {
+                        const date = new Date(tab.timeWillBeSubmitted * 1);
+                        // Returns 0-11 so must add 1 to month
+                        const month = date.getMonth() + 1;
+                        const day = date.getDate();
+                        const year = date.getFullYear();
+                        return (
+                            <ul style={{margin: 0, padding: 0}}>
+                                <h4>{month}/{day}/{year} - {tab.locationName}</h4>
+                                {tab.items.map(item => {
+                                    return (
+                                        <li style={{marginLeft: 20}}>
+                                            <p>{item.description}</p>
+                                        </li>
+                                    )
+                                })}
+                                <br/>
+                            </ul>
+                        )
+                    })
+                }
             </div>
         </Card>
     )
@@ -209,7 +244,7 @@ function PaymentOptions(props) {
     }, [stripe, elements])
 
     useEffect(() => {
-        if (props.auth.user) {
+        if (props.auth?.user) {
             props.getPaymentDetails(props.auth.user._id)
         }
     }, [props.auth])
@@ -270,21 +305,6 @@ function PaymentOptions(props) {
     )
 }
 
-/**
- * Made Location History different because it will be used multiple times.  Takes in name as prop
- */
-function LocationHistory(props) {
-    // TODO: Figure out how history will be stored in the backend, and how the
-    //  data will be passed through to this component
-
-    return (
-        <div>
-            <h4>{props.name}</h4>
-            <p>Entered raffle 10/10/21</p>
-        </div>
-    )
-}
-
 
 Profile.propTypes = {
     auth: PropTypes.object.isRequired,
@@ -295,4 +315,4 @@ const mapStateToProps = (state) => ({
     auth: state.auth,
     stripe: state.stripe
 })
-export default connect(mapStateToProps, { getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent, updateUser, deleteUser })(Profile)
+export default connect(mapStateToProps, { getPaymentDetails, updatePaymentMethod, markProcessing, markComplete, createSetupIntent, updateUser, deleteUser, getPastTabs })(Profile)

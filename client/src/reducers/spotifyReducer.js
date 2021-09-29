@@ -1,4 +1,5 @@
 import {
+    SPOTIFY_ERROR,
     SPOTIFY_LOADING,
     SPOTIFY_QUEUE_SONG,
     SPOTIFY_USER_AUTH
@@ -6,6 +7,7 @@ import {
 
 const initialState = {
     loading: false,
+    error: ''
 }
 
 export default function (state = initialState, action) {
@@ -13,18 +15,27 @@ export default function (state = initialState, action) {
         case SPOTIFY_USER_AUTH:
             return {
                 ...state,
-                loading: false
+                loading: false,
+                error: ''
             }
         case SPOTIFY_LOADING:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: ''
             }
         case SPOTIFY_QUEUE_SONG:
             return {
                 ...state,
-                loading: false
+                loading: false,
+                error: ''
             }
+        case SPOTIFY_ERROR:
+            return {
+                ...state,
+                error: action.error
+            }
+
         default:
             return state
     }

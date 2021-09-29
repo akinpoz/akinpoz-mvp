@@ -70,7 +70,7 @@ function CustomerCampaign(props) {
         }
         if (props.stripe.hasOpenTab) {
             if (window.confirm('Your tab is at $' + parseFloat(props.stripe.tab.amount / 100).toFixed(2) + '.  Would you like to add this to your tab?')) {
-                props.submitCampaignData(item)
+                props.submitCampaignData(item, props.location.select_location.name)
             }
         } else {
             props.setupNewTab(item)

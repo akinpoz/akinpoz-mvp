@@ -50,7 +50,7 @@ router.get('/getAuthURL', auth, async function(req, res) {
 
     const constructedUrl = 'https://accounts.spotify.com/authorize' +
     '?response_type=code' + '&client_id=' + process.env.SPOTIFY_CLIENT_ID + (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
-        '&redirect_uri=' + encodeURIComponent(redirectUri) + '&state=' + req.query.location;
+        '&redirect_uri=' + encodeURIComponent(redirectUri) + '&state=' + req.query.location + '&show_dialog=true';
     res.status(200).send(constructedUrl)
 })
 

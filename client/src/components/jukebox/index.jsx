@@ -4,7 +4,6 @@ import { Button, Card, Search, Message } from "semantic-ui-react";
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 import { cleanQuery, startSearch, updateSelection } from "../../actions/searchActions";
-import { queueSong } from "../../actions/spotifyActions";
 import history from '../../history'
 import { useState } from 'react';
 import {getDraftInvoice, setupNewTab, submitCampaignData} from "../../actions/stripeActions";
@@ -70,6 +69,12 @@ function Jukebox(props) {
         }
     }, [props.auth])
 
+    useEffect(() => {
+        if (props.spotify.error) {
+            setMsg(props.spotify.error)
+        }
+    }, [props.spotify])
+
     const handleSelectionChange = useCallback((e, data) => {
         props.updateSelection(data.result);
     }, [])
@@ -108,7 +113,7 @@ function Jukebox(props) {
         }
         if (props.stripe.hasOpenTab) {
             if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
-                props.submitCampaignData(item)
+                props.submitCampaignData(item, props.location.select_location.name)
             }
         } else {
             props.setupNewTab(item)
@@ -165,13 +170,13 @@ Jukebox.propTypes = {
     startSearch: PropTypes.func.isRequired,
     cleanQuery: PropTypes.func.isRequired,
     updateSelection: PropTypes.func.isRequired,
-    queueSong: PropTypes.func.isRequired
 }
 const mapStateToProps = (state) => ({
     search: state.search,
     location: state.location,
     auth: state.auth,
-    stripe: state.stripe
+    stripe: state.stripe,
+    spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, queueSong, getDraftInvoice, setupNewTab, submitCampaignData })(Jukebox);
+export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, getDraftInvoice, setupNewTab, submitCampaignData })(Jukebox);

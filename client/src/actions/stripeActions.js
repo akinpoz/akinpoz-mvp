@@ -29,9 +29,13 @@ import {
     SPOTIFY_QUEUE_SONG,
     SPOTIFY_LOADING,
     SPOTIFY_ERROR,
-    SUBMIT_CAMPAIGN_ERROR, SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, CLEAR_MSG
+    SUBMIT_CAMPAIGN_ERROR,
+    SUBMITTED_CAMPAIGN,
+    SUBMITTING_CAMPAIGN,
+    CLEAR_MSG,
+    REQUESTED_PAST_TABS,
+    RETRIEVED_PAST_INVOICES, ERROR_PAST_INVOICES
 } from "./types";
-import {queueSong} from "./spotifyActions";
 
 /**
  * Creates stripe customer object to save and process payment
@@ -133,13 +137,13 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
  * @param item
  * @return {(function(*, *=): void)|*}
  */
-export const addInvoiceItem = (userID, item) => (dispatch, getState) => {
-    _addInvoiceItem(userID, item, dispatch, getState)
+export const addInvoiceItem = (userID, item, locationName) => (dispatch, getState) => {
+    _addInvoiceItem(userID, item, locationName, dispatch, getState)
 }
 
-function _addInvoiceItem (userID, item, dispatch, getState) {
+function _addInvoiceItem (userID, item, locationName, dispatch, getState) {
     dispatch({type: REQUESTED_ADD_INVOICE_ITEM})
-    let params = {userID, item}
+    let params = {userID, item, locationName}
     axios.post('/api/stripe/add-invoice-item', params, tokenConfig(getState)).then(res => {
         if (res.status !== 200) {
             dispatch({type: ERROR_ADDING_INVOICE_ITEM})
@@ -151,13 +155,13 @@ function _addInvoiceItem (userID, item, dispatch, getState) {
     })
 }
 
-export const submitCampaignData = (item) => (dispatch, getState) => {
+export const submitCampaignData = (item, locationName) => (dispatch, getState) => {
     if (item.data.type !== 'song') {
         dispatch({type: SUBMITTING_CAMPAIGN})
         axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
-                _addInvoiceItem(item.user._id, item, dispatch, getState)
+                _addInvoiceItem(item.user._id, item,locationName, dispatch, getState)
             }
             else {
                 dispatch({type: SUBMIT_CAMPAIGN_ERROR})
@@ -171,10 +175,13 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
         axios.post('/api/spotify/queueSong', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SPOTIFY_QUEUE_SONG})
-                addInvoiceItem(item.user._id, item)
+                _addInvoiceItem(item.user._id, item, locationName, dispatch, getState)
             }
             else {
-                dispatch({type: SPOTIFY_ERROR})
+                dispatch({
+                    type: SPOTIFY_ERROR,
+                    error: 'Looks like the jukebox feature is experiencing some issues.' +
+                        '  If you would like to use this feature, please report the error to this location.'})
                 console.error('failed: ' + res.status)
             }
         })

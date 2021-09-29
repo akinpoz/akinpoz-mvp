@@ -22,10 +22,11 @@
     /*justify-content: center;*/
     flex-direction: column;
     margin: 0;
+    overflow-y: auto;
 }
 
 .divider {
-    height: 1px;
+    min-height: 1px;
     background-color: lightgray;
     width: 100%;
 }
