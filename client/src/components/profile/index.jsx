@@ -30,7 +30,7 @@ function EndUserDashboard(props) {
     const [msg, setMsg] = useState()
     useEffect(() => {
         if (props.stripe) {
-            setMsg(props.stripe.error)
+            setMsg(props.stripe.msg)
         }
     }, [props.stripe])
     return (

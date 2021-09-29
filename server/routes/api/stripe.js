@@ -210,6 +210,12 @@ router.post('/add-invoice-item', async function (req, res) {
         return
     }
 
+    let openInvoices = await stripe.invoices.list({customer: customerID, status: 'open'})
+    if (openInvoices && openInvoices.data && openInvoices.data.length > 0) {
+        res.status(400).send('You currently have an open tab.  Please pay that before opening a new tab.')
+        return
+    }
+
     let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
     let invoice
 

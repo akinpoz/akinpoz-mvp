@@ -34,7 +34,7 @@ import {
     SUBMITTING_CAMPAIGN,
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
-    RETRIEVED_PAST_INVOICES, ERROR_PAST_INVOICES
+    RETRIEVED_PAST_TABS, ERROR_PAST_TABS
 } from "./types";
 
 /**
@@ -221,6 +221,25 @@ export const closeTab = (userID) => (dispatch, getState) => {
         else {
             console.error('Tabs Outstanding: ' + res.data)
             dispatch({type: ERROR_CLOSING_TAB})
+        }
+    })
+}
+
+export const getPastTabs = (userID) => (dispatch, getState) => {
+    dispatch({type: REQUESTED_PAST_TABS})
+    const params = {userID}
+    axios.post('/api/stripe/get-past-tabs', params, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            let error
+            for (const tab of res.data) {
+                if (tab.open) {
+                    error = 'You currently have an open tab.  Your account will be locked until it is paid'
+                }
+            }
+            dispatch({type: RETRIEVED_PAST_TABS, pastTabs: res.data, error: error})
+        }
+        else {
+            dispatch({type: ERROR_PAST_TABS, error: 'Could not load past tabs due to a server error.'})
         }
     })
 }

@@ -75,6 +75,12 @@ function Jukebox(props) {
         }
     }, [props.spotify])
 
+    useEffect(() => {
+        if (props?.stripe?.msg ?? false) {
+            setMsg(props.stripe.msg)
+        }
+    }, [props.stripe.msg])
+
     const handleSelectionChange = useCallback((e, data) => {
         props.updateSelection(data.result);
     }, [])

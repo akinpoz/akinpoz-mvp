@@ -26,7 +26,7 @@ import {
     SUCCESSFULLY_CLOSED_TAB,
     SUBMITTED_CAMPAIGN,
     CLEAR_MSG,
-    REQUESTED_PAST_TABS, RETRIEVED_PAST_INVOICES, ERROR_PAST_INVOICES
+    REQUESTED_PAST_TABS, RETRIEVED_PAST_TABS, ERROR_PAST_TABS
 } from '../actions/types';
 
 const initialState = {
@@ -164,14 +164,14 @@ export default function ( state = initialState, action) {
                 loading: true,
                 pastTabs: []
             }
-        case RETRIEVED_PAST_INVOICES:
+        case RETRIEVED_PAST_TABS:
             return {
                 ...state,
                 loading: false,
                 pastTabs: action.pastTabs,
-                error: action.error
+                msg: action.error
             }
-        case ERROR_PAST_INVOICES:
+        case ERROR_PAST_TABS:
             return {
                 ...state,
                 loading: false,
