@@ -7,7 +7,7 @@ import {
     addInvoiceItem,
     closeTab,
     createPaymentIntent, // NOT BEING USED
-    getDraftInvoice,
+    getDraftInvoice, getUnpaidTabs,
     markComplete, // NOT BEING USED
     markProcessing // NOT BEING USED
 } from "../../actions/stripeActions";
@@ -29,10 +29,13 @@ function Checkout(props) {
     useEffect(() => {
         if (props.auth.user) {
             props.getDraftInvoice(props.auth.user._id)
+            props.getUnpaidTabs(props.auth.user._id)
         }
     }, [props.auth])
     useEffect(() => {
-        setMsg(props.stripe.msg?.msg ?? '')
+        if (props.stripe.msg) {
+            setMsg(props.stripe.msg?.msg ?? '')
+        }
     }, [props.stripe.msg])
 
     useEffect(() => {
@@ -50,6 +53,8 @@ function Checkout(props) {
             props.addInvoiceItem(props.auth.user._id, props.stripe.localTab.item, props.location.select_location.name)
         }
     }, [props.campaign.last_submitted])
+
+
 
     return (
         <Elements stripe={stripePromise}>
@@ -87,6 +92,13 @@ function NewTab(props) {
 
     const [tac, setTac] = useState(false);
     const [payAgreement, setPayAgreement] = useState(false)
+    const [locked, setLocked] = useState(true)
+
+    useEffect(() => {
+        if (props.stripe.unpaidTabs) {
+            setLocked(props.stripe.unpaidTabs.length !== 0)
+        }
+    }, [props.stripe.unpaidTabs])
 
     const handleSubmit = async (event) => {
         // Block native form submission.
@@ -308,7 +320,8 @@ export default connect(mapStateToProps, {
     closeTab,
     submitCampaignData,
     queueSong,
-    addInvoiceItem
+    addInvoiceItem,
+    getUnpaidTabs
 })(Checkout);
 
 

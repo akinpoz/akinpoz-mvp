@@ -35,7 +35,7 @@ import {
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
-    USER_LOADING
+    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS
 } from "./types";
 import history from "../history";
 
@@ -208,6 +208,19 @@ export const getPastTabs = (userID) => (dispatch, getState) => {
         }
         else {
             dispatch({type: ERROR_PAST_TABS, error: 'Could not load past tabs due to a server error.'})
+        }
+    })
+}
+
+export const getUnpaidTabs = (userID) => (dispatch, getState) => {
+    dispatch({type: REQUESTED_UNPAID_TABS})
+    const params = {userID}
+    axios.post('/api/stripe/get-unpaid-tabs', params, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            dispatch({type: RETRIEVED_UNPAID_TABS, unpaidTabs: res.data})
+        }
+        else {
+            dispatch({type: ERROR_UNPAID_TABS})
         }
     })
 }

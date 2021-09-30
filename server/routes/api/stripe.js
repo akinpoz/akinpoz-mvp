@@ -211,15 +211,8 @@ router.post('/add-invoice-item', async function (req, res) {
         return
     }
 
-    let openInvoices = await stripe.invoices.list({customer: customerID, status: 'open'})
-    if (openInvoices && openInvoices.data && openInvoices.data.length > 0) {
-        res.status(400).send({msg: 'You currently have an open tab.  Please pay that before opening a new tab.'})
-        return
-    }
-
     let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
     let invoice
-
     if (invoices.data && invoices.data.length !== 0) {
         invoice = invoices.data.pop()
         let item = await stripe.invoiceItems.create({
@@ -346,52 +339,23 @@ router.post('/get-past-tabs', async function(req, res) {
         return
     }
 
-    let tabs = []
+    let openTabs = createTabs(openInvoices, true)
 
-    // Includes open invoices and marks the tab as 'open' so a message can be displayed that the account is locked until they pay their invoice.
-    if (openInvoices && openInvoices.data && openInvoices.data.length > 0) {
-        for (let invoice of openInvoices.data) {
-            let items = []
-            for (let line of invoice.lines.data) {
-                items.push({
-                    amount: line.amount,
-                    description: line.description,
-                    data: line.metadata
-                })
-            }
-            const tab = {
-                amount: invoice.total,
-                timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
-                items: items,
-                fromOnline: true,
-                open: true,
-                locationName: invoice.metadata['locationName']
-            }
-            tabs.push(tab)
-        }
-    }
+    let paidTabs = createTabs(paidInvoices, false)
 
-    if (paidInvoices && paidInvoices.data && paidInvoices.data.length > 0) {
-        for (let invoice of paidInvoices.data) {
-            let items = []
-            for (let line of invoice.lines.data) {
-                items.push({
-                    amount: line.amount,
-                    description: line.description,
-                    data: line.metadata
-                })
-            }
-            const tab = {
-                amount: invoice.total,
-                timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
-                items: items,
-                fromOnline: true,
-                open: false,
-                locationName: invoice.metadata['locationName']
-            }
-            tabs.push(tab)
-        }
+    res.status(200).send(openTabs.concat(paidTabs))
+})
+
+router.post('/get-unpaid-tabs', async function (req, res) {
+    let params = req.body;
+    let customerID = await getCustomerID(params.userID, res)
+    let errorOpen, openInvoices = await stripe.invoices.list({customer: customerID, status: "open"})
+    if (errorOpen) {
+        console.error('Could Not get Invoices')
+        res.status(400).send({msg: 'Could Not Get Invoices'})
+        return
     }
+    let tabs = createTabs(openInvoices, true)
     res.status(200).send(tabs)
 })
 
@@ -400,6 +364,34 @@ router.post('/get-past-tabs', async function(req, res) {
 ////////////////////////////////////////// THESE ARE HELPER FUNCTIONS. /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function createTabs(invoices, open) {
+    let tabs = []
+
+    // Includes open invoices and marks the tab as 'open' so a message can be displayed that the account is locked until they pay their invoice.
+    if (invoices && invoices.data && invoices.data.length > 0) {
+        for (let invoice of invoices.data) {
+            let items = []
+            for (let line of invoice.lines.data) {
+                items.push({
+                    amount: line.amount,
+                    description: line.description,
+                    data: line.metadata
+                })
+            }
+            const tab = {
+                amount: invoice.total,
+                timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
+                items: items,
+                fromOnline: true,
+                open: open,
+                locationName: invoice.metadata['locationName']
+            }
+            tabs.push(tab)
+        }
+    }
+    return tabs;
+}
 
 //gets customer and payment id (dont want to tax the backend a second time)
 async function getCustomerAndPaymentID(userID, res) {

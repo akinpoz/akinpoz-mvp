@@ -29,8 +29,9 @@ import {
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS,
     ERROR_PAST_TABS,
-    RESET_STRIPE
+    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS
 } from '../actions/types';
+import {getUnpaidTabs} from "../actions/stripeActions";
 
 const initialState = {
     clientSecret: '',
@@ -44,7 +45,8 @@ const initialState = {
     localTab: null,
     msg: null,
     pastTabs: [],
-    lastAdded: ''
+    lastAdded: '',
+    unpaidTabs: []
 }
 
 export default function (state = initialState, action) {
@@ -178,6 +180,28 @@ export default function (state = initialState, action) {
             }
         case RESET_STRIPE:
             return initialState;
+        case ERROR_UNPAID_TABS:
+            return {
+                ...state,
+                loading: false,
+                error: 'Cannot load tabs from stripe.'
+            }
+        case REQUESTED_UNPAID_TABS:
+            return {
+                ...state,
+                loading: true,
+            }
+        case RETRIEVED_UNPAID_TABS:
+            let newMessage = null
+            if (action.unpaidTabs !== []) {
+                newMessage = 'Account is locked.  Check your email for an unpaid tab invoice.'
+            }
+            return {
+                ...state,
+                loading: false,
+                unpaidTabs: action.unpaidTabs,
+                msg: newMessage
+            }
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

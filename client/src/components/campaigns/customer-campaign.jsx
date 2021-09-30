@@ -3,7 +3,7 @@ import history from '../../history'
 import { connect } from 'react-redux'
 import {getCampaign, submitCampaignData} from '../../actions/campaignActions'
 import { Button, Card, Input, Message } from 'semantic-ui-react'
-import { getDraftInvoice, setupNewTab } from "../../actions/stripeActions";
+import {getDraftInvoice, getUnpaidTabs, setupNewTab} from "../../actions/stripeActions";
 import { getLocation } from "../../actions/locationActions";
 
 
@@ -14,11 +14,11 @@ function CustomerCampaign(props) {
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const [msg, setMsg] = useState(props.stripe.msg || '')
     const [show, setShow] = useState(true)
+    const [locked, setLocked] = useState(true)
     useEffect(() => {
         if (props.stripe && props.stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
         }
-
     }, [])
     useEffect(() => {
         if (props.auth.user?.campaigns?.includes(campaign._id)) {
@@ -48,6 +48,7 @@ function CustomerCampaign(props) {
     useEffect(() => {
         if (props.auth && props.auth.user) {
             props.getDraftInvoice(props.auth.user._id)
+            props.getUnpaidTabs(props.auth.user._id)
         }
     }, [props.auth])
     useEffect(() => {
@@ -68,6 +69,16 @@ function CustomerCampaign(props) {
             setButtonLabel('Open New Tab')
         }
     }, [props.stripe.hasOpenTab])
+
+    useEffect(() => {
+
+        if (props.stripe.unpaidTabs) {
+            setLocked(props.stripe.unpaidTabs.length !== 0)
+        }
+    }, [props.stripe])
+
+
+
     function handleChange(e, data) {
         setInfo(data.value)
     }
@@ -116,7 +127,7 @@ function CustomerCampaign(props) {
     return (
         <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
             <div id="customer-campaign-card-message_container">
-                {msg &&
+                {msg && msg.msg &&
                     <Message color={msg.msg.includes("login") ? "red" : "green"}>
                         <Message.Header>
                             {msg.msg}
@@ -139,7 +150,7 @@ function CustomerCampaign(props) {
                             <div style={{ flexDirection: "row-reverse", display: "flex" }}>
                                 {props.auth.isAuthenticated && campaign.details.type !== 'Survey' && <div id="submit-button-div">
                                     {hasPaymentMethod() && <Button primary onClick={handleSubmit}
-                                        disabled={campaign.details.type !== 'Fastpass' && info === ''}>{buttonLabel}</Button>}
+                                        disabled={(campaign.details.type !== 'Fastpass' && info === '') || locked}>{buttonLabel}</Button>}
                                     {!hasPaymentMethod() && <Button primary onClick={() => {
                                         history.push({ pathname: '/profile' })
                                     }}>Add a Payment Method</Button>}
@@ -188,4 +199,4 @@ const mapStateToProps = state => ({
     location: state.location
 })
 
-export default connect(mapStateToProps, { getCampaign, getDraftInvoice, setupNewTab, submitCampaignData, getLocation })(CustomerCampaign)
+export default connect(mapStateToProps, { getCampaign, getDraftInvoice, setupNewTab, submitCampaignData, getLocation, getUnpaidTabs })(CustomerCampaign)
