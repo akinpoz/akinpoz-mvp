@@ -139,6 +139,9 @@ function History(props) {
                         )
                     })
                 }
+                {(props.stripe?.pastTabs?.length ?? 0) === 0 &&
+                <b>No campaign history.  Participate in campaigns and view that history here!</b>
+                }
             </div>
         </Card>
     )

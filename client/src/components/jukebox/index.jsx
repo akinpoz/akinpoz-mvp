@@ -6,7 +6,9 @@ import PropTypes from 'prop-types';
 import { cleanQuery, startSearch, updateSelection } from "../../actions/searchActions";
 import history from '../../history'
 import { useState } from 'react';
-import { getDraftInvoice, setupNewTab, submitCampaignData } from "../../actions/stripeActions";
+import { getDraftInvoice, setupNewTab } from "../../actions/stripeActions";
+import {submitCampaignData} from "../../actions/campaignActions";
+import {queueSong} from "../../actions/spotifyActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
@@ -119,7 +121,7 @@ function Jukebox(props) {
         }
         if (props.stripe.hasOpenTab) {
             if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
-                props.submitCampaignData(item, props.location.select_location.name)
+                props.queueSong(item)
             }
         } else {
             props.setupNewTab(item)
@@ -199,4 +201,4 @@ const mapStateToProps = (state) => ({
     spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, getDraftInvoice, setupNewTab, submitCampaignData })(Jukebox);
+export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, getDraftInvoice, setupNewTab, submitCampaignData, queueSong })(Jukebox);

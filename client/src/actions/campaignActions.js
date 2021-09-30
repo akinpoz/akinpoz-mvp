@@ -1,4 +1,15 @@
-import { GET_CAMPAIGNS_BY_USER_ID, CAMPAIGNS_LOADING, ADD_CAMPAIGN, UPDATE_CAMPAIGN, DELETE_CAMPAIGN, GET_CAMPAIGNS, GET_CAMPAIGN, SET_CAMPAIGN, GET_ERRORS } from './types'
+import {
+    GET_CAMPAIGNS_BY_USER_ID,
+    CAMPAIGNS_LOADING,
+    ADD_CAMPAIGN,
+    UPDATE_CAMPAIGN,
+    DELETE_CAMPAIGN,
+    GET_CAMPAIGNS,
+    GET_CAMPAIGN,
+    SET_CAMPAIGN,
+    GET_ERRORS,
+    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR
+} from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
 
@@ -62,6 +73,20 @@ export const deleteCampaign = (campaign) => (dispatch, getState) => {
         })
     })
 }
+
+export const submitCampaignData = (item) => (dispatch, getState) => {
+    dispatch({type: SUBMITTING_CAMPAIGN})
+    axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
+        if (res.status === 200) {
+            dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
+        }
+        else {
+            dispatch({type: SUBMIT_CAMPAIGN_ERROR})
+            console.error('failed: ' + res.data.msg)
+        }
+    })
+}
+
 
 
 export const setCampaignsLoading = () => {

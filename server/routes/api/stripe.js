@@ -103,7 +103,7 @@ router.post('/update-payment', async function (req, res) {
 
     if (!user) {
         console.error('User not found')
-        res.status(400).send('User not found')
+        res.status(400).send({msg: 'User not found'})
         return;
     }
 
@@ -149,7 +149,7 @@ router.post('/get-draft-invoice', async function (req, res) {
 
     if (!customerID || customerID === '') {
         console.error('Could not get customer ID')
-        res.status(400).send('Could not get customer ID')
+        res.status(400).send({msg: 'Could not get customer ID'})
         return;
     }
 
@@ -207,13 +207,13 @@ router.post('/add-invoice-item', async function (req, res) {
     let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
     if (!customerID || customerID === '') {
         console.error('User has no customer ID')
-        res.status(400).send('User has no customer ID')
+        res.status(400).send({msg: 'User has no customer ID'})
         return
     }
 
     let openInvoices = await stripe.invoices.list({customer: customerID, status: 'open'})
     if (openInvoices && openInvoices.data && openInvoices.data.length > 0) {
-        res.status(400).send('You currently have an open tab.  Please pay that before opening a new tab.')
+        res.status(400).send({msg: 'You currently have an open tab.  Please pay that before opening a new tab.'})
         return
     }
 
@@ -239,11 +239,12 @@ router.post('/add-invoice-item', async function (req, res) {
             }
         })
         if (item.invoice === invoice.id) {
-            res.status(200).send('Success')
+            res.status(200).send({msg: 'Success'})
         } else {
             // should this be different? (still invoice item, just on next invoice)
             res.status(400).send({error: 'Could not add invoice item to current invoice'})
         }
+
     } else {
         let item = await stripe.invoiceItems.create({
             customer: customerID,
@@ -300,9 +301,9 @@ router.post('/add-invoice-item', async function (req, res) {
             }
             res.status(200).send(tab)
         } else if (item && fee) {
-            res.status(200).send('Added Items to customer, could not create invoice')
+            res.status(200).send({msg: 'Added Items to customer, could not create invoice'})
         } else {
-            res.status(400).send('Could not add items to account')
+            res.status(400).send({msg: 'Could not add items to account'})
         }
     }
 })
@@ -315,7 +316,7 @@ router.post('/close-tab', async function(req, res) {
         let paid = true;
         let errors = [];
         if (!invoices.data ||invoices.data.length === 0) {
-            res.status(400).send('No Tab to Close')
+            res.status(400).send({msg: 'No Tab to Close'})
         }
         for (const invoice of invoices.data) {
             const invoiceRes = await stripe.invoices.pay(invoice.id)
@@ -325,7 +326,7 @@ router.post('/close-tab', async function(req, res) {
             }
         }
         if (paid) {
-            res.status(200).send('Invoices paid')
+            res.status(200).send({msg: 'Invoices paid'})
         }
         else {
             res.status(400).send(errors)
@@ -341,7 +342,7 @@ router.post('/get-past-tabs', async function(req, res) {
 
     if (errorOpen || errorPaid) {
         console.error('Could Not get Invoices')
-        res.status(400).send('Could Not Get Invoices')
+        res.status(400).send({msg: 'Could Not Get Invoices'})
         return
     }
 
@@ -514,7 +515,6 @@ router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, 
         data = req.body.data;
         eventType = req.body.type;
     }
-
     if (eventType === 'payment_intent.succeeded') {
         // Funds have been captured
         // Fulfill any orders, e-mail receipts, etc

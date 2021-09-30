@@ -141,10 +141,6 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
  * @return {(function(*, *=): void)|*}
  */
 export const addInvoiceItem = (userID, item, locationName) => (dispatch, getState) => {
-    _addInvoiceItem(userID, item, locationName, dispatch, getState)
-}
-
-function _addInvoiceItem (userID, item, locationName, dispatch, getState) {
     dispatch({type: REQUESTED_ADD_INVOICE_ITEM})
     let params = {userID, item, locationName}
     axios.post('/api/stripe/add-invoice-item', params, tokenConfig(getState)).then(res => {
@@ -157,43 +153,6 @@ function _addInvoiceItem (userID, item, locationName, dispatch, getState) {
             history.push('/checkout')
         }
     })
-}
-
-export const submitCampaignData = (item, locationName) => (dispatch, getState) => {
-    if (item.data.type !== 'song') {
-        dispatch({type: SUBMITTING_CAMPAIGN})
-        axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
-            if (res.status === 200) {
-                dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
-                if(item.data.type !== 'Survey') _addInvoiceItem(item.user._id, item, dispatch, getState)
-            }
-            else {
-                dispatch({type: SUBMIT_CAMPAIGN_ERROR})
-                console.error('failed: ' + res.data.msg)
-            }
-        })
-    }
-    else {
-        dispatch({type: SPOTIFY_LOADING})
-        axios.post('/api/spotify/queueSong', item, tokenConfig(getState)).then(res => {
-            if (res.status === 200) {
-                dispatch({type: SPOTIFY_QUEUE_SONG})
-                _addInvoiceItem(item.user._id, item, locationName, dispatch, getState)
-            }
-            else {
-                dispatch({
-                    type: SPOTIFY_ERROR,
-                    error: 'Looks like the jukebox feature is experiencing some issues.' +
-                        '  If you would like to use this feature, please report the error to this location.'})
-                console.error('failed: ' + res.status)
-            }
-        }).catch(err => {
-                dispatch({
-                    type: SPOTIFY_ERROR,
-                    error: 'Looks like the jukebox feature is experiencing some issues.' +
-                        '  If you would like to use this feature, please report the error to this location.'})
-        })
-    }
 }
 
 /**

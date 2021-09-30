@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import history from '../../history'
 import { connect } from 'react-redux'
-import { getCampaign } from '../../actions/campaignActions'
+import {getCampaign, submitCampaignData} from '../../actions/campaignActions'
 import { Button, Card, Input, Message } from 'semantic-ui-react'
-import { getDraftInvoice, setupNewTab, submitCampaignData } from "../../actions/stripeActions";
+import { getDraftInvoice, setupNewTab } from "../../actions/stripeActions";
 import { getLocation } from "../../actions/locationActions";
 
 
@@ -96,10 +96,11 @@ function CustomerCampaign(props) {
         if (type !== "Survey") {
             if (props.stripe.hasOpenTab) {
                 if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                    props.submitCampaignData(item, props.location.select_location.name)
+                    props.submitCampaignData(item)
                 }
             } else {
                 props.setupNewTab(item)
+                history.push('/checkout')
             }
         } else {
             props.submitCampaignData(item)

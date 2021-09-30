@@ -8,10 +8,12 @@ import {
     createPaymentIntent, // NOT BEING USED
     getDraftInvoice,
     markComplete, // NOT BEING USED
-    markProcessing, submitCampaignData // NOT BEING USED
+    markProcessing // NOT BEING USED
 } from "../../actions/stripeActions";
+import {submitCampaignData} from "../../actions/campaignActions"
 import { connect } from "react-redux";
 import history from '../../history'
+import {queueSong} from "../../actions/spotifyActions";
 
 /**
  * Checkout form for rendering tabs (3 conditions -- Has open tab, wants to open tab, has no tab and doesnt want to start a tab)
@@ -29,7 +31,7 @@ function Checkout(props) {
         }
     }, [props.auth])
     useEffect(() => {
-        setMsg(props.stripe.msg)
+        setMsg(props.stripe.msg.msg)
     }, [props.stripe.msg])
 
     useEffect(() => {
@@ -38,7 +40,7 @@ function Checkout(props) {
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
-                {msg && <Message><Message.Header>{msg}<br></br><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
+                {msg && <Message><Message.Header>{msg}<br/><a href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another Campaign!</a></Message.Header></Message>}
                 {props.stripe.tab &&
                     <ExistingTab {...props} />
                 }
@@ -77,7 +79,12 @@ function NewTab(props) {
         event.preventDefault();
 
         if (tac && payAgreement) {
-            props.submitCampaignData(props.stripe.localTab.item, props.location.select_location.name)
+            if (props.stripe.localTab.item.data.type !== 'song') {
+                props.submitCampaignData(props.stripe.localTab.item)
+            }
+            else {
+                props.queueSong(props.stripe.localTab.item)
+            }
         }
     }
 
@@ -279,12 +286,13 @@ const mapStateToProps = (state) => ({
 
 //TODO: Determine if those methods are being used or not. If not remove them....
 export default connect(mapStateToProps, {
-    createPaymentIntent, // NOT BEING USED 
+    createPaymentIntent, // NOT BEING USED
     markProcessing, // NOT BEING USED
     markComplete, // NOT BEING USED
     getDraftInvoice,
     closeTab,
-    submitCampaignData
+    submitCampaignData,
+    queueSong
 })(Checkout);
 
 
@@ -389,7 +397,12 @@ function CheckoutForm(props) {
         event.preventDefault();
         // TODO: Make sure item object here has the redux state user object (needed for stripe: see submitCampaignData for usage)
         if (tac && payAgreement) {
-            props.submitCampaignData(item, props.location.select_location.name)
+            if (props.stripe.localTab.item.data.type !== 'song') {
+                props.submitCampaignData(props.stripe.localTab.item)
+            }
+            else {
+                props.queueSong(props.stripe.localTab.item)
+            }
         }
 
         if (!stripe || !elements || props.stripe.loading || props.stripe.status === 'succeeded') {

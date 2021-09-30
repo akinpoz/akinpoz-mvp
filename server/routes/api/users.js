@@ -87,7 +87,7 @@ router.post('/update', auth, function (req, res) {
         })
         .catch(e => {
             console.error(e);
-            res.status(500).send('Server Error')
+            res.status(500).send({msg: 'Server Error'})
         })
     //TODO: Add stripe update logic here
 })
