@@ -8,7 +8,6 @@ const Campaign = require('../../models/Campaign');
 var auth = require('../../middleware/auth')
 
 
-
 /**
  * @route GET api/campaigns/location
  * @desc get all campaigns by location ID
@@ -16,7 +15,7 @@ var auth = require('../../middleware/auth')
  */
 router.get('/location', auth, async function (req, res) {
     try {
-        let campaigns = await Campaign.find({ location: req.query.location_id })
+        let campaigns = await Campaign.find({location: req.query.location_id})
         res.status(200).send(campaigns)
     } catch (e) {
         console.error(e)
@@ -30,7 +29,7 @@ router.get('/location', auth, async function (req, res) {
  */
 router.get('/user_id', auth, async function (req, res) {
     try {
-        let campaigns = await Campaign.find({ user: req.query.user }, null, {sort: {'date': -1}})
+        let campaigns = await Campaign.find({user: req.query.user}, null, {sort: {'date': -1}})
         res.status(200).send(campaigns)
     } catch (e) {
         console.error(e)
@@ -43,7 +42,7 @@ router.get('/user_id', auth, async function (req, res) {
  */
 router.get('/location_id', async (req, res) => {
     try {
-        res.status(200).send(await Campaign.findOne({ location: req.query.location_id }))
+        res.status(200).send(await Campaign.findOne({location: req.query.location_id}))
     } catch (error) {
         console.error(error)
         res.status(500).send(error)
@@ -57,7 +56,7 @@ router.get('/location_id', async (req, res) => {
  */
 router.get('/campaign_id', async (req, res) => {
     try {
-        res.status(200).send(await Campaign.findOne({ _id: req.query.campaign_id }))
+        res.status(200).send(await Campaign.findOne({_id: req.query.campaign_id}))
     } catch (error) {
         console.error(error)
         res.status(500).send(error)
@@ -65,7 +64,7 @@ router.get('/campaign_id', async (req, res) => {
 })
 
 /**
- * @route POST api/campaigns/add 
+ * @route POST api/campaigns/add
  * @desc post a new campaign
  * @access Private
  */
@@ -77,8 +76,14 @@ router.post('/add', auth, (req, res) => {
         newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);
             if (campaign) {
-                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { campaigns: campaign._id } }, { new: true, useFindAndModify: false })
-                await Location.findOneAndUpdate({ _id: req.body.location }, { $push: { campaigns: campaign._id } }, { new: true, useFindAndModify: false})
+                await User.findOneAndUpdate({_id: req.body.user}, {$push: {campaigns: campaign._id}}, {
+                    new: true,
+                    useFindAndModify: false
+                })
+                await Location.findOneAndUpdate({_id: req.body.location}, {$push: {campaigns: campaign._id}}, {
+                    new: true,
+                    useFindAndModify: false
+                })
                 res.status(200).send(campaign);
             }
         })
@@ -94,8 +99,8 @@ router.post('/add', auth, (req, res) => {
  */
 router.post('/update', auth, async (req, res) => {
     try {
-        await Campaign.findOneAndUpdate({ _id: req.body.campaign_id }, req.body, { useFindAndModify: false, new: true })
-        res.status(200).send(await Campaign.find({ user: req.body.user }, null, {sort: {'date': -1}}))
+        await Campaign.findOneAndUpdate({_id: req.body.campaign_id}, req.body, {useFindAndModify: false, new: true})
+        res.status(200).send(await Campaign.find({user: req.body.user}, null, {sort: {'date': -1}}))
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
@@ -108,11 +113,11 @@ router.post('/update', auth, async (req, res) => {
  */
 router.post('/delete', auth, async (req, res) => {
     try {
-        const campaign = await Campaign.findOneAndRemove({ _id: req.body._id }, { useFindAndModify: false })
-        const user = await User.findOne({ _id: req.body.user })
+        const campaign = await Campaign.findOneAndRemove({_id: req.body._id}, {useFindAndModify: false})
+        const user = await User.findOne({_id: req.body.user})
         user.campaigns.splice(user.campaigns.indexOf(req.body._id), 1)
         await user.save();
-        const location = await Location.findOne({ _id: req.body.location })
+        const location = await Location.findOne({_id: req.body.location})
         location.campaigns.splice(location.campaigns.indexOf(req.body._id), 1)
         await location.save();
         res.status(200).send(campaign._id)
@@ -129,8 +134,8 @@ router.post('/delete', auth, async (req, res) => {
  */
 router.post('/toggleMusic', auth, async (req, res) => {
     try {
-        const { music, _id } = req.body;
-        const campaign = await Campaign.findOneAndUpdate({ _id }, { music }, { useFindAndModify: false, new: true })
+        const {music, _id} = req.body;
+        const campaign = await Campaign.findOneAndUpdate({_id}, {music}, {useFindAndModify: false, new: true})
         res.status(200).send(campaign)
     } catch (e) {
         console.error(e)
@@ -141,84 +146,105 @@ router.post('/toggleMusic', auth, async (req, res) => {
 /**
  * @route POST api/campaigns/removeName
  * @desc remove the name put on the fast pass list
- * @access Public 
- * @note Want to move away from over engineering hot garbage code in redux. Not everything should be a redux action. This endpoint is called directly from the business-campaign file. 
+ * @access Public
+ * @note Want to move away from over engineering hot garbage code in redux. Not everything should be a redux action. This endpoint is called directly from the business-campaign file.
  */
 router.post('/removeName', auth, async (req, res) => {
     try {
-        const { name, _id } = req.body
-        const campaign = await Campaign.findOne({ _id })
+        const {name, _id} = req.body
+        const campaign = await Campaign.findOne({_id})
         campaign.details.options.splice(campaign.details.options.indexOf(name), 1)
         const newNames = campaign.details.options
-        await Campaign.findOneAndUpdate({ _id }, { details: { options: newNames, type: campaign.details.type } }, { useFindAndModify: false, new: true })
-        res.status(200).send({ msg: "Successfully removed name", name })
+        await Campaign.findOneAndUpdate({_id}, {
+            details: {
+                options: newNames,
+                type: campaign.details.type
+            }
+        }, {useFindAndModify: false, new: true})
+        res.status(200).send({msg: "Successfully removed name", name})
     } catch (e) {
         console.error(e)
-        res.status(500).send({ msg: `Failed: ${e.message}` })
+        res.status(500).send({msg: `Failed: ${e.message}`})
     }
 })
 
 /**
  * @route POST api/campaigns/submitData
  * @desc submit data to a campaign
- * @access Private 
+ * @access Private
  */
 router.post('/submitData', auth, async (req, res) => {
-    const { user, data, description } = req.body
-    const { campaign_id, info } = data
+    const {user, data, description} = req.body
+    const {campaign_id, info} = data
     switch (description) {
         case "Survey":
             try {
-                var campaign = await Campaign.findOne({ _id: campaign_id })
-                var results = campaign.details.results
+                let campaign = await Campaign.findOne({_id: campaign_id})
+                let results = campaign.details.results
                 // Info {String} - The name of one of the options of the survey.
                 if (results[info]) {
                     results[info]++
-                }
-                else {
+                } else {
                     results[info] = 1
                 }
                 const newResults = results
-                await Campaign.findOneAndUpdate({ _id: campaign_id }, { details: { options: campaign.details.options, type: campaign.details.type, results: newResults } }, { useFindAndModify: false, new: true })
-                res.status(200).send({ msg: "Thanks for your vote!" })
+                await Campaign.findOneAndUpdate({_id: campaign_id}, {
+                    details: {
+                        options: campaign.details.options,
+                        type: campaign.details.type,
+                        results: newResults
+                    }
+                }, {useFindAndModify: false, new: true})
+                res.status(200).send({msg: "Thanks for your vote!"})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({ msg: error.message })
+                res.status(400).send({msg: error.message})
             }
             break
         case "Fastpass":
             try {
-                var campaign = await Campaign.findOne({ _id: campaign_id })
-                var options = campaign.details.options
+                let campaign = await Campaign.findOne({_id: campaign_id})
+                let options = campaign.details.options
                 options.push(user.name)
                 const newOptions = options
-                await Campaign.findOneAndUpdate({ _id: campaign_id }, { details: { options: newOptions, type: campaign.details.type, results: campaign.details.results } }, { useFindAndModify: false, new: true })
-                res.status(200).send({ msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment." })
+                await Campaign.findOneAndUpdate({_id: campaign_id}, {
+                    details: {
+                        options: newOptions,
+                        type: campaign.details.type,
+                        results: campaign.details.results
+                    }
+                }, {useFindAndModify: false, new: true})
+                res.status(200).send({msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment."})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({ msg: error.message })
+                res.status(400).send({msg: error.message})
             }
             break
         case "Raffle":
             try {
-                var campaign = await Campaign.findOne({ _id: campaign_id })
-                var results = campaign.details.results
+                let campaign = await Campaign.findOne({_id: campaign_id})
+                let results = campaign.details.results
                 if (results[user.name]) {
                     results[user.name] = results[user.name] + parseInt(info)
-                }
-                else {
+                } else {
                     results[user.name] = parseInt(info)
                 }
                 const newResults = results
-                await Campaign.findOneAndUpdate({ _id: campaign_id }, { details: { options: campaign.details.options, type: campaign.details.type, results: newResults } }, { useFindAndModify: false, new: true })
-                res.status(200).send({ msg: "Thanks for participating in our raffle! We will let you know if you won." })
+                await Campaign.findOneAndUpdate({_id: campaign_id}, {
+                    details: {
+                        options: campaign.details.options,
+                        type: campaign.details.type,
+                        results: newResults
+                    }
+                }, {useFindAndModify: false, new: true})
+                res.status(200).send({msg: "Thanks for participating in our raffle! We will let you know if you won."})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({ msg: error.message })
+                res.status(400).send({msg: error.message})
             }
             break
     }
-    await User.findOneAndUpdate({ _id: user }, { $push: { campaigns: campaign_id } }, { new: true, useFindAndModify: false })
+    await User.findOneAndUpdate({_id: user}, {$push: {campaigns: campaign_id}}, {new: true, useFindAndModify: false})
 })
 
 module.exports = router

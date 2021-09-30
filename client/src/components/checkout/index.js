@@ -4,6 +4,7 @@ import styles from './checkout.module.css'
 import { loadStripe } from "@stripe/stripe-js";
 import { CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import {
+    addInvoiceItem,
     closeTab,
     createPaymentIntent, // NOT BEING USED
     getDraftInvoice,
@@ -31,12 +32,25 @@ function Checkout(props) {
         }
     }, [props.auth])
     useEffect(() => {
-        setMsg(props.stripe.msg.msg)
+        setMsg(props.stripe.msg?.msg ?? '')
     }, [props.stripe.msg])
 
     useEffect(() => {
         setMsg(props.spotify.error)
     }, [props.spotify.error])
+
+    useEffect(() => {
+        if (props.campaign.msg !== '') {
+            setMsg(props.campaign.msg)
+        }
+    }, [props.campaign.msg])
+
+    useEffect(() => {
+        if ((props.stripe?.localTab?.item ?? false) && props.campaign?.last_submitted === props.stripe?.localTab?.data?.transactionID && !props.campaign.loading && !props.stripe.loading && props.stripe.lastAdded !== props.campaign.last_submitted) {
+            props.addInvoiceItem(props.auth.user._id, props.stripe.localTab.item, props.location.select_location.name)
+        }
+    }, [props.campaign.last_submitted])
+
     return (
         <Elements stripe={stripePromise}>
             <div className={styles.checkoutContainer}>
@@ -281,7 +295,8 @@ const mapStateToProps = (state) => ({
     stripe: state.stripe,
     auth: state.auth,
     location: state.location,
-    spotify: state.spotify
+    spotify: state.spotify,
+    campaign: state.campaign
 })
 
 //TODO: Determine if those methods are being used or not. If not remove them....
@@ -292,7 +307,8 @@ export default connect(mapStateToProps, {
     getDraftInvoice,
     closeTab,
     submitCampaignData,
-    queueSong
+    queueSong,
+    addInvoiceItem
 })(Checkout);
 
 
@@ -384,12 +400,6 @@ function CheckoutForm(props) {
             })
         }
     }, [paymentRequest, props.stripe])
-
-    useEffect(() => {
-        if (props.auth.user) {
-            props.getDraftInvoice(props.auth.user._id)
-        }
-    }, [props.auth.user])
 
     // Handles submit logic for manually entering credit cards
     const handleSubmit = async (event) => {

@@ -1,9 +1,21 @@
-import { GET_CAMPAIGNS_BY_USER_ID, ADD_CAMPAIGN, CAMPAIGNS_LOADING, UPDATE_CAMPAIGN, DELETE_CAMPAIGN, GET_CAMPAIGNS, GET_CAMPAIGN, SET_CAMPAIGN } from '../actions/types'
+import {
+    GET_CAMPAIGNS_BY_USER_ID,
+    ADD_CAMPAIGN,
+    CAMPAIGNS_LOADING,
+    UPDATE_CAMPAIGN,
+    DELETE_CAMPAIGN,
+    GET_CAMPAIGNS,
+    GET_CAMPAIGN,
+    SET_CAMPAIGN,
+    SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR
+} from '../actions/types'
 
 const initialState = {
     campaigns: [],
     loading: false,
-    select_campaign: ""
+    select_campaign: '',
+    last_submitted: '',
+    msg: ''
 }
 
 export default function (state = initialState, action) {
@@ -27,7 +39,7 @@ export default function (state = initialState, action) {
             }
         case ADD_CAMPAIGN:
             return {
-                ...state, 
+                ...state,
                 campaigns: [action.payload, ...state.campaigns]
             }
         case UPDATE_CAMPAIGN:
@@ -45,6 +57,24 @@ export default function (state = initialState, action) {
                 ...state,
                 loading: true
             }
+        case SUBMITTING_CAMPAIGN:
+            return {
+                ...state,
+                loading: true,
+            }
+        case SUBMITTED_CAMPAIGN:
+            return {
+                ...state,
+                msg: action.payload,
+                loading: false,
+                last_submitted: action.last_submitted
+            }
+        case SUBMIT_CAMPAIGN_ERROR:
+            return {
+                ...state,
+                msg: 'Error Submitting Campaign'
+            }
+
         default:
             return state
     }

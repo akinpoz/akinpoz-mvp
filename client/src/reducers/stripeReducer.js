@@ -43,7 +43,8 @@ const initialState = {
     tab: null,
     localTab: null,
     msg: null,
-    pastTabs: []
+    pastTabs: [],
+    lastAdded: ''
 }
 
 export default function (state = initialState, action) {
@@ -128,7 +129,8 @@ export default function (state = initialState, action) {
                 loading: false,
                 tab: action.tab,
                 hasOpenTab: true,
-                localTab: null
+                localTab: null,
+                lastAdded: action.lastAdded
             }
         case ERROR_ADDING_INVOICE_ITEM:
             return initialState
@@ -149,12 +151,7 @@ export default function (state = initialState, action) {
             return {
                 ...state
             }
-        case SUBMITTED_CAMPAIGN:
-            return {
-                ...state,
-                msg: action.payload,
-                loading: false
-            }
+
         case CLEAR_MSG:
             return {
                 ...state,

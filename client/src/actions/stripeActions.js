@@ -138,6 +138,7 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
  * Adds an item to be invoiced via either adding to a current invoice or creating a new one
  * @param userID
  * @param item
+ * @param locationName
  * @return {(function(*, *=): void)|*}
  */
 export const addInvoiceItem = (userID, item, locationName) => (dispatch, getState) => {
@@ -149,7 +150,7 @@ export const addInvoiceItem = (userID, item, locationName) => (dispatch, getStat
             console.error(res.data)
         }
         else {
-            dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, tab: res.data})
+            dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, tab: res.data, lastAdded: item.data.transactionID})
             history.push('/checkout')
         }
     })
