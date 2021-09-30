@@ -20,6 +20,10 @@ var LocationSchema = new Schema({
             default: Date.now()
         }
     },
+    date: {
+        type: Date,
+        default: Date.now()
+    },
     description: {
         type: String,
         required: false,

@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Form, Modal, Icon, Message } from "semantic-ui-react";
+import { Button, Modal } from "semantic-ui-react";
 import { connect } from 'react-redux'
 import { updateCampaign } from '../../actions/campaignActions'
+
 
 function ResultsModal(props) {
     const [open, setOpen] = useState(false);
     const [msg, setMsg] = useState();
     useEffect(() => { }, [props])
+    // Jukebox & Fastpass are not in this file (jukebox/index.jsx, campaigns/business-campaign.jsx respectively)
+    // Picking Raffle winner
     function handlePick() {
-        const winner = props.details.options[Math.floor(Math.random() * props.details.options.length)];
+        var options = []
+        for (var entry of Object.entries(props.details.results)) {
+            while (entry[1] > 0) {
+                options.push(entry[0])
+                entry[1]--;
+            }
+        }
+        var winner = options[Math.floor(Math.random() * options.length)];
         // updateCampaign. Set results {"0": winner}, active: false
         const campaignDetails = {
             title: props.title,
@@ -22,14 +32,15 @@ function ResultsModal(props) {
         }
         props.updateCampaign(campaignDetails)
     }
+    // Ending survey logic
     function handleEnd() {
-        var options = Object.values(props.details.results).sort((a, b) => a - b);
-        var winner = options[0];
+        var options = Object.entries(props.details.results).sort((a, b) => a[1] - b[1]);
+        var winner = options[0][0];
         const campaignDetails = {
             title: props.title,
             description: props.description,
             question: props.question,
-            details: {...props.details, results: { "0": winner }},
+            details: { ...props.details, results: { "0": winner } },
             user: props.user,
             location: props.location,
             campaign_id: props._id,
@@ -42,8 +53,14 @@ function ResultsModal(props) {
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={props.trigger}>
-            <Modal.Header>{props.active ? "Campaign in Progress..." : "Results"}</Modal.Header>
+            trigger={props.trigger}
+            closeIcon>
+            <Modal.Header>{props.active ? "Campaign in Progress..." : "Results"}
+                {props.active &&
+                    <h6>
+                        {results.length === 0 ? 'There have been no entries yet...' : `${results.length} Entries`}
+                    </h6>}
+            </Modal.Header>
             <Modal.Content>
                 {props.details.type === "Survey" &&
                     <div>
@@ -54,7 +71,14 @@ function ResultsModal(props) {
                                 </div>
                             )
                         })}
-                        {props.active &&
+                        {props.active && results.length === 0 && props.details.options.map((option, index) => {
+                            return (
+                                <div key={index}>
+                                    <h4>{option} : 0</h4>
+                                </div>
+                            )
+                        })}
+                        {props.active && results.length > 0 &&
                             <Button onClick={handleEnd}>End Campaign</Button>
                         }
                         {!props.active &&
@@ -72,7 +96,7 @@ function ResultsModal(props) {
                             <h4>Winner</h4>
                             <p>{props.details.results[0]}</p>
                         </div>}
-                        {props.active && <div>
+                        {props.active && results.length > 0 && <div>
                             <Button onClick={handlePick}>Pick Winner</Button>
                         </div>}
                     </div>

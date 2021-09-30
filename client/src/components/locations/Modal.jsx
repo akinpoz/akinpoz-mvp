@@ -42,9 +42,8 @@ function LocationModal(props) {
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={
-                props.trigger
-            }>
+            trigger={props.trigger}
+            closeIcon>
             <Modal.Header>{title} Location</Modal.Header>
             <Modal.Content>
                 <Form>

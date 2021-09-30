@@ -165,15 +165,16 @@ router.post('/get-draft-invoice', async function (req, res) {
     if (invoice !== undefined) {
         let items = []
         for (let line of invoice.lines.data) {
+            var amount = line.description.includes("fee") ? parseFloat(line.amount / 100) : line.amount
             items.push({
-                amount: line.amount,
+                amount: amount,
                 description: line.description,
                 createdAt: line.metadata['createdAt'],
                 data: {
                     timestamp: line.metadata['timestamp'],
                     type: line.metadata['type'],
-                    campaignID: line.metadata['campaignID'],
-                    locationID: line.metadata['locationID'],
+                    campaign_id: line.metadata['campaign_id'],
+                    location_id: line.metadata['location_id'],
                     transactionID: line.metadata['transactionID'],
                     name: line.metadata['name']
                 }
@@ -230,8 +231,8 @@ router.post('/add-invoice-item', async function (req, res) {
             metadata: {
                 'timestamp': params.item.data.timestamp.toString(),
                 'type': params.item.data.type.toString(),
-                'campaignID': params.item.data.campaignID.toString(),
-                'locationID': params.item.data.locationID.toString(),
+                'campaign_id': params.item.data.campaign_id.toString(),
+                'location_id': params.item.data.location_id.toString(),
                 'transactionID': params.item.data.transactionID.toString(),
                 'fee': 'false',
                 'name': params.item.data.name.toString()
@@ -252,8 +253,8 @@ router.post('/add-invoice-item', async function (req, res) {
             metadata: {
                 'timestamp': '' + params.item.data.timestamp.toString(),
                 'type': params.item.data.type.toString(),
-                'campaignID': params.item.data.campaignID.toString(),
-                'locationID': params.item.data.locationID.toString(),
+                'campaign_id': params.item.data.campaign_id.toString(),
+                'location_id': params.item.data.location_id.toString(),
                 'transactionID': params.item.data.transactionID.toString(),
                 'name': params.item.data.name.toString()
             }
@@ -283,8 +284,9 @@ router.post('/add-invoice-item', async function (req, res) {
             setTimeout(closeTab, timeout, invoice.id)
             let items = []
             for (let line of invoice.lines.data) {
+                var amount = line.description.includes("fee") ? parseFloat(line.amount / 100) : line.amount
                 items.push({
-                    amount: line.amount,
+                    amount: amount,
                     description: line.description,
                     data: line.metadata
                 })

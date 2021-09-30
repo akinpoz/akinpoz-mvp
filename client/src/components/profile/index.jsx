@@ -48,8 +48,8 @@ function EndUserDashboard(props) {
             }
             <Card.Group className={styles.endUserDashboardContainer}>
                 <AccountSettings {...props} />
-                <PaymentOptions {...props} />
-                <History {...props} />
+                {props.auth.user.type === 'customer' && <PaymentOptions {...props} /> }
+                <History {...props}/>
             </Card.Group>
         </div>
     )

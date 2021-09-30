@@ -126,29 +126,25 @@ function Slider(props) {
                         </a>
                     </div>
                     {location && location.music && <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-jukebox`}>
-                        <a href="/#/customer-jukebox">
-                            <Card>
-                                <Image src={JukeboxImage} wrapped ui={false} />
-                                <Card.Content>
-                                    <Card.Header>Jukebox</Card.Header>
-                                    <Card.Meta>Play a Song!</Card.Meta>
-                                </Card.Content>
-                            </Card>
-                        </a>
+                        <Card style={{ cursor: 'pointer' }} onClick={() => history.push('/customer-jukebox')}>
+                            <Image src={JukeboxImage} wrapped ui={false} />
+                            <Card.Content>
+                                <Card.Header>Jukebox</Card.Header>
+                                <Card.Meta>Play a Song!</Card.Meta>
+                            </Card.Content>
+                        </Card>
                     </div>}
                     {location && location.campaigns.length > 0 && location.campaigns.map(campaign => {
                         if (campaign.active) {
                             return (
                                 <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-${campaign._id}`}>
-                                    <a style={{ cursor: 'pointer' }} onClick={handleClick.bind(null, campaign)}>
-                                        <Card>
-                                            <Image src={icons[campaign.details["type"]]} wrapped ui={false} />
-                                            <Card.Content>
-                                                <Card.Header>{campaign.title}</Card.Header>
-                                                <Card.Meta>{campaign.details.type}</Card.Meta>
-                                            </Card.Content>
-                                        </Card>
-                                    </a>
+                                    <Card style={{ cursor: 'pointer' }} onClick={handleClick.bind(null, campaign)}>
+                                        <Image src={icons[campaign.details["type"]]} wrapped ui={false} />
+                                        <Card.Content>
+                                            <Card.Header>{campaign.title}</Card.Header>
+                                            <Card.Meta>{campaign.details.type}</Card.Meta>
+                                        </Card.Content>
+                                    </Card>
                                 </div>
                             )
                         }

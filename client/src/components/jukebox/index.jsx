@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { cleanQuery, startSearch, updateSelection } from "../../actions/searchActions";
 import history from '../../history'
 import { useState } from 'react';
-import {getDraftInvoice, setupNewTab, submitCampaignData} from "../../actions/stripeActions";
+import { getDraftInvoice, setupNewTab, submitCampaignData } from "../../actions/stripeActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
@@ -14,7 +14,7 @@ function Jukebox(props) {
     const location_id = props.location.select_location || props.location.select_location._id
     const timeoutRef = useRef()
     const [location, setLocation] = useState({ name: "" })
-    const [msg, setMsg] = useState()
+    const [msg, setMsg] = useState(props.stripe.msg)
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
@@ -109,8 +109,8 @@ function Jukebox(props) {
             data: {
                 timestamp: new Date().toLocaleDateString("en-US"),
                 type: 'song',
-                campaignID: 'jukebox_' + props.location.select_location._id,
-                locationID: props.location.select_location._id,
+                campaign_id: 'jukebox_' + props.location.select_location._id,
+                location_id: props.location.select_location._id,
                 transactionID: props.auth.user._id + Date.now(),
                 name: props.search.selection.name,
                 songUri: props.search.selection.uri
@@ -127,16 +127,30 @@ function Jukebox(props) {
         }
 
     }
-
+    function handleRedirect() {
+        history.location.state = history.location
+    }
     return (
         <div className={styles.container}>
+            {msg && <Message color={msg.includes("login") ? "red" : "green"}>
+                <Message.Header>
+                    {msg}
+                    {msg.includes("login") && <p><a href="/#/login" onClick={handleRedirect}>Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a></p>}
+                </Message.Header>
+            </Message>}
+            {props.auth.user.type === 'business' &&
+                <Message>
+                    <Message.Header>You are seeing a preview of the jukebox feature.
+                        <Message.Content>
+                            <p>This feature is only enabled for customers of Apokoz.</p>
+                            <p>To test this feature for yourself, please create a customer account.</p>
+                            <p>Please also note that in order for customers to play music, you must start playing songs on a device that is linked to the account you linked to Apokoz.</p>
+                        </Message.Content>
+                    </Message.Header>
+                </Message>
+            }
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
             <div className={styles.shiftUp}>
-                {msg &&
-                    <Message color="red">
-                        <Message.Header>{msg}</Message.Header>
-                    </Message>
-                }
                 {location && <h2 style={{ textAlign: 'center' }}>Playing @ {location.name}</h2>}
                 <Card fluid>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40 }}>
@@ -155,13 +169,13 @@ function Jukebox(props) {
                         />
                         <br />
                         <div style={{ flexDirection: "row-reverse", display: "flex" }}>
-                            {props.auth.isAuthenticated && <div>
+                            {props.auth.isAuthenticated && props.auth.user.type === "customer" && <div>
                                 {hasPaymentMethod() && <Button primary disabled={props.search.selection === null} onClick={handleSubmit}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({ pathname: '/profile' })
                                 }}>Add a Payment Method</Button>}
                             </div>}
-                            {!props.auth.isAuthenticated && <Button primary onClick={() => { history.push({ pathname: '/login' }) }}>Login to Queue a Song</Button>}
+                            {/* {!props.auth.isAuthenticated && <Button primary onClick={() => { history.push({ pathname: '/login' }) }}>Login to Queue a Song</Button>} */}
                             <Button style={{ marginRight: 10 }} onClick={() => props.cleanQuery()}>Clear Selection</Button>
                         </div>
                     </div>

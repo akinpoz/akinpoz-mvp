@@ -26,7 +26,10 @@ import {
     SUCCESSFULLY_CLOSED_TAB,
     SUBMITTED_CAMPAIGN,
     CLEAR_MSG,
-    REQUESTED_PAST_TABS, RETRIEVED_PAST_TABS, ERROR_PAST_TABS
+    REQUESTED_PAST_TABS,
+    RETRIEVED_PAST_TABS,
+    ERROR_PAST_TABS,
+    RESET_STRIPE
 } from '../actions/types';
 
 const initialState = {
@@ -43,7 +46,7 @@ const initialState = {
     pastTabs: []
 }
 
-export default function ( state = initialState, action) {
+export default function (state = initialState, action) {
     switch (action.type) {
         case CREATED_SETUP_INTENT:
             return {
@@ -150,7 +153,6 @@ export default function ( state = initialState, action) {
             return {
                 ...state,
                 msg: action.payload,
-                status: 'fulfilled',
                 loading: false
             }
         case CLEAR_MSG:
@@ -177,13 +179,15 @@ export default function ( state = initialState, action) {
                 loading: false,
                 msg: action.error
             }
+        case RESET_STRIPE:
+            return initialState;
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// THESE ARE METHODS THAT MIGHT BE USED LATER.  THEY INVOLVE MAKING CURRENT TRANSACTIONS NOT MAKING A TAB //////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // THESE ARE METHODS THAT MIGHT BE USED LATER.  THEY INVOLVE MAKING CURRENT TRANSACTIONS NOT MAKING A TAB //////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         case CREATED_PAYMENT_INTENT:
             return {

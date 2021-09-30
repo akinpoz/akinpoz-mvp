@@ -5,11 +5,11 @@ import { register } from '../../actions/authActions'
 import { clearErrors } from '../../actions/errorActions'
 import history from '../../history'
 import styles from './Auth.module.css'
-import {Accordion, Card, Dropdown, Form, Icon, Message} from 'semantic-ui-react'
+import { Accordion, Card, Dropdown, Form, Icon, Loader, Message } from 'semantic-ui-react'
 import PasswordStrengthBar from 'react-password-strength-bar';
-import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {loadStripe} from "@stripe/stripe-js";
-import {createCustomer, createSetupIntent, markComplete, markProcessing} from "../../actions/stripeActions";
+import { CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { createCustomer, createSetupIntent, markComplete, markProcessing } from "../../actions/stripeActions";
 
 
 function Register(props) {
@@ -43,7 +43,7 @@ function RegisterForm(props) {
     const [paymentActive, setPaymentActive] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState(null);
     const [paymentAuthenticatedByMobile, setPaymentAuthenticatedByMobile] = useState(false)
-
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
 
         if (stripe && elements) {
@@ -79,7 +79,7 @@ function RegisterForm(props) {
 
                 const result = await stripe.confirmCardSetup(
                     props.stripe.clientSecret,
-                    {payment_method: event.paymentMethod.id}
+                    { payment_method: event.paymentMethod.id }
                 );
                 if (result.error) {
                     event.complete('fail')
@@ -89,7 +89,7 @@ function RegisterForm(props) {
                     event.complete('success')
                     if (result.setupIntent.status === 'requires_action') {
                         // can redirect to bank for further action / confirmation, etc.
-                        const {error} = await stripe.confirmCardSetup(props.stripe.clientSecret);
+                        const { error } = await stripe.confirmCardSetup(props.stripe.clientSecret);
                         if (error) {
                             console.error(error.message)
                             props.markComplete('fail')
@@ -118,24 +118,26 @@ function RegisterForm(props) {
     }, [props.error])
 
     useEffect(() => {
-        if (props.isAuthenticated) {
+        if (props.auth.isAuthenticated) {
             history.push('/')
         }
-    }, [props.isAuthenticated])
+    }, [props.auth.isAuthenticated])
 
     useEffect(() => {
         props.createSetupIntent()
     }, [])
-
+    useEffect(() => {
+        setLoading(props.auth.isLoading)
+    }, [props.auth.isLoading])
     useEffect(() => {
         if (elements) {
             elements.getElement(CardElement).on("change", (event) => {
                 if (event.complete && !event.error) {
                     if (!values.cardApproved) {
-                        setValues({...values, cardApproved: true})
+                        setValues({ ...values, cardApproved: true })
                     }
                 } else {
-                    setValues({...values, cardApproved: false})
+                    setValues({ ...values, cardApproved: false })
                 }
             })
         }
@@ -143,7 +145,7 @@ function RegisterForm(props) {
 
     useEffect(() => {
         if (props.stripe.customer !== '') {
-            const {name, email, password, type} = values
+            const { name, email, password, type } = values
             const customerID = props.stripe.customer;
 
             let newUser
@@ -175,7 +177,7 @@ function RegisterForm(props) {
     }
 
     function isValid() {
-        const {name, email, password, type, nameOnCard, cardApproved} = values
+        const { name, email, password, type, nameOnCard, cardApproved } = values
         const paymentValid = nameOnCard !== '' && cardApproved
         const cardConsidered = !paymentActive || paymentValid || paymentAuthenticatedByMobile
         return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '');
@@ -183,7 +185,7 @@ function RegisterForm(props) {
 
     const onSubmit = async e => {
         e.preventDefault()
-        const {name, email, nameOnCard} = values
+        const { name, email, nameOnCard } = values
 
         // clear prev errors
         props.clearErrors()
@@ -205,7 +207,7 @@ function RegisterForm(props) {
             if (paymentActive) {
                 result = await stripe.confirmCardSetup(props.stripe.clientSecret, {
                     payment_method: {
-                        card: elements.getElement(CardElement), billing_details: {name: nameOnCard}
+                        card: elements.getElement(CardElement), billing_details: { name: nameOnCard }
                     }
                 })
                 setPaymentMethod(result.setupIntent.payment_method)
@@ -225,17 +227,17 @@ function RegisterForm(props) {
     const PaymentForm = (
         <div id='optionalPaymentInput'>
             {paymentRequest &&
-            <div id='browser-card-support'>
-                <PaymentRequestButtonElement options={{paymentRequest}} type='button'/>
-                <br/>
-                <div className={styles.divider}/>
-                <br/>
-            </div>
+                <div id='browser-card-support'>
+                    <PaymentRequestButtonElement options={{ paymentRequest }} type='button' />
+                    <br />
+                    <div className={styles.divider} />
+                    <br />
+                </div>
             }
             <Form.Field>
                 <Form.Input name='nameOnCard' value={values.nameOnCard} onChange={handleChange} required={paymentActive && !paymentAuthenticatedByMobile} placeholder='Name On Card' />
             </Form.Field>
-            <Card style={{padding: 10}} >
+            <Card style={{ padding: 10 }} >
                 <CardElement />
             </Card>
         </div>
@@ -244,20 +246,20 @@ function RegisterForm(props) {
     return (
         <Form className={styles.formContainer} onSubmit={onSubmit}>
             {msg &&
-            <Message negative className={styles.message}>
-                <Message.Header>{msg}</Message.Header>
-            </Message>
+                <Message negative className={styles.message}>
+                    <Message.Header>{msg}</Message.Header>
+                </Message>
             }
 
-                <Form.Input required name="name" label="Name" placeholder="First and Last Name" onChange={handleChange} value={values.name} />
-                <Form.Input required type="email" label="Email" onChange={handleChange} placeholder="Email..." value={values.email} name="email" />
-                <Form.Input required type="password" label="Password" onChange={handleChange} placeholder="Password..." value={values.password} name="password" />
-                <Form.Field>
-                    <PasswordStrengthBar password={values.password} onChangeScore={(score, feedback) => {
-                        setScore(score)
-                        setFeedback(feedback.warning)
-                    }
-                    } />
+            <Form.Input required name="name" label="Name" placeholder="First and Last Name" onChange={handleChange} value={values.name} />
+            <Form.Input required type="email" label="Email" onChange={handleChange} placeholder="Email..." value={values.email} name="email" />
+            <Form.Input required type="password" label="Password" onChange={handleChange} placeholder="Password..." value={values.password} name="password" />
+            <Form.Field>
+                <PasswordStrengthBar password={values.password} onChangeScore={(score, feedback) => {
+                    setScore(score)
+                    setFeedback(feedback.warning)
+                }
+                } />
             </Form.Field>
             {feedback && <Message color='yellow'>
                 <Message.Header>
@@ -267,20 +269,21 @@ function RegisterForm(props) {
             <Form.Field required>
                 <label>Select If you are a Business or Customer</label>
                 <Dropdown selection fluid options={[{ key: 'business', text: 'Business', value: 'business' }, { key: 'customer', text: 'Customer', value: 'customer' }]} placeholder="Are you a business or a customer"
-                          onChange={(e, data) => {
-                              setValues({ ...values, type: data.value })
-                          }
-                          } />
+                    onChange={(e, data) => {
+                        setValues({ ...values, type: data.value })
+                    }
+                    } />
             </Form.Field>
-            <Accordion style={{marginBottom: 20}} hidden={paymentAuthenticatedByMobile}>
+            <Accordion style={{ marginBottom: 20 }} hidden={paymentAuthenticatedByMobile}>
                 <Accordion.Title active={paymentActive} content='Payment (optional)' onClick={() => setPaymentActive(!paymentActive)} />
                 <Accordion.Content active={paymentActive} content={PaymentForm} />
             </Accordion>
-            <div id={'paymentAuthenticated'} style={{marginBottom: 20}} hidden={!paymentAuthenticatedByMobile}>
+            <div id={'paymentAuthenticated'} style={{ marginBottom: 20 }} hidden={!paymentAuthenticatedByMobile}>
                 <Icon name={"check"} color={'green'} />
                 <b>Payment Authenticated Via Browser Card</b>
             </div>
-            <Form.Button content="Submit" color="blue" disabled={!isValid() || props.stripe.loading}/>
+            {!loading && <Form.Button content={"Register"} type="submit" color="blue" disabled={!isValid() || props.stripe.loading} />}
+            {loading && <Loader />}
             <Message>
                 <Message.Header>Have An Account? <a href="/#/login">Login.</a></Message.Header>
             </Message>
@@ -289,17 +292,17 @@ function RegisterForm(props) {
 }
 
 Register.propTypes = {
-    isAuthenticated: PropTypes.bool,
     error: PropTypes.object.isRequired,
     register: PropTypes.func.isRequired,
-    clearErrors: PropTypes.func.isRequired
+    clearErrors: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired,
 }
 
 
 const mapStateToProps = state => ({
-    isAuthenticated: state.auth.isAuthenticated,
     error: state.error,
-    stripe: state.stripe
+    stripe: state.stripe,
+    auth: state.auth
 })
 
 export default connect(mapStateToProps, { register, clearErrors, createCustomer, createSetupIntent, markProcessing, markComplete })(Register)

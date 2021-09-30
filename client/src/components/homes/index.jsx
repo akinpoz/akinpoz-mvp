@@ -11,7 +11,6 @@ import styles from './home.module.css'
 function Home(props) {
     history.location.search = ""
     const [msg, setMsg] = useState(history.location.state)
-    console.log(msg)
     useEffect(() => {
         if (history.location.state) {
             setMsg(history.location.state)
@@ -30,7 +29,6 @@ Home.propTypes = {
 }
 
 const Welcome = (props) => {
-    console.log(props.msg);
     return (
         <div id="welcome-container" className={styles.welcome_container}>
             {props.msg && <Message color={props.msg.status}>

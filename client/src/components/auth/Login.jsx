@@ -14,21 +14,19 @@ function Login(props) {
     const [values, setValues] = useState({ email: '', password: '' })
     const [msg, setMsg] = useState()
     useEffect(() => {
-    console.log(props)
         if (props.error.id === 'LOGIN_FAIL') {
             setMsg(props.error.msg)
         }
     }, [props.error])
-    useEffect(() => {
-        if (props.isAuthenticated) {
-            history.push(history.location.pathname)
-        }
-    }, [props.isAuthenticated])
+    // useEffect(() => {
+    //     if (props.isAuthenticated) {
+    //         history.push(history.location.pathname)
+    //     }
+    // }, [props.isAuthenticated])
     const handleChange = e => {
         setValues({ ...values, [e.target.name]: e.target.value })
     }
-    const onSubmit = e => {
-        e.preventDefault();
+    function onSubmit(e) {
         const { email, password } = values
         const user = {
             email,
@@ -37,14 +35,8 @@ function Login(props) {
         // clear errors
         props.clearErrors()
         // Attempt Login
-        props.login(user)
-
-        function redirect() {
-            if (props.isAuthenticated) {
-                history.push("/")
-            }
-        }
-        setTimeout(redirect(), 1000)
+        const data = {user, history}
+        props.login(data)
     }
     return (
         <div className={styles.auth}>
@@ -56,7 +48,7 @@ function Login(props) {
                 }
                 <Form.Input type="email" onChange={handleChange} placeholder="Email..." label="Email" value={values.email} name="email" />
                 <Form.Input type="password" onChange={handleChange} placeholder="Password..." label="Password" value={values.password} name="password" />
-                <Form.Button content="Login" color="blue"/>
+                <Form.Button content="Login" color="blue" type="submit" />
                 <Message>
                     <Message.Header>Don't have an account? <a href="/#/register">Register Here</a></Message.Header>
                 </Message>

@@ -33,7 +33,7 @@ export default function (state = initialState, action) {
         case UPDATE_CAMPAIGN:
             return {
                 ...state,
-                campaigns: [action.payload, ...state.campaigns.filter(campaign => campaign._id !== action.payload._id)]
+                campaigns: action.payload
             }
         case DELETE_CAMPAIGN:
             return {

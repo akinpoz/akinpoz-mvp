@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { returnErrors } from './errorActions'
-import { USER_LOADED, USER_LOADING, AUTH_ERROR, LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT_SUCCESS, REGISTER_SUCCESS, REGISTER_FAIL } from '../actions/types'
+import { USER_LOADED, USER_LOADING, AUTH_ERROR, LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT_SUCCESS, REGISTER_SUCCESS, REGISTER_FAIL, RESET_STRIPE } from '../actions/types'
 
 //Check token & load user
 export const loadUser = () => (dispatch, getState) => {
@@ -10,7 +10,6 @@ export const loadUser = () => (dispatch, getState) => {
     axios.get('/api/auth/user/', tokenConfig(getState)).then(res => {
         dispatch({ type: USER_LOADED, payload: res.data })
     }).catch(e => {
-        console.log(JSON.stringify(e));
         dispatch(returnErrors(e.message, e.status))
         dispatch({ type: AUTH_ERROR })
     })
@@ -58,8 +57,10 @@ export const tokenConfig = (getState) => {
 }
 
 // Login User
-export const login =({ email, password }) => async dispatch => {
+export const login = (data) => async dispatch => {
     // Headers
+    const { user, history } = data
+    const { email, password } = user
     const config = {
         headers: {
             "Content-Type": 'application/json'
@@ -68,13 +69,22 @@ export const login =({ email, password }) => async dispatch => {
     // Request body
     const body = JSON.stringify({ email, password })
     axios.post('/api/auth/', body, config).then(res => {
-        console.log(res.json)
         dispatch({
             type: LOGIN_SUCCESS,
             payload: res.data
         })
+        if (history.location.search) {
+            const search = history.location.search.split('?')[1]
+            history.push(`${history.location.pathname}?${search}`)
+        }
+        else if (res.data.user.type === 'business') {
+            history.push('/')
+        }
+        else {
+            history.push(history.location.pathname)
+        }
     }).catch(e => {
-        console.log('error: ' + e)
+        console.error('error: ' + e)
         dispatch(returnErrors(e.message, e.status, 'LOGIN_FAIL'))
         dispatch({
             type: LOGIN_FAIL
@@ -97,7 +107,7 @@ export const updateUser = (modifiedUser) => (dispatch, getState) => {
 export const deleteUser = (_id) => (dispatch, getState) => {
     const body = JSON.stringify({ _id })
     axios.post('/api/users/delete', body, tokenConfig(getState)).then(res => {
-        if(res.status === 200) {
+        if (res.status === 200) {
             dispatch({ type: LOGOUT_SUCCESS })
         }
     }).catch(e => {
@@ -107,9 +117,8 @@ export const deleteUser = (_id) => (dispatch, getState) => {
 }
 
 // Logout User
-export const logout = () => {
-    return {
-        type: LOGOUT_SUCCESS
-    }
+export const logout = () => (dispatch) => {
+    dispatch({ type: RESET_STRIPE })
+    dispatch({ type: LOGOUT_SUCCESS })
 }
 

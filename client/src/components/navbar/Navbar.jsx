@@ -45,6 +45,7 @@ function MyNavbar(props) {
                 <div className={cx(globalStyles["navbar-nav"])}>
                     {isLoggedIn && <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])} style={{ lineHeight: "25px" }}>{toggle ? <Icon name='user' size="large" className={styles.profile_icon} /> : <span>Profile</span>}
                     </a>}
+                    {isLoggedIn && props.stripe.hasOpenTab && <a style={{ lineHeight: "25px" }} href="/#/checkout" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>View Tab</a>}
                     {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>
                         <Logout onClick={() => { setIsLoggedIn(false) }} />
                     </a>}
@@ -62,6 +63,7 @@ MyNavbar.propTypes = {
 }
 
 const mapStateToProps = (state) => ({
-    auth: state.auth
+    auth: state.auth,
+    stripe: state.stripe
 })
 export default connect(mapStateToProps, null)(MyNavbar)

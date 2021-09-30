@@ -53,7 +53,7 @@ function BusinessCampaign(props) {
     )
 }
 
-// a component that displays the list of names/results that are in the campaign
+// Fastpass "Results" equivalent.
 function FastPassList(props) {
     return (
         <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>

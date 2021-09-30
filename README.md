@@ -38,15 +38,10 @@
 ### Paul
 
 #### Currently working
-
-- [ ] User side
-  - [x] figure out how to QR code navigation works
-  - [x]create customer landing page
-    - [x] if from QR code render landing page that's location specific
-    - [x] if no location_id param, render a location search page. Mobile first.
-  - [x] Create each campaign card
-  - [x] Continue to payment
-  - [x] Check github
+  
+- [ ] Login error message bug
+- [ ] UI Polish
+- [ ] Google docs TODOS
 
 #### Completed
 
@@ -58,22 +53,37 @@
 - [x] File structure change
 - [x] Check if jukebox is enabled / token is not null. Set up example for page to page status messaging
 - [x] Skip the line campaign (business side)
+- [x] User side
 
 ##### Tentative Change Log
-
-- 9/5 - 9/7
-  - What to expect:
-    - Blank Jukebox bug fix
-    - Skip the line campaign CRUD operations & example of not using redux for all actions
-  - What's left to do:
-    - Start the user side of the app.
 
 ## Known bugs
 
 - [ ] JWT token expires too quickly and makes actions like add fail. When those actions fail, they crash the site. Either extend the token to infinite or handle the 400 user not found error and redirect to the login for all actions.
 
+### 200 empty response
+
+- The server is likly down. This is mainly a development error/bug.
+
+#### Example
+  
+  ```Error: Network Error
+    at createError (createError.js:16)
+    at XMLHttpRequest.handleError (xhr.js:84)
+  GET http://localhost:8001/api/auth/user/ net::ERR_EMPTY_RESPONSE 200```
+
+
+
 ## Change Log
 
+- 9/25-9/30 (drew & paul)
+  - What to expect: 
+    - lots og bug fixes
+    - user side done but not super pretty
+    - results
+    - any other tasks highlighted green in the google doc
+  - TODO:
+    - Google Doc tasks
 - 9/24 (paul)
   - What to expect:
     - Bug Fixes
@@ -194,6 +204,8 @@
 3. Add toggle for allowing explicit songs on jukebox?
 4. Should the price for jukebox be fixed or should the establishment set the price?
 5. Figure out a method for message handling (including errors). if an error occurs. What happens? On success, should a message always be sent? Or never be sent? If never, what should happen instead. How do we communicate things?
+6. Messages should be it's own component. Once we do above^ everything should be in the same form and will allow us to reuse a custom message component that relies on status and message
+7. Use const or function definitions for functions in React
 
 ## Our Code Standards
 
@@ -202,3 +214,4 @@
 3. use console.error for printing errors. use console.log for temporary debugging (delete afterwards)
 4. There should be no nameless divs. Give each div an id that describes what it does
 5. Every action should handle it's errors with messages and easy to decipher codes.
+6. If you find yourself duplicating code ever. Ask yourself if the code you are writing can be put into a single component with conditionals, then create that component.

@@ -81,7 +81,8 @@ function CampaignModal(props) {
         <Modal onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             open={open}
-            trigger={props.trigger}>
+            trigger={props.trigger}
+            closeIcon>
             <Modal.Header>{title} Campaign</Modal.Header>
             <Modal.Content scrolling>
                 {/* {props.action === "add" &&  <Tab panes={panes} /> } */}

@@ -90,7 +90,7 @@ function NewTab(props) {
                     {props.stripe.localTab.item &&
                         <div className={styles.itemContainer}>
                             <p style={{ margin: 0 }}>{props.stripe.localTab.item.data.name}</p>
-                            <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
+                            <p>${props.stripe.localTab.item.amount}</p>
                         </div>
                     }
                     <div className={styles.itemContainer}>
@@ -99,7 +99,7 @@ function NewTab(props) {
                     </div>
                     <div className={styles.totalContainer}>
                         <b>Subtotal</b>
-                        <b>${((props.stripe.localTab.item.amount + feePrice * 100) / 100).toFixed(2)}</b>
+                        <b>${(props.stripe.localTab.item.amount + feePrice).toFixed(2)}</b>
                     </div>
                 </div>
                 <br />
@@ -221,21 +221,23 @@ function ExistingTab(props) {
                 <h2>Current Tab</h2>
                 <div className={styles.divider} />
                 <div>
-                    {(props.stripe?.tab?.items ?? false) && props.stripe.tab.items.length > 0 && props.stripe.tab.items.map(item => (
-                        <div className={styles.itemContainer}>
-                            <p style={{ margin: 0 }}>{item.data.name}</p>
-                            <p>${(item.amount / 100).toFixed(2)}</p>
-                        </div>
-                    ))}
+                    {props.stripe?.tab?.items && props.stripe.tab.items.map(item => {
+                        return (
+                            <div className={styles.itemContainer}>
+                                <p style={{ margin: 0 }}>{item.data.name}</p>
+                                <p>${item.amount.toFixed(2)}</p>
+                            </div>
+                        )
+                    })}
                     {props.stripe?.localTab?.items &&
                         <div className={styles.itemContainer}>
                             <p style={{ margin: 0 }}>{props.stripe.localTab.item.data.name}</p>
-                            <p>${(props.stripe.localTab.item.amount / 100).toFixed(2)}</p>
+                            <p>${props.stripe.localTab.item.amount}</p>
                         </div>
                     }
                     <div className={styles.totalContainer}>
                         <b>Subtotal</b>
-                        <b>${(sum / 100).toFixed(2)}</b>
+                        <b>${sum.toFixed(2)}</b>
                     </div>
                     <br />
                     <div className={styles.timerBox}>
@@ -275,8 +277,9 @@ const mapStateToProps = (state) => ({
     spotify: state.spotify
 })
 
+//TODO: Determine if those methods are being used or not. If not remove them....
 export default connect(mapStateToProps, {
-    createPaymentIntent, // NOT BEING USED
+    createPaymentIntent, // NOT BEING USED 
     markProcessing, // NOT BEING USED
     markComplete, // NOT BEING USED
     getDraftInvoice,
@@ -299,8 +302,8 @@ function CheckoutForm(props) {
         name: 'Have you ever seen the rain?',
         amount: 99,
         transactionID: '517',
-        campaignID: 'campaignID',
-        locationID: 'locationID'
+        campaign_id: 'campaign_id',
+        location_id: 'location_id'
     }; // TODO: make this a redux field
     const [paymentRequest, setPaymentRequest] = React.useState(null);
     const [tac, setTac] = useState(false);

@@ -34,8 +34,10 @@ import {
     SUBMITTING_CAMPAIGN,
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
-    RETRIEVED_PAST_TABS, ERROR_PAST_TABS
+    RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
+    USER_LOADING
 } from "./types";
+import history from "../history";
 
 /**
  * Creates stripe customer object to save and process payment
@@ -46,6 +48,7 @@ import {
  */
 export const createCustomer = (name, email, paymentMethod) => (dispatch) => {
     dispatch({type: REQUESTED_CUSTOMER})
+    dispatch({type: USER_LOADING})
     const params = {
         name, email, paymentMethod
     }
@@ -151,6 +154,7 @@ function _addInvoiceItem (userID, item, locationName, dispatch, getState) {
         }
         else {
             dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, tab: res.data})
+            history.push('/checkout')
         }
     })
 }
@@ -161,7 +165,7 @@ export const submitCampaignData = (item, locationName) => (dispatch, getState) =
         axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SUBMITTED_CAMPAIGN, payload: res.data})
-                _addInvoiceItem(item.user._id, item,locationName, dispatch, getState)
+                if(item.data.type !== 'Survey') _addInvoiceItem(item.user._id, item, dispatch, getState)
             }
             else {
                 dispatch({type: SUBMIT_CAMPAIGN_ERROR})
@@ -171,7 +175,6 @@ export const submitCampaignData = (item, locationName) => (dispatch, getState) =
     }
     else {
         dispatch({type: SPOTIFY_LOADING})
-      //  const params = {location: item.data.locationID, songUri: item.data.songUri}
         axios.post('/api/spotify/queueSong', item, tokenConfig(getState)).then(res => {
             if (res.status === 200) {
                 dispatch({type: SPOTIFY_QUEUE_SONG})
@@ -203,7 +206,7 @@ export const submitCampaignData = (item, locationName) => (dispatch, getState) =
 export const setupNewTab = (item) => (dispatch) => {
     const feeAmt = 40
     const tab = {
-        amount: item.amount + feeAmt,
+        amount: item.amount + parseFloat(feeAmt / 100).toFixed(2),
         item: item,
         fromOnline: false
     }
