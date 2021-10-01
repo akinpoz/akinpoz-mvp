@@ -78,7 +78,7 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
     dispatch({type: SUBMITTING_CAMPAIGN})
     axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
-            dispatch({type: SUBMITTED_CAMPAIGN, last_submitted: item.transactionID})
+            dispatch({type: SUBMITTED_CAMPAIGN, last_submitted: item.transactionID, payload: res.data})
         }
         else {
             dispatch({type: SUBMIT_CAMPAIGN_ERROR})

@@ -15,7 +15,7 @@ const initialState = {
     loading: false,
     select_campaign: '',
     last_submitted: '',
-    msg: ''
+    msg: null
 }
 
 export default function (state = initialState, action) {

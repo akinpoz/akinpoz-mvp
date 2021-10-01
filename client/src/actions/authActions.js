@@ -83,9 +83,8 @@ export const login = (data) => async dispatch => {
         else {
             history.push(history.location.pathname)
         }
-    }).catch(e => {
-        console.error('error: ' + e)
-        dispatch(returnErrors(e.message, e.status, 'LOGIN_FAIL'))
+    }).catch((e) => {
+        dispatch(returnErrors(e.response.data.msg, e.response.status, 'LOGIN_FAIL'))
         dispatch({
             type: LOGIN_FAIL
         })

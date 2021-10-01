@@ -74,7 +74,6 @@ router.get('/location_id', async function (req, res) {
  */
 router.post('/add', auth, (req, res) => {
     try {
-        console.log(req.body)
         var newLocation = new Location(req.body);
         newLocation.save(async function (err, location) {
             if (err) res.status(500).send(err);
