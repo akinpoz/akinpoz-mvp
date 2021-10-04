@@ -162,6 +162,7 @@ router.post('/get-draft-invoice', async function (req, res) {
             stripe.invoices.finalizeInvoice(i.id)
         })
     }
+
     if (invoice !== undefined) {
         let items = []
         for (let line of invoice.lines.data) {
@@ -180,6 +181,7 @@ router.post('/get-draft-invoice', async function (req, res) {
                 }
             })
         }
+
         const tab = {
             amount: invoice.total,
             timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
@@ -198,7 +200,6 @@ router.post('/get-draft-invoice', async function (req, res) {
  */
 router.post('/add-invoice-item', async function (req, res) {
     let params = req.body;
-    console.log(JSON.stringify(params))
     // Fee in cents (usd)
     const feeAmount = 40;
     const feeDescription = 'Tab fee'
@@ -434,14 +435,18 @@ async function getCustomerID(userID, res) {
 
 // abstracts close tab logic -- part of automated close tab logic
 function closeTab(invoiceID) {
-    stripe.invoices.pay(invoiceID).then(r => {
-        if (r.last_finalization_error) {
-            console.error(r.last_finalization_error.message);
-        } else {
-            // This is automated so I want to leave this in
-            console.log('Closed tab: ' + r.id);
-        }
-    })
+    try {
+        stripe.invoices.pay(invoiceID).then(r => {
+            if (r.last_finalization_error) {
+                console.error(r.last_finalization_error.message);
+            } else {
+                // This is automated so I want to leave this in
+                console.log('Closed tab: ' + r.id);
+            }
+        })
+    }catch (e) {
+        console.error(e);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

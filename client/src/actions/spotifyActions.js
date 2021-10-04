@@ -1,4 +1,4 @@
-import {SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
+import {CLEAR_SPOTIFY_ERRORS, NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
 import axios from 'axios';
 import {tokenConfig} from "./authActions";
 
@@ -18,7 +18,14 @@ export const queueSong = (item) => (dispatch, getState) => {
     let params = {location_id: item.data.location_id, song_uri: item.data.songUri}
     axios.post('/api/spotify/queueSong', params, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
-            dispatch({type: SPOTIFY_QUEUE_SONG})
+            const newItem = {
+                item: item,
+                status: 'processing'
+            }
+            dispatch({type: SPOTIFY_QUEUE_SONG, last_queued: item.transactionID})
+
+            // dispatches to stripe reducer to change status from unprocessed to processing
+            dispatch({type: NEW_ITEM_PROCESSING, newItem: newItem})
         }
         else {
             dispatch({
@@ -33,6 +40,10 @@ export const queueSong = (item) => (dispatch, getState) => {
             error: 'Looks like the jukebox feature is experiencing some issues.' +
                 '  If you would like to use this feature, please report the error to this location.'})
     })
+}
+
+export const clearSpotifyErrors = () => (dispatch) => {
+    dispatch({type: SPOTIFY_ERROR, error: null})
 }
 
 export const setSpotifyLoading = () => {

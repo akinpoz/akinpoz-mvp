@@ -1,21 +1,20 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, {useEffect, useRef, useCallback} from 'react';
 import styles from './jukebox.module.css'
-import { Button, Card, Search, Message } from "semantic-ui-react";
-import { connect } from "react-redux";
+import {Button, Card, Search, Message} from "semantic-ui-react";
+import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import { cleanQuery, startSearch, updateSelection } from "../../actions/searchActions";
+import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
 import history from '../../history'
-import { useState } from 'react';
-import { getDraftInvoice, setupNewTab } from "../../actions/stripeActions";
-import {submitCampaignData} from "../../actions/campaignActions";
-import {queueSong} from "../../actions/spotifyActions";
+import {useState} from 'react';
+import {setupNewTab} from "../../actions/stripeActions";
+import {clearSpotifyErrors, queueSong} from "../../actions/spotifyActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
     // Queueing needs to check for auth state first
     const location_id = props.location.select_location || props.location.select_location._id
     const timeoutRef = useRef()
-    const [location, setLocation] = useState({ name: "" })
+    const [location, setLocation] = useState({name: ""})
     const [msg, setMsg] = useState(props.stripe.msg)
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const handleSearchChange = useCallback((e, data) => {
@@ -36,11 +35,15 @@ function Jukebox(props) {
         }
     }, [props.stripe.hasOpenTab])
     useEffect(() => {
+        setMsg(null)
         if (!location_id) {
             history.push({
                 pathname: '/',
                 state: {
-                    msg: { status: 'yellow', text: "Please click on the location's jukebox button before navigating to the jukebox page." }
+                    msg: {
+                        status: 'yellow',
+                        text: "Please click on the location's jukebox button before navigating to the jukebox page."
+                    }
                 }
             })
         }
@@ -52,6 +55,7 @@ function Jukebox(props) {
         if (props.stripe && props.stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
         }
+        props.cleanQuery()
         return () => {
             clearTimeout(timeoutRef.current)
         }
@@ -61,7 +65,6 @@ function Jukebox(props) {
         if (props.auth.user) {
             if (props.auth.isAuthenticated && props.auth.user.paymentMethod) {
                 if (props.auth.user.paymentMethod.length === 0) setMsg("Please add a payment method in the profile page before queuing a song.")
-                props.getDraftInvoice(props.auth.user._id)
             }
             if (!props.auth.isAuthenticated) setMsg("Please login to queue a song... You must also have a valid payment method associated with your account.")
             setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
@@ -74,6 +77,7 @@ function Jukebox(props) {
     useEffect(() => {
         if (props.spotify.error) {
             setMsg(props.spotify.error)
+            props.clearSpotifyErrors()
         }
     }, [props.spotify])
 
@@ -103,9 +107,8 @@ function Jukebox(props) {
         // At payment page access the info from the redux store
         // Add the name/number of tickets to the select campaign redux object
         // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
-
         const item = {
-            amount: 100,
+            amount: 1,
             user: props.auth.user,
             description: 'song',
             data: {
@@ -119,47 +122,64 @@ function Jukebox(props) {
             }
 
         }
-        if (props.stripe.hasOpenTab) {
-            if (window.confirm('Your tab is at $' + props.stripe.tab.subtotal + '.  Would you like to add this to your tab?')) {
-                props.queueSong(item)
+        props.setupNewTab(item)
+        if (props.stripe.hasOpenTab && parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
+            if (window.confirm('Are you sure you would you like to add this to your tab?')) {
+                if (parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+                    props.submitCampaignData(item)
+                }
+                else {
+                    history.push('/checkout')
+                }
             }
         } else {
-            props.setupNewTab(item)
             history.push('/checkout')
         }
-
+        props.cleanQuery()
     }
+
     function handleRedirect() {
         history.location.state = history.location
     }
+
     return (
         <div className={styles.container}>
-            {msg && <Message color={msg.includes("login") ? "red" : "green"}>
+            {msg && msg.msg && <Message color={msg.msg.includes("login") ? "red" : "green"}>
                 <Message.Header>
-                    {msg}
-                    {msg.includes("login") && <p><a href="/#/login" onClick={handleRedirect}>Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a></p>}
+                    {msg.msg}
+                    {msg.msg.includes("login") &&
+                    <div><a href="/#/login" onClick={handleRedirect}>Login</a> or <a href="/#/register"
+                                                                                     onClick={handleRedirect}>Register</a></div>
+                    }
                 </Message.Header>
             </Message>}
-            {props.auth.user.type === 'business' &&
-                <Message>
-                    <Message.Header>You are seeing a preview of the jukebox feature.
-                        <Message.Content>
-                            <p>This feature is only enabled for customers of Apokoz.</p>
-                            <p>To test this feature for yourself, please create a customer account.</p>
-                            <p>Please also note that in order for customers to play music, you must start playing songs on a device that is linked to the account you linked to Apokoz.</p>
-                        </Message.Content>
-                    </Message.Header>
-                </Message>
+            {props.auth.user && props.auth.user.type === 'business' &&
+            <Message>
+                <Message.Header>You are seeing a preview of the jukebox feature.
+                    <Message.Content>
+                        <p>This feature is only enabled for customers of Apokoz.</p>
+                        <p>To test this feature for yourself, please create a customer account.</p>
+                        <p>Please also note that in order for customers to play music, you must start playing songs on a
+                            device that is linked to the account you linked to Apokoz.</p>
+                    </Message.Content>
+                </Message.Header>
+            </Message>
             }
-            <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
+            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
             <div className={styles.shiftUp}>
-                {location && <h2 style={{ textAlign: 'center' }}>Playing @ {location.name}</h2>}
+                {location && <h2 style={{textAlign: 'center'}}>Playing @ {location.name}</h2>}
                 <Card fluid>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40 }}>
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 40
+                    }}>
                         <h1>
                             Search For a Song
                         </h1>
-                        <br />
+                        <br/>
                         <Search
                             loading={props.search.loading}
                             size='large'
@@ -169,21 +189,22 @@ function Jukebox(props) {
                             resultRenderer={resultRender}
                             onResultSelect={handleSelectionChange}
                         />
-                        <br />
-                        <div style={{ flexDirection: "row-reverse", display: "flex" }}>
+                        <br/>
+                        <div style={{flexDirection: "row-reverse", display: "flex"}}>
                             {props.auth.isAuthenticated && props.auth.user.type === "customer" && <div>
-                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null} onClick={handleSubmit}>{buttonLabel}</Button>}
+                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null}
+                                                               onClick={handleSubmit}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
-                                    history.push({ pathname: '/profile' })
+                                    history.push({pathname: '/profile'})
                                 }}>Add a Payment Method</Button>}
                             </div>}
-                            {/* {!props.auth.isAuthenticated && <Button primary onClick={() => { history.push({ pathname: '/login' }) }}>Login to Queue a Song</Button>} */}
-                            <Button style={{ marginRight: 10 }} onClick={() => props.cleanQuery()}>Clear Selection</Button>
+                            <Button style={{marginRight: 10}} onClick={() => props.cleanQuery()}>Clear
+                                Selection</Button>
                         </div>
                     </div>
                 </Card>
             </div>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column" }} />
+            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
         </div>
     )
 }
@@ -201,4 +222,11 @@ const mapStateToProps = (state) => ({
     spotify: state.spotify
 })
 
-export default connect(mapStateToProps, { startSearch, cleanQuery, updateSelection, getDraftInvoice, setupNewTab, submitCampaignData, queueSong })(Jukebox);
+export default connect(mapStateToProps, {
+    startSearch,
+    cleanQuery,
+    updateSelection,
+    setupNewTab,
+    queueSong,
+    clearSpotifyErrors
+})(Jukebox);

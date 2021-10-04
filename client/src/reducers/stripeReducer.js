@@ -22,16 +22,14 @@ import {
     REQUESTED_SETUP_INTENT,
     RETRIEVED_DRAFT_INVOICE,
     RETRIEVED_PAYMENT_DETAILS,
-    SET_LOCAL_TAB,
+    NEW_ITEM_PROCESSING,
     SUCCESSFULLY_CLOSED_TAB,
-    SUBMITTED_CAMPAIGN,
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS,
     ERROR_PAST_TABS,
-    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS
+    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, NEW_ITEM_SUBMITTED
 } from '../actions/types';
-import {getUnpaidTabs} from "../actions/stripeActions";
 
 const initialState = {
     clientSecret: '',
@@ -42,10 +40,9 @@ const initialState = {
     paymentDetails: null,
     hasOpenTab: false,
     tab: null,
-    localTab: null,
+    newItem: null,
     msg: null,
     pastTabs: [],
-    lastAdded: '',
     unpaidTabs: []
 }
 
@@ -105,8 +102,7 @@ export default function (state = initialState, action) {
         case REQUESTED_DRAFT_INVOICE:
             return {
                 ...state,
-                loading: true,
-                hasOpenTab: false
+                loading: true
             }
 
         case RETRIEVED_DRAFT_INVOICE:
@@ -114,7 +110,8 @@ export default function (state = initialState, action) {
                 ...state,
                 loading: false,
                 hasOpenTab: action.hasOpenTab,
-                tab: action.tab
+                tab: action.tab,
+                newItem: null
             }
 
         case ERROR_RETRIEVING_DRAFT_INVOICE:
@@ -129,18 +126,20 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                tab: action.tab,
-                hasOpenTab: true,
-                localTab: null,
-                lastAdded: action.lastAdded
+                newItem: action.newItem,
             }
         case ERROR_ADDING_INVOICE_ITEM:
             return initialState
 
-        case SET_LOCAL_TAB:
+        case NEW_ITEM_PROCESSING:
             return {
                 ...state,
-                localTab: action.tab
+                newItem: action.newItem
+            }
+        case NEW_ITEM_SUBMITTED:
+            return {
+                ...state,
+                newItem: action.newItem
             }
         case SUCCESSFULLY_CLOSED_TAB:
             return initialState
@@ -193,8 +192,8 @@ export default function (state = initialState, action) {
             }
         case RETRIEVED_UNPAID_TABS:
             let newMessage = null
-            if (action.unpaidTabs !== []) {
-                newMessage = 'Account is locked.  Check your email for an unpaid tab invoice.'
+            if (action.unpaidTabs.length !== 0) {
+                newMessage = {msg: 'Account is locked.  Check your email for an unpaid tab invoice.'}
             }
             return {
                 ...state,

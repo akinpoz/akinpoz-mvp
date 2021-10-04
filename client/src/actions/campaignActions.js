@@ -8,7 +8,7 @@ import {
     GET_CAMPAIGN,
     SET_CAMPAIGN,
     GET_ERRORS,
-    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR
+    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, NEW_ITEM_PROCESSING
 } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
@@ -78,7 +78,19 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
     dispatch({type: SUBMITTING_CAMPAIGN})
     axios.post('/api/campaigns/submitData', item, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
+            const newItem = {
+                item: item,
+                status: 'processing'
+            }
             dispatch({type: SUBMITTED_CAMPAIGN, last_submitted: item.transactionID, payload: res.data})
+
+            if (item.data.type !== 'Survey') {
+                // dispatches to stripe reducer to change status from unprocessed to processing
+                dispatch({type: NEW_ITEM_PROCESSING, newItem: newItem})
+            } else {
+                // if survey then doesnt need to do anything else -- will trigger adding to stripe otherwise
+                dispatch({type: NEW_ITEM_PROCESSING, newItem: null})
+            }
         }
         else {
             dispatch({type: SUBMIT_CAMPAIGN_ERROR})

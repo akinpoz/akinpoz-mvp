@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
@@ -14,6 +14,7 @@ import CustomerHome from './components/homes/customer-home'
 import Slider from './components/locations/Slider'
 import Search from './components/locations/Search'
 import Campaign from './components/campaigns/customer-campaign'
+import {addInvoiceItem, getDraftInvoice, getUnpaidTabs} from "./actions/stripeActions";
 
 const components = {
   Home: Home,
@@ -25,6 +26,25 @@ const components = {
 
 
 function Router(props) {
+  useEffect(() => {
+    if (props.stripe && !props.stripe.loading && props.stripe.newItem) {
+      if (props.stripe.newItem.item.data.type !== 'Survey') {
+        if (props.stripe.newItem.status === 'processing') {
+          props.addInvoiceItem(props.auth.user._id, props.stripe.newItem.item, props.location.select_location.name)
+        } else if (props.stripe.newItem.status === 'paid' && props.auth && props.auth.user) {
+          props.getDraftInvoice(props.auth.user._id)
+        }
+      }
+    }
+  }, [props.stripe.newItem])
+
+  useEffect(() => {
+    if (props.auth.user) {
+      props.getDraftInvoice(props.auth.user._id)
+      props.getUnpaidTabs(props.auth.user._id)
+    }
+  }, [props.auth])
+
   return (
     <HashRouter>
       <Switch>
@@ -106,7 +126,8 @@ Router.propTypes = {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
-  selected_location: state.location.selected_location
+  stripe: state.stripe,
+  location: state.location,
 })
 
-export default connect(mapStateToProps, null)(Router)
+export default connect(mapStateToProps, {addInvoiceItem, getDraftInvoice, getUnpaidTabs})(Router)

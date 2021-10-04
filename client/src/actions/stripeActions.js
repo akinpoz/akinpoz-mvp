@@ -22,16 +22,10 @@ import {
     REQUESTED_ADD_INVOICE_ITEM,
     ERROR_ADDING_INVOICE_ITEM,
     ADD_INVOICE_ITEM_SUCCESSFUL,
-    SET_LOCAL_TAB,
+    NEW_ITEM_PROCESSING,
     REQUEST_CLOSE_TAB,
     SUCCESSFULLY_CLOSED_TAB,
     ERROR_CLOSING_TAB,
-    SPOTIFY_QUEUE_SONG,
-    SPOTIFY_LOADING,
-    SPOTIFY_ERROR,
-    SUBMIT_CAMPAIGN_ERROR,
-    SUBMITTED_CAMPAIGN,
-    SUBMITTING_CAMPAIGN,
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
@@ -126,7 +120,16 @@ export const getDraftInvoice = (userID) => (dispatch, getState) => {
     dispatch({type: REQUESTED_DRAFT_INVOICE})
     axios.post('/api/stripe/get-draft-invoice', params, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
-            dispatch({type: RETRIEVED_DRAFT_INVOICE, hasOpenTab: res.data !== '', tab: res.data})
+            let hasOpenTab
+            let tab
+            if (res.data === ''){
+                tab = null
+                hasOpenTab = false
+            } else {
+                tab = res.data
+                hasOpenTab = true
+            }
+            dispatch({type: RETRIEVED_DRAFT_INVOICE, hasOpenTab: hasOpenTab, tab: tab})
         }
         else {
             dispatch({type: ERROR_RETRIEVING_DRAFT_INVOICE})
@@ -150,8 +153,11 @@ export const addInvoiceItem = (userID, item, locationName) => (dispatch, getStat
             console.error(res.data)
         }
         else {
-            dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, tab: res.data, lastAdded: item.data.transactionID})
-            history.push('/checkout')
+            let newItem = {
+                item: item,
+                status: 'paid'
+            }
+            dispatch({type: ADD_INVOICE_ITEM_SUCCESSFUL, newItem: newItem})
         }
     })
 }
@@ -164,13 +170,11 @@ export const addInvoiceItem = (userID, item, locationName) => (dispatch, getStat
  * @return {(function(*): void)|*}
  */
 export const setupNewTab = (item) => (dispatch) => {
-    const feeAmt = 40
-    const tab = {
-        amount: item.amount + parseFloat(feeAmt / 100).toFixed(2),
+    const newItem = {
         item: item,
-        fromOnline: false
+        status: 'unprocessed'
     }
-    dispatch({type: SET_LOCAL_TAB, tab: tab})
+    dispatch({type: NEW_ITEM_PROCESSING, newItem: newItem})
     dispatch({type: CLEAR_MSG})
 }
 

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import history from '../../history'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import {getCampaign, submitCampaignData} from '../../actions/campaignActions'
-import { Button, Card, Input, Message } from 'semantic-ui-react'
-import {getDraftInvoice, getUnpaidTabs, setupNewTab} from "../../actions/stripeActions";
-import { getLocation } from "../../actions/locationActions";
+import {Button, Card, Input, Message} from 'semantic-ui-react'
+import {setupNewTab} from "../../actions/stripeActions";
+import {getLocation} from "../../actions/locationActions";
 
 
 function CustomerCampaign(props) {
@@ -13,50 +13,37 @@ function CustomerCampaign(props) {
     const [info, setInfo] = useState('')
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const [msg, setMsg] = useState(props.stripe.msg || '')
-    const [show, setShow] = useState(true)
     const [locked, setLocked] = useState(true)
-    useEffect(() => {
-        if (props.stripe && props.stripe.hasOpenTab) {
-            setButtonLabel('Add To Tab')
-        }
-    }, [])
+
+    // useEffect(() => setMsg(null), [])
     useEffect(() => {
         if (props.auth.user?.campaigns?.includes(campaign._id)) {
             if (campaign.details.type === "Survey") {
-                setShow(false)
-                setMsg({ msg: "You have already submitted your vote!" })
-            }
-            else if (campaign.details.type === "Raffle") {
-                setMsg({ msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!" })
-            }
-            else if (campaign.details.type === "Fastpass") {
-                setShow(false)
-                setMsg({ msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account."})
+                setLocked(false)
+                setMsg({msg: "You have already submitted your vote!"})
+            } else if (campaign.details.type === "Raffle") {
+                setMsg({msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!"})
+            } else if (campaign.details.type === "Fastpass") {
+                setLocked(false)
+                setMsg({msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account."})
             }
         }
         if (props.location.select_location === '' && campaign.location) {
             props.getLocation(campaign.location)
         }
-    }, [props])
+    }, [props.auth])
     useEffect(() => {
         if (props.campaign === "") {
             props.getCampaign(campaign_id)
         }
-
         setCampaign(props.campaign)
     }, [props.campaign])
-    useEffect(() => {
-        if (props.auth && props.auth.user) {
-            props.getDraftInvoice(props.auth.user._id)
-            props.getUnpaidTabs(props.auth.user._id)
-        }
-    }, [props.auth])
     useEffect(() => {
         if (props.stripe.msg) {
             setMsg(props.stripe.msg)
         }
         if (!props.auth.isAuthenticated) {
-            setMsg({ msg: `Please login/register to participate in a campaign` })
+            setMsg({msg: `Please login/register to participate in a campaign`})
         }
         if (!props.stripe.msg && props.auth.isAuthenticated) {
             setMsg(null)
@@ -71,12 +58,16 @@ function CustomerCampaign(props) {
     }, [props.stripe.hasOpenTab])
 
     useEffect(() => {
-
+        if (!props.stripe) {
+            return
+        }
+        if (props.stripe.hasOpenTab) {
+            setButtonLabel('Add To Tab')
+        }
         if (props.stripe.unpaidTabs) {
             setLocked(props.stripe.unpaidTabs.length !== 0)
         }
     }, [props.stripe])
-
 
 
     function handleChange(e, data) {
@@ -89,7 +80,7 @@ function CustomerCampaign(props) {
 
     function handleSubmit() {
         const type = campaign.details.type
-        var amount = type === "Survey" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
+        let amount = type === "Survey" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
         const item = {
             amount,
             user: props.auth.user,
@@ -105,12 +96,17 @@ function CustomerCampaign(props) {
             }
         }
         if (type !== "Survey") {
-            if (props.stripe.hasOpenTab) {
+            props.setupNewTab(item)
+            if (props.stripe.hasOpenTab && parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
                 if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                    props.submitCampaignData(item)
+                    if (parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+                        props.submitCampaignData(item)
+                    }
+                    else {
+                        history.push('/checkout')
+                    }
                 }
             } else {
-                props.setupNewTab(item)
                 history.push('/checkout')
             }
         } else {
@@ -121,44 +117,52 @@ function CustomerCampaign(props) {
     const hasPaymentMethod = () => {
         return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
     }
+
     function handleRedirect() {
         history.location.state = history.location
     }
+
     return (
-        <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
+        <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
             <div id="customer-campaign-card-message_container">
                 {msg && msg.msg &&
-                    <Message color={msg.msg.includes("login") ? "red" : "green"}>
-                        <Message.Header>
-                            {msg.msg}
-                            {msg.msg.includes("login") && <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a></p>}
-                            {msg.msg.includes("Participate") || msg.msg.includes("already") && <p><a href={`/#/location/?location_id=${props.location.select_location._id}`} onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
-                        </Message.Header>
-                    </Message>}
-                {campaign && show &&
-                    <Card fluid>
-                        <Card.Content>
-                            <Card.Header>{campaign.title}</Card.Header>
-                            <Card.Meta>{campaign.details.type}</Card.Meta>
-                            <p>
-                                {campaign.details.type === "Survey" ? campaign.question : `Cost: $ ${campaign.question}`}
-                                <View type={campaign.details.type} campaign={campaign} handleChange={handleChange}
-                                    handleClick={handleClick} info={info} />
-                            </p>
-                        </Card.Content>
-                        <Card.Content extra>
-                            <div style={{ flexDirection: "row-reverse", display: "flex" }}>
-                                {props.auth.isAuthenticated && campaign.details.type !== 'Survey' && <div id="submit-button-div">
-                                    {hasPaymentMethod() && <Button primary onClick={handleSubmit}
-                                        disabled={(campaign.details.type !== 'Fastpass' && info === '') || locked}>{buttonLabel}</Button>}
-                                    {!hasPaymentMethod() && <Button primary onClick={() => {
-                                        history.push({ pathname: '/profile' })
-                                    }}>Add a Payment Method</Button>}
-                                </div>}
-                                {props.auth.isAuthenticated && campaign.details.type === 'Survey' && <Button primary onClick={handleSubmit}>Submit Vote</Button>}
-                            </div>
-                        </Card.Content>
-                    </Card>}
+                <Message color={msg.msg.includes("login") ? "red" : "green"}>
+                    <Message.Header>
+                        {msg.msg}
+                        {msg.msg.includes("login") &&
+                        <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a>
+                        </p>}
+                        {msg.msg.includes("Participate") || msg.msg.includes("already") &&
+                        <p><a href={`/#/location/?location_id=${props.location.select_location._id}`}
+                              onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
+                    </Message.Header>
+                </Message>}
+                {campaign &&
+                <Card fluid>
+                    <Card.Content>
+                        <Card.Header>{campaign.title}</Card.Header>
+                        <Card.Meta>{campaign.details.type}</Card.Meta>
+                        <p>
+                            {campaign.details.type === "Survey" ? campaign.question : `Cost: $ ${campaign.question}`}
+                            <View type={campaign.details.type} campaign={campaign} handleChange={handleChange}
+                                  handleClick={handleClick} info={info}/>
+                        </p>
+                    </Card.Content>
+                    <Card.Content extra>
+                        <div style={{flexDirection: "row-reverse", display: "flex"}}>
+                            {props.auth.isAuthenticated && campaign.details.type !== 'Survey' &&
+                            <div id="submit-button-div">
+                                {hasPaymentMethod() && <Button primary onClick={handleSubmit}
+                                                               disabled={(campaign.details.type !== 'Fastpass' && info === '') || locked}>{buttonLabel}</Button>}
+                                {!hasPaymentMethod() && <Button primary onClick={() => {
+                                    history.push({pathname: '/profile'})
+                                }}>Add a Payment Method</Button>}
+                            </div>}
+                            {props.auth.isAuthenticated && campaign.details.type === 'Survey' &&
+                            <Button primary disabled={locked} onClick={handleSubmit}>Submit Vote</Button>}
+                        </div>
+                    </Card.Content>
+                </Card>}
             </div>
         </div>
     )
@@ -172,7 +176,7 @@ function View(props) {
                     {props.campaign && props.campaign.details.options.map((option, index) => {
                         return (
                             <div key={index}>
-                                <input type="radio" name="option" value={option} onClick={props.handleClick} />
+                                <input type="radio" name="option" value={option} onClick={props.handleClick}/>
                                 <label>{option}</label>
                             </div>
                         )
@@ -185,7 +189,7 @@ function View(props) {
             return (
                 <div>
                     <Input fluid type="number" placeholder="How many Tickets do you want to purchase?"
-                        onChange={props.handleChange} value={props.info} />
+                           onChange={props.handleChange} value={props.info}/>
                 </div>
             )
     }
@@ -199,4 +203,9 @@ const mapStateToProps = state => ({
     location: state.location
 })
 
-export default connect(mapStateToProps, { getCampaign, getDraftInvoice, setupNewTab, submitCampaignData, getLocation, getUnpaidTabs })(CustomerCampaign)
+export default connect(mapStateToProps, {
+    getCampaign,
+    setupNewTab,
+    submitCampaignData,
+    getLocation,
+})(CustomerCampaign)

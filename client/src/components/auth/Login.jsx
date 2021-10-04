@@ -41,9 +41,9 @@ function Login(props) {
     return (
         <div className={styles.auth}>
             <Form className={styles.formContainer} onSubmit={onSubmit}>
-                {msg &&
+                {msg && msg.msg &&
                     <Message negative className={styles.message}>
-                        <Message.Header>{msg}</Message.Header>
+                        <Message.Header>{msg.msg}</Message.Header>
                     </Message>
                 }
                 <Form.Input type="email" onChange={handleChange} placeholder="Email..." label="Email" value={values.email} name="email" />

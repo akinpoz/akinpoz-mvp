@@ -7,7 +7,7 @@ import {
 
 const initialState = {
     loading: false,
-    error: ''
+    error: '',
 }
 
 export default function (state = initialState, action) {
@@ -28,7 +28,8 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                error: ''
+                error: {msg: 'Successfully added song!'},
+
             }
         case SPOTIFY_ERROR:
             return {

@@ -92,8 +92,8 @@ function CampaignModal(props) {
                     <Button toggle active={values.details.type === "Fastpass"} onClick={handleClick}>Fastpass</Button>
                 </Button.Group>}
                 <Form>
-                    {msg && <Message negative>
-                        <Message.Header>{msg}</Message.Header>
+                    {msg && msg.msg && <Message negative>
+                        <Message.Header>{msg.msg}</Message.Header>
                     </Message>}
                     <br />
                     <Form.Input required label={`${values.details.type} Title`} placeholder='enter title...' value={values.title} onChange={handleChange} name="title" />

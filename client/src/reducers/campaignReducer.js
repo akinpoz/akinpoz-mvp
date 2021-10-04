@@ -14,8 +14,7 @@ const initialState = {
     campaigns: [],
     loading: false,
     select_campaign: '',
-    last_submitted: '',
-    msg: null
+    msg: {}
 }
 
 export default function (state = initialState, action) {
@@ -61,18 +60,17 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: true,
+                msg: {}
             }
         case SUBMITTED_CAMPAIGN:
             return {
                 ...state,
-                msg: action.payload,
                 loading: false,
-                last_submitted: action.last_submitted
             }
         case SUBMIT_CAMPAIGN_ERROR:
             return {
                 ...state,
-                msg: 'Error Submitting Campaign'
+                msg: {msg: 'Error Submitting Campaign'}
             }
 
         default:

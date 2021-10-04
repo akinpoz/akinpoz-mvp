@@ -41,9 +41,9 @@ function EndUserDashboard(props) {
                 <div className={styles.divider} />
             </div>
             <br />
-            {msg &&
+            {msg && msg.msg &&
             <Message negative className={styles.message}>
-                <Message.Header>{msg}</Message.Header>
+                <Message.Header>{msg.msg}</Message.Header>
             </Message>
             }
             <Card.Group className={styles.endUserDashboardContainer}>

@@ -51,8 +51,8 @@ function LocationModal(props) {
             <Modal.Content>
                 <Form>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                        {msg && <Message style={{ height: '100%', width: '100%', margin: 'auto auto' }} negative={msg.includes("Failed")} positive={msg.includes("Success")} className={styles.message}>
-                            <Message.Header>{msg}</Message.Header>
+                        {msg && msg.msg && <Message style={{ height: '100%', width: '100%', margin: 'auto auto' }} negative={msg.msg.includes("Failed")} positive={msg.msg.includes("Success")} className={styles.message}>
+                            <Message.Header>{msg.msg}</Message.Header>
                         </Message>}
                         {/* <img src={imageData} className={styles.image} /> */}
                         {/* <input type="file" accept="image/*" onChange={handleUpload} placeholder="Upload your logo"/> */}
