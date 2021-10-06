@@ -8,7 +8,7 @@ import {
     GET_CAMPAIGN,
     SET_CAMPAIGN,
     GET_ERRORS,
-    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, NEW_ITEM_PROCESSING
+    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, NEW_ITEM_PROCESSING, CLEAR_CAMPAIGN_MSG
 } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
@@ -99,7 +99,9 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
     })
 }
 
-
+export const clearCampaignMsg = () => (dispatch) => {
+    dispatch({type: CLEAR_CAMPAIGN_MSG})
+}
 
 export const setCampaignsLoading = () => {
     return {

@@ -7,7 +7,7 @@ import {
     GET_CAMPAIGNS,
     GET_CAMPAIGN,
     SET_CAMPAIGN,
-    SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR
+    SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, CLEAR_CAMPAIGN_MSG
 } from '../actions/types'
 
 const initialState = {
@@ -71,6 +71,12 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 msg: {msg: 'Error Submitting Campaign'}
+            }
+
+        case CLEAR_CAMPAIGN_MSG:
+            return {
+                ...state,
+                msg: null
             }
 
         default:

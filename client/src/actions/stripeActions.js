@@ -29,7 +29,7 @@ import {
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
-    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS
+    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS, CLEAR_STRIPE_MSG
 } from "./types";
 import history from "../history";
 
@@ -227,6 +227,10 @@ export const getUnpaidTabs = (userID) => (dispatch, getState) => {
             dispatch({type: ERROR_UNPAID_TABS})
         }
     })
+}
+
+export const clearStripeMsg = () => (dispatch) => {
+    dispatch({type: CLEAR_STRIPE_MSG})
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

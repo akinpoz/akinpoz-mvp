@@ -28,7 +28,7 @@ import {
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS,
     ERROR_PAST_TABS,
-    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, NEW_ITEM_SUBMITTED
+    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, NEW_ITEM_SUBMITTED, CLEAR_STRIPE_MSG
 } from '../actions/types';
 
 const initialState = {
@@ -202,6 +202,11 @@ export default function (state = initialState, action) {
                 msg: newMessage
             }
 
+        case CLEAR_STRIPE_MSG:
+            return {
+                ...state,
+                msg: null
+            }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
