@@ -13,7 +13,7 @@ function Analytics() {
             <br/>
             <div style={{textAlign: 'center', width: '90%'}}>
                 <h4 style={{margin: 0}}>Sincerely,</h4>
-                <h4 style={{margin: 0}}>Akinpoz</h4>
+                <h4 style={{margin: 0}}>Apokoz</h4>
             </div>
         </div>
     )

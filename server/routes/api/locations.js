@@ -1,10 +1,10 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
 const dotenv = require('dotenv');
 dotenv.config();
 const Location = require('../../models/Location');
 const User = require('../../models/User');
-var auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth');
 const Campaign = require('../../models/Campaign');
 
 
@@ -43,14 +43,14 @@ router.get('/user_id', auth, async function (req, res) {
  * @route GET api/locations/location_id
  * @desc get location by location_id (customer side use)
  * @access Public
- * @note O(n + m) runtime where n is the number of locations and m is the number of campaigns for each location. Possible improvement: O(n + m) -> O(n). Tried: Redux, but there were too many use cases where it would fail. Tried separate axios calls but React would not update the state/loop update forever. 
+ * @note O(n + m) runtime where n is the number of locations and m is the number of campaigns for each location. Possible improvement: O(n + m) -> O(n). Tried: Redux, but there were too many use cases where it would fail. Tried separate axios calls but React would not update the state/loop update forever.
  */
 router.get('/location_id', async function (req, res) {
     try {
         let location = await Location.findOne({ _id: req.query.location_id })
         let campaigns = []
         if (location.campaigns) {
-            for (var campaign of location.campaigns) {
+            for (const campaign of location.campaigns) {
                 campaigns.push(await Campaign.findOne({ _id: campaign }))
             }
         }
@@ -74,7 +74,7 @@ router.get('/location_id', async function (req, res) {
  */
 router.post('/add', auth, (req, res) => {
     try {
-        var newLocation = new Location(req.body);
+        const newLocation = new Location(req.body);
         newLocation.save(async function (err, location) {
             if (err) res.status(500).send(err);
             if (location) {
@@ -112,7 +112,7 @@ router.post('/delete', auth, async (req, res) => {
         const location = await Location.findOne({ _id: req.body._id })
         const user = await User.findOne({ _id: req.body.user })
         user.locations.splice(user.locations.indexOf(req.body._id), 1)
-        for (var campaign of location.campaigns) {
+        for (const campaign of location.campaigns) {
             user.campaigns.splice(user.campaigns.indexOf(campaign), 1)
         }
         await user.save()

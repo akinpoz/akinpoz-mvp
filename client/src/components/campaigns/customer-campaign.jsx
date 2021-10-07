@@ -21,7 +21,7 @@ function CustomerCampaign(props) {
         }
 
         if (!props.auth.isAuthenticated) {
-            setMsgWithPriority({msg: `Please login/register to participate in a campaign`, priority: 1})
+            setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1})
         } else {
             // set to normal unless higher priority exists
             if (msg && msg.priority === 1) {
@@ -95,7 +95,6 @@ function CustomerCampaign(props) {
 
     function setMsgWithPriority(newMsg) {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        console.log(newMsg)
         if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
             setMsg(newMsg)
         }
@@ -167,7 +166,7 @@ function CustomerCampaign(props) {
 
     return (
         <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
-            <div id="customer-campaign-card-message_container">
+            <div id="customer-campaign-card-message_container" style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                 {msg && msg.msg &&
                 <Message color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid')) ? "red" : "green"}>
                     <Message.Header>
@@ -233,7 +232,7 @@ function View(props) {
                 </div>
             )
         case "Fastpass":
-            return (<div></div>)
+            return (<div/>)
         case "Raffle":
             return (
                 <div>

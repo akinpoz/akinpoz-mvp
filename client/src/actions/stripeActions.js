@@ -29,9 +29,8 @@ import {
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
-    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS, CLEAR_STRIPE_MSG
+    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS, CLEAR_STRIPE_MSG, UPDATE_USER
 } from "./types";
-import history from "../history";
 
 /**
  * Creates stripe customer object to save and process payment
@@ -102,7 +101,9 @@ export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getStat
     let params = {userID, paymentMethod}
     axios.post('/api/stripe/update-payment', params, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
-            dispatch({type: RETRIEVED_PAYMENT_DETAILS, paymentDetails: res.data})
+            console.log(res.data.user)
+            dispatch({type: RETRIEVED_PAYMENT_DETAILS, paymentDetails: res.data.pm})
+            dispatch({type: UPDATE_USER, payload: res.data.user})
         }
         else {
             dispatch({type: ERROR_RETRIEVING_PAYMENT_DETAILS})

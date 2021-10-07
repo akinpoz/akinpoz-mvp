@@ -1,11 +1,11 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
 const dotenv = require('dotenv');
 dotenv.config();
 const Location = require('../../models/Location');
 const User = require('../../models/User');
 const Campaign = require('../../models/Campaign');
-var auth = require('../../middleware/auth')
+const auth = require('../../middleware/auth')
 
 
 /**
@@ -70,9 +70,9 @@ router.get('/campaign_id', async (req, res) => {
  */
 router.post('/add', auth, (req, res) => {
     try {
-        var details = req.body
+        const details = req.body
         details.date = new Date()
-        var newCampaign = new Campaign(details);
+        const newCampaign = new Campaign(details);
         newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);
             if (campaign) {

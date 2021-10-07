@@ -11,14 +11,14 @@ function ResultsModal(props) {
     // Jukebox & Fastpass are not in this file (jukebox/index.jsx, campaigns/business-campaign.jsx respectively)
     // Picking Raffle winner
     function handlePick() {
-        var options = []
-        for (var entry of Object.entries(props.details.results)) {
+        const options = []
+        for (let entry of Object.entries(props.details.results)) {
             while (entry[1] > 0) {
                 options.push(entry[0])
                 entry[1]--;
             }
         }
-        var winner = options[Math.floor(Math.random() * options.length)];
+        const winner = options[Math.floor(Math.random() * options.length)];
         // updateCampaign. Set results {"0": winner}, active: false
         const campaignDetails = {
             title: props.title,
@@ -34,8 +34,8 @@ function ResultsModal(props) {
     }
     // Ending survey logic
     function handleEnd() {
-        var options = Object.entries(props.details.results).sort((a, b) => a[1] - b[1]);
-        var winner = options[0][0];
+        const options = Object.entries(props.details.results).sort((a, b) => a[1] - b[1]);
+        const winner = options[0][0];
         const campaignDetails = {
             title: props.title,
             description: props.description,

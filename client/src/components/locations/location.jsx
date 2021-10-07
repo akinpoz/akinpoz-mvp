@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Card, Icon, Radio } from "semantic-ui-react";
 import { updateLocation, deleteLocation, toggleMusic, setLocation } from '../../actions/locationActions';
 import { deleteCampaign, updateCampaign } from '../../actions/campaignActions'
@@ -30,7 +30,7 @@ function Location(props) {
         props.setLocation(_id)
     }
     //TODO: make responsive with actual link to real campaign ?? QR codes are for locations, not campaigns. The URL should be the landing page for the user-location with parameter specific to the location.
-    var url = ""
+    let url
     if (process.env.NODE_ENV === 'development') {
         url = `http://localhost:3000/#/customer-home/?location_id=${_id}`
     }

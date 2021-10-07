@@ -12,10 +12,10 @@ class Stack {
 
     pop() {
         let top = this.items[this.top]
-        delete this.items[this.top] 
+        delete this.items[this.top]
         this.top--
         return top;
-        
+
     }
 
     get peek() {
@@ -46,7 +46,7 @@ describe('test', () => {
     })
     it('it can pop', () => {
         stack.push('🥑')
-        var top = stack.pop()
+        const top = stack.pop()
         expect(stack.top).toBe(-1)
         expect(stack.items).toEqual({})
         expect(top).toBe('🥑')

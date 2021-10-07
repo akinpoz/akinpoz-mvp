@@ -48,7 +48,7 @@ function Jukebox(props) {
             }
         } else {
             setMsgWithPriority({
-                msg: "Please login to queue a song... You must also have a valid payment method associated with your account.",
+                msg: "Please login to queue a song.",
                 priority: 1
             })
         }
@@ -146,7 +146,7 @@ function Jukebox(props) {
         if (props.stripe.hasOpenTab && parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
             if (window.confirm('Are you sure you would you like to add this to your tab?')) {
                 if (parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
-                    props.submitCampaignData(item)
+                    props.queueSong(item)
                 } else {
                     history.push('/checkout')
                 }
@@ -163,7 +163,8 @@ function Jukebox(props) {
 
     return (
         <div className={styles.container}>
-            {msg && msg.msg && <Message color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid')) ? "red" : "green"}>
+            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            {msg && msg.msg && <Message color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid') || msg.msg.includes('issues')) ? "red" : "green"}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&
@@ -186,7 +187,9 @@ function Jukebox(props) {
                 </Message.Header>
             </Message>
             }
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            <br/>
+            <br/>
+            <br/>
             <div className={styles.shiftUp}>
                 {location && <h2 style={{textAlign: 'center'}}>Playing @ {location.name}</h2>}
                 <Card fluid>

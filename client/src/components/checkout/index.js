@@ -93,7 +93,7 @@ function NewTab(props) {
                     {props.stripe.newItem.item &&
                     <div className={styles.itemContainer}>
                         <p style={{margin: 0}}>{props.stripe.newItem.item.data.name}</p>
-                        <p>${props.stripe.newItem.item.amount}</p>
+                        <p>${props.stripe.newItem.item.amount.toFixed(2)}</p>
                     </div>
                     }
                     <div className={styles.itemContainer}>
@@ -233,7 +233,7 @@ function ExistingTab(props) {
                     {props.stripe?.newItem?.item &&
                     <div className={styles.itemContainer}>
                         <p style={{margin: 0}}>{props.stripe.newItem.item.data.name}</p>
-                        <p>${props.stripe.newItem.item.amount}</p>
+                        <p>${props.stripe.newItem.item.amount.toFixed(2)}</p>
                     </div>
                     }
                     <div className={styles.totalContainer}>

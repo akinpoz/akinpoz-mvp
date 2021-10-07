@@ -1,6 +1,6 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
 /**
  * @Schema Campaign
@@ -10,7 +10,7 @@ var Schema = mongoose.Schema
  * @property {Array[String]} campaigns - The campaigns that belong to the location.
  * @property {String} user* - The user that created the location.
  */
-var CampaignSchema = new Schema({
+const CampaignSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -28,8 +28,8 @@ var CampaignSchema = new Schema({
         }
     },
     user: {
-        type: String, 
-        required: true, 
+        type: String,
+        required: true,
     },
     location: {
         type: String,

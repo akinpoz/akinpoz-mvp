@@ -1,12 +1,12 @@
-var express = require('express')
-var bcrypt = require('bcryptjs')
-var router = express.Router()
-var jwt = require('jsonwebtoken')
+const express = require('express')
+const bcrypt = require('bcryptjs')
+const router = express.Router()
+const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
 dotenv.config();
 const User = require('../../models/User');
 const { encrypt, decrypt} = require("./encryption");
-var auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth');
 const Campaign = require('../../models/Campaign');
 const Location = require('../../models/Location');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -18,7 +18,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  * @access Public
  */
 router.post('/', function (req, res) {
-    var { name, email, password, type, customerID, paymentMethod } = req.body;
+    const { name, email, password, type, customerID, paymentMethod } = req.body;
     // Simple validation
     if (!name || !email || !password || !type || !customerID) {
         return res.status(400).json({ msg: 'Please Enter all fields' })
@@ -30,7 +30,7 @@ router.post('/', function (req, res) {
     // Check for existing user
     User.findOne({ email }).then(user => {
         if (user) return res.status(400).json({ msg: 'User already exists' })
-        var newUser = new User({ name, email, password, type, locations: [], customerID: encryptedCustomerID, paymentMethod: encryptedPaymentMethod })
+        const newUser = new User({ name, email, password, type, locations: [], customerID: encryptedCustomerID, paymentMethod: encryptedPaymentMethod })
         // Create salt & hash
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -71,7 +71,7 @@ router.post('/', function (req, res) {
  * @access Private
  */
 router.post('/update', auth, function (req, res) {
-    var { name, email } = req.body
+    const { name, email } = req.body
     User.findOneAndUpdate({ _id: req.body._id }, { name, email }, { new: true })
         .then(user => {
             const customerID = decrypt(user.customerID)
@@ -82,7 +82,15 @@ router.post('/update', auth, function (req, res) {
                 else {
                     console.log('Stripe Object Updated')
                 }
-                res.json(user)
+                let resUser =  {
+                    _id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        type: user.type,
+                        customerID: user.customerID,
+                        paymentMethod: user.paymentMethod
+                }
+                res.json(resUser)
             })
         })
         .catch(e => {

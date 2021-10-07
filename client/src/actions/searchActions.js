@@ -1,20 +1,16 @@
 import { CLEAN_QUERY, FINISH_SEARCH, START_SEARCH, UPDATE_SELECTION } from "./types";
-import { tokenConfig } from "./authActions";
 import axios from "axios";
 import { setSpotifyLoading } from "./spotifyActions";
 
 
-export const startSearch = (query) => (dispatch, getState) => {
+export const startSearch = (query) => (dispatch) => {
     if (query === '') {
         dispatch({ type: CLEAN_QUERY })
         return;
     }
     dispatch({ type: START_SEARCH, query: query })
     dispatch(setSpotifyLoading())
-    // const config = {
-    //     headers: tokenConfig(getState).headers,
-    //     params: {query}
-    // }
+
     axios.get('/api/spotify/search', { params: { query } }).then(res => {
         dispatch({
             type: FINISH_SEARCH,

@@ -1,10 +1,10 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser')
 dotenv.config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-var User = require('../../models/User');
+const User = require('../../models/User');
 const {decrypt, encrypt} = require("./encryption");
 const open = require("open");
 
@@ -112,7 +112,7 @@ router.post('/update-payment', async function (req, res) {
 
     if (oldPm && oldPm !== '') {
         try {
-            let {pm, error} = await stripe.paymentMethods.detach(oldPm)
+            await stripe.paymentMethods.detach(oldPm)
         } catch (e) {
             console.error(e.message)
         }
@@ -130,11 +130,21 @@ router.post('/update-payment', async function (req, res) {
             expYear: newPm.card.exp_year,
             brand: newPm.card.brand
         }
-        User.findOneAndUpdate({_id: userID}, {paymentMethod: encrypt(newPm.id)}).then((user, err) => {
+        let encrypted = encrypt(newPm.id)
+        User.findOneAndUpdate({_id: userID}, {paymentMethod: encrypted}).then((user, err) => {
             if (err) {
                 res.status(400).send({error: err.message})
             }
-            res.status(200).send(pm)
+            let resUser =  {
+                _id: user.id,
+                name: user.name,
+                email: user.email,
+                type: user.type,
+                customerID: user.customerID,
+                paymentMethod: encrypted
+            }
+            let results = {pm: pm, user: resUser}
+            res.status(200).send(results)
         })
     })
 })
@@ -504,12 +514,10 @@ router.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, 
             console.log(`⚠️  Webhook signature verification failed. ` + err.message);
             return res.sendStatus(400);
         }
-        data = event.data;
         eventType = event.type;
     } else {
         // Webhook signing is recommended, but if the secret is not configured in `config.js`,
         // we can retrieve the event data directly from the request body.
-        data = req.body.data;
         eventType = req.body.type;
     }
     if (eventType === 'payment_intent.succeeded') {

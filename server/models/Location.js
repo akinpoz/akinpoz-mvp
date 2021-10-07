@@ -1,6 +1,6 @@
-var mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
 /**
  * @Schema Location
@@ -11,7 +11,7 @@ var Schema = mongoose.Schema
  * @property {String} user* - The user that created the location.
  * @property {Boolean} music - The jukebox status of the location.
  */
-var LocationSchema = new Schema({
+const LocationSchema = new Schema({
     name: {
         type: String,
         required: true,

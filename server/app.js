@@ -1,15 +1,15 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require('cors')
-var mongoose = require('mongoose')
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors')
+const mongoose = require('mongoose')
 const dotenv = require('dotenv');
 dotenv.config();
 
 
-var db = process.env.MONGOURI
+const db = process.env.MONGOURI
 mongoose.connect(db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -19,7 +19,7 @@ mongoose.connect(db, {
   console.error(e)
 })
 
-var app = express();
+const app = express();
 
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/stripe/webhook') {

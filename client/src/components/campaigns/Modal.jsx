@@ -57,22 +57,22 @@ function CampaignModal(props) {
         setOpen(false);
     }
     function handleClick(e) {
-        var details = values.details
+        let details = values.details
         details.type = e.target.innerHTML
         setValues({ ...values, question: "", details })
     }
     function handleOptionChange(data, index) {
-        var options = values.details.options
+        let options = values.details.options
         options[index] = data.value
         setValues({ ...values, details: { ...values.details, options } })
     }
     function handleOptionAdd() {
-        var options = values.details.options
+        let options = values.details.options
         options.push("")
         setValues({ ...values, details: { ...values.details, options } })
     }
     function handleOptionRemove(index) {
-        var options = values.details.options
+        let options = values.details.options
         options.splice(index, 1)
         setValues({ ...values, details: { ...values.details, options } })
     }
@@ -116,19 +116,17 @@ function CampaignModal(props) {
                                                 <Form.Input placeholder={`enter option ${index + 1}...`} name={`${values.details.options}_${index}`} value={values.details.options[index]} onChange={(e, data) => handleOptionChange(data, index)} />
                                             </td>
                                             <td>
-                                                <a style={{
+                                                <div style={{
                                                     display: 'flex',
                                                     flexDirection: 'row',
                                                     cursor: 'pointer',
                                                     color: 'red',
                                                     fontWeight: 'bold'
                                                 }}
-                                                    icon
-                                                    labelPosition='right'
                                                     color='white'
                                                     onClick={handleOptionRemove.bind(null, index)}>
                                                     <Icon name="trash" />
-                                                </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     )
@@ -158,20 +156,18 @@ function CampaignModal(props) {
 
 function AddOptionButton(props) {
     return (
-        <a style={{
+        <div style={{
             display: 'flex',
             flexDirection: 'row',
             cursor: 'pointer',
             color: '#4183c4',
             fontWeight: 'bold'
         }}
-            icon
-            labelPosition='right'
             color='white'
             onClick={props.handler}>
             <i className='add icon' />
             Add Option
-        </a>
+        </div>
     )
 }
 

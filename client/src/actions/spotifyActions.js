@@ -1,4 +1,4 @@
-import {CLEAR_SPOTIFY_ERRORS, NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
+import {NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
 import axios from 'axios';
 import {tokenConfig} from "./authActions";
 
@@ -30,15 +30,17 @@ export const queueSong = (item) => (dispatch, getState) => {
         else {
             dispatch({
                 type: SPOTIFY_ERROR,
-                error: 'Looks like the jukebox feature is experiencing some issues.' +
-                    '  If you would like to use this feature, please report the error to this location.'})
+                error: {msg:'Looks like the jukebox feature is experiencing some issues.' +
+                    '  If you would like to use this feature, please report the error to this location.'}
+            })
             console.error('failed: ' + res.status)
         }
-    }).catch(err => {
+    }).catch(() => {
         dispatch({
             type: SPOTIFY_ERROR,
-            error: 'Looks like the jukebox feature is experiencing some issues.' +
-                '  If you would like to use this feature, please report the error to this location.'})
+            error: {msg: 'Looks like the jukebox feature is experiencing some issues.' +
+                '  If you would like to use this feature, please report the error to this location.'}
+        })
     })
 }
 

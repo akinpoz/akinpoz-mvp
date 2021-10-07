@@ -1,13 +1,13 @@
-var express = require('express')
-var bcrypt = require('bcryptjs')
-var router = express.Router()
-var jwt = require('jsonwebtoken')
+const express = require('express')
+const bcrypt = require('bcryptjs')
+const router = express.Router()
+const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
 dotenv.config();
 // Item Model
-var User = require('../../models/User');
+const User = require('../../models/User');
 
-var auth = require('../../middleware/auth')
+const auth = require('../../middleware/auth')
 
 /**
  * @route POST api/auth
@@ -15,7 +15,7 @@ var auth = require('../../middleware/auth')
  * @access Public
  */
 router.post('/', function (req, res) {
-    var { email, password } = req.body;
+    const { email, password } = req.body;
     // Simple validation
     if (!email || !password) {
         return res.status(400).json({ msg: 'Please Enter all fields' })

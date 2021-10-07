@@ -25,13 +25,6 @@ function Register(props) {
 
 function RegisterForm(props) {
 
-    const propTypes = {
-        isAuthenticated: PropTypes.bool,
-        error: PropTypes.object.isRequired,
-        register: PropTypes.func.isRequired,
-        clearErrors: PropTypes.func.isRequired
-    }
-
     const stripe = useStripe()
     const elements = useElements();
 
@@ -178,8 +171,8 @@ function RegisterForm(props) {
 
     function isValid() {
         const { name, email, password, type, nameOnCard, cardApproved } = values
-        const paymentValid = nameOnCard !== '' && cardApproved
-        const cardConsidered = !paymentActive || paymentValid || paymentAuthenticatedByMobile
+        // const paymentValid = nameOnCard !== '' && cardApproved
+        // const cardConsidered = !paymentActive || paymentValid || paymentAuthenticatedByMobile
         return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '');
     }
 
