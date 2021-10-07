@@ -29,7 +29,6 @@ function Location(props) {
     function handleClick() {
         props.setLocation(_id)
     }
-    //TODO: make responsive with actual link to real campaign ?? QR codes are for locations, not campaigns. The URL should be the landing page for the user-location with parameter specific to the location.
     let url
     if (process.env.NODE_ENV === 'development') {
         url = `http://localhost:3000/#/customer-home/?location_id=${_id}`
@@ -50,6 +49,7 @@ function Location(props) {
 
                 </div>
                 <p>{description}</p>
+                <br/>
                 <div style={{ marginLeft: 20 }}>
                     <div style={{ display: "flex", flexDirection: 'row', marginBottom: 5, alignItems: "center", gap: "10%" }}>
                         <Button icon basic color={!isEnabled ? "grey" : "blue"} disabled={!isEnabled} href='/#/jukebox' style={{ marginBottom: 5, border: "none !important" }} onClick={handleClick}><Icon name="music" /> Jukebox</Button>
@@ -57,6 +57,7 @@ function Location(props) {
                             <Radio toggle checked={isEnabled} onChange={handleToggle} />
                         </div>
                     </div>
+                    <br/>
                     <Campaigns location_id={_id} {...props} />
                 </div>
             </Card>

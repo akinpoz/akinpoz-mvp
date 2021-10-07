@@ -101,7 +101,6 @@ export const updatePaymentMethod = (userID, paymentMethod) => (dispatch, getStat
     let params = {userID, paymentMethod}
     axios.post('/api/stripe/update-payment', params, tokenConfig(getState)).then(res => {
         if (res.status === 200) {
-            console.log(res.data.user)
             dispatch({type: RETRIEVED_PAYMENT_DETAILS, paymentDetails: res.data.pm})
             dispatch({type: UPDATE_USER, payload: res.data.user})
         }
@@ -279,5 +278,9 @@ export const markProcessing = () => (dispatch) => {
  * @return {(function(*): void)|*}
  */
 export const markComplete = (status) => (dispatch) => {
-    dispatch({type: PAYMENT_COMPLETE, status: status})
+    let msg
+    if (status === 'fail') {
+        msg = {msg: 'Stripe could not process card.  Please try another card.'}
+    }
+    dispatch({type: PAYMENT_COMPLETE, status: status, msg: msg})
 }

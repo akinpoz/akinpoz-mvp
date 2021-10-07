@@ -3,6 +3,7 @@ import styles from './locations.module.css'
 import history from '../../history'
 import { connect } from 'react-redux'
 import { getLocations, setLocation } from '../../actions/locationActions'
+import {Search as SemanticSearch} from 'semantic-ui-react'
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
@@ -27,17 +28,30 @@ function Search(props) {
     }
     return (
         <div id="search-container" className={styles.search_container}>
-            <input placeholder='Search' style={{ borderColor: 'grey', height: '30px', width: "95%", marginLeft: 'auto', marginRight: 'auto', marginBottom: '5%' }} value={searchTerm} onChange={handleChange} />
+            <br/>
+            <SemanticSearch
+                size='large'
+                value={searchTerm}
+                onSearchChange={handleChange}
+                results={[]}
+                showNoResults={false}
+                placeholder={'Search'}
+            />
+            <br/>
             {locations.map(location => {
                 return (
-                    <div key={location._id} style={{ borderBottom: '.5px solid grey', width: "100%", background: 'lightgrey' }}>
+                    <div key={location._id} style={{ borderBottom: '.5px solid grey', width: "90%", maxWidth: 500, background: 'lightgrey', borderRadius: 15, marginBottom: 10 }}>
                         <div id="search-item-container" style={{ width: "95%", margin: 'auto', cursor: 'pointer' }} onClick={handleClick.bind(null, location)}>
-                            <h1>{location.name}</h1>
+                            <h1 style={{textAlign: 'center'}}>{location.name}</h1>
                         </div>
                     </div>
                 )
-            }
+                }
             )}
+            <br/>
+            {locations.length === 0 &&
+                <h4>No Results :(</h4>
+            }
         </div>
     )
 }

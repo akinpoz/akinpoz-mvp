@@ -16,7 +16,7 @@ import {loadStripe} from "@stripe/stripe-js";
 import {updateUser, deleteUser} from "../../actions/authActions";
 
 function Profile(props) {
-    const stripePromise = loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk');
+    const [stripePromise] = useState(() => loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk'))
     return (
         <div className={styles.profileContainer}>
             <Elements stripe={stripePromise}>
@@ -33,6 +33,7 @@ function EndUserDashboard(props) {
             setMsg(props.stripe.msg)
         }
     }, [props.stripe])
+
     return (
         <div>
             <br/>
@@ -48,8 +49,11 @@ function EndUserDashboard(props) {
             }
             <Card.Group className={styles.endUserDashboardContainer}>
                 <AccountSettings {...props} />
-                {props.auth.user.type === 'customer' && <PaymentOptions {...props} />}
+                {props.auth.user.type === 'customer' &&
+                <PaymentOptions {...props} setMsg={setMsg}/>}
+                {props.auth.user.type === 'customer' &&
                 <History {...props}/>
+                }
             </Card.Group>
         </div>
     )
@@ -84,9 +88,7 @@ function AccountSettings(props) {
         <Card>
             <div className={styles.userAccountSettings}>
                 <h2>Account</h2>
-                {/* <div style={{backgroundColor: 'gray', width: 200, height: 150, borderRadius: 10}}>
-                    Profile Pic
-                </div> */}
+
                 <br/>
                 <Form style={{width: '90%'}}>
                     <Form.Input placeholder="Email" name="email" required value={email} onChange={handleChange}/>
@@ -94,7 +96,6 @@ function AccountSettings(props) {
                 </Form>
                 <br/>
                 <div className={styles.buttonContainer}>
-                    {/* TODO: Make Buttons work, reset fields */}
                     <Button primary onClick={handleSave}>Save</Button>
                     <Button style={{marginRight: 10}}>Cancel</Button>
                 </div>
@@ -128,11 +129,11 @@ function History(props) {
                     const day = date.getDate();
                     const year = date.getFullYear();
                     return (
-                        <ul style={{margin: 0, padding: 0}}>
+                        <ul style={{margin: 0, padding: 0}} key={`${tab.timeWillBeSubmitted}`}>
                             <h4>{month}/{day}/{year} - {tab.locationName}</h4>
                             {tab.items.map(item => {
                                 return (
-                                    <li style={{marginLeft: 20}}>
+                                    <li style={{marginLeft: 20}} key={`${tab.timeWillBeSubmitted}_${item.data.transactionID}`}>
                                         <p>{item.description}</p>
                                     </li>
                                 )
@@ -157,6 +158,7 @@ function PaymentOptions(props) {
     const [nameOnCard, setNameOnCard] = useState('')
     const [cardApproved, setCardApproved] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState(null);
+    const [disabled, setDisabled] = useState(false);
 
     useEffect(() => props.createSetupIntent(), [])
 
@@ -177,10 +179,14 @@ function PaymentOptions(props) {
 
     useEffect(() => {
         if (paymentRequest) {
+            paymentRequest.removeAllListeners()
             paymentRequest.on('paymentmethod', async (event) => {
+                setDisabled(true)
                 props.markProcessing()
                 if (props.stripe.loading || props.stripe.status !== 'unfulfilled') {
                     event.complete('fail')
+                    props.setMsg({msg: 'Something\'s not right...  Lets try that again'})
+                    setDisabled(false)
                     return;
                 }
 
@@ -191,6 +197,7 @@ function PaymentOptions(props) {
                 if (result.error) {
                     event.complete('fail')
                     props.markComplete('fail')
+                    props.setMsg({msg: 'Could not update payment.  Please try a different card'})
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
@@ -200,22 +207,20 @@ function PaymentOptions(props) {
                         if (error) {
                             console.error(error.message)
                             props.markComplete('fail')
-                            // TODO: Error handling
+                            props.setMsg({msg: 'Could not update payment.  Please try a different card'})
                         } else {
-                            console.log('Needed action but successful')
                             props.markComplete('success')
-                            // TODO: Success Logic
                         }
                     } else {
-                        console.log('successful')
                         props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
                         props.markComplete('success')
-                        // TODO: Success Logic
                     }
                 }
+                setDisabled(false)
             })
+
         }
-    }, [paymentRequest, props.stripe])
+    }, [paymentRequest, props.stripe.clientSecret])
 
     useEffect(() => {
         if (elements) {
@@ -223,7 +228,7 @@ function PaymentOptions(props) {
             setNameOnCard('')
             elements.getElement(CardElement).clear()
         }
-    }, [props.stripe.paymentDetails])
+    }, [props.auth.user.paymentMethod])
 
     useEffect(() => {
         if (stripe && elements) {
@@ -242,6 +247,7 @@ function PaymentOptions(props) {
             // Check the availability of the Payment Request API.
             pr.canMakePayment().then(result => {
                 if (result) {
+                    paymentRequest?.removeAllListeners()
                     setPaymentRequest(pr);
                 }
             });
@@ -262,7 +268,7 @@ function PaymentOptions(props) {
             }
         })
         if (result.error) {
-            // TODO: Handle this
+            props.setMsg({msg: 'Could not update payment.  Please try a different card'})
         } else {
             props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
         }
@@ -307,7 +313,7 @@ function PaymentOptions(props) {
                             <CardElement/>
                         </Card>
                         <div className={styles.buttonContainer}>
-                            <Form.Button primary content='Submit' disabled={nameOnCard === '' || !cardApproved}/>
+                            <Form.Button primary content='Submit' disabled={nameOnCard === '' || !cardApproved || disabled}/>
                         </div>
                     </Form>
                 </div>

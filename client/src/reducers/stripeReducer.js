@@ -162,7 +162,6 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: true,
-                pastTabs: []
             }
         case RETRIEVED_PAST_TABS:
             return {
@@ -240,7 +239,8 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                status: action.status
+                status: action.status,
+                msg: action.msg
             }
 
         default:

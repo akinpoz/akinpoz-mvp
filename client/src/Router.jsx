@@ -43,7 +43,7 @@ function Router(props) {
             props.getDraftInvoice(props.auth.user._id)
             props.getUnpaidTabs(props.auth.user._id)
         }
-    }, [props.auth])
+    }, [props.auth.user])
 
     return (
         <HashRouter>

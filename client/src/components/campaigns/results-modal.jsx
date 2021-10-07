@@ -68,6 +68,7 @@ function ResultsModal(props) {
                             return (
                                 <div key={index}>
                                     <h4>{result[0]} : {result[1]}</h4>
+                                    <br/>
                                 </div>
                             )
                         })}
@@ -75,12 +76,10 @@ function ResultsModal(props) {
                             return (
                                 <div key={index}>
                                     <h4>{option} : 0</h4>
+                                    <br/>
                                 </div>
                             )
                         })}
-                        {props.active && results.length > 0 &&
-                            <Button onClick={handleEnd}>End Campaign</Button>
-                        }
                         {!props.active &&
                             <div>
                                 <h4>Winner</h4>
@@ -91,17 +90,25 @@ function ResultsModal(props) {
                 }
                 {props.details.type === "Raffle" &&
                     <div>
-                        <p>Please note: it is your responsibility to notify the winner</p>
+                        <b>Please note: it is your responsibility to notify the winner</b>
                         {!props.active && <div>
                             <h4>Winner</h4>
                             <p>{props.details.results[0]}</p>
                         </div>}
-                        {props.active && results.length > 0 && <div>
-                            <Button onClick={handlePick}>Pick Winner</Button>
-                        </div>}
                     </div>
                 }
             </Modal.Content>
+            <Modal.Actions>
+                {props.details.type === 'Survey' && props.active && results.length > 0 &&
+                        <Button primary onClick={handleEnd}>End Campaign</Button>
+                }
+                {props.details.type === 'Raffle' && props.active && results.length > 0 &&
+                <div>
+                    <Button primary onClick={handlePick}>Pick Winner</Button>
+                </div>
+                }
+
+            </Modal.Actions>
         </Modal>
 
     )

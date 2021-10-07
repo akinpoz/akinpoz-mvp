@@ -31,7 +31,6 @@ export default function (state = initialState, action) {
                 isLoading: false,
             }
         case UPDATE_USER:
-            console.log(action.payload)
             return {
                 ...state,
                 user: action.payload,

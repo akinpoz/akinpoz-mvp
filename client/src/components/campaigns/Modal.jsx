@@ -102,6 +102,7 @@ function CampaignModal(props) {
                     {values.details.type === "Raffle" && <Form.Input required value={values.question} label='Cost Per Ticket' type="number" placeholder='enter in dollar amount...' onChange={handleChange} name="question" />}
                     {values.details.type === "Fastpass" && <Form.Input required value={values.question} label='Cost to Skip' type="number" placeholder='enter in dollar amount...' onChange={handleChange} name="question" />}
                     {values.details.type === "Survey" &&
+                        <div id={'survey-options'}>
                         <table style={{ width: '100%' }}>
                             <thead>
                                 <tr>
@@ -111,7 +112,7 @@ function CampaignModal(props) {
                             <tbody>
                                 {values.details.options.map((option, index) => {
                                     return (
-                                        <tr>
+                                        <tr key={index}>
                                             <td>
                                                 <Form.Input placeholder={`enter option ${index + 1}...`} name={`${values.details.options}_${index}`} value={values.details.options[index]} onChange={(e, data) => handleOptionChange(data, index)} />
                                             </td>
@@ -132,10 +133,10 @@ function CampaignModal(props) {
                                     )
                                 })}
                             </tbody>
-                            <tfoot>
-                                <AddOptionButton handler={handleOptionAdd} />
-                            </tfoot>
                         </table>
+                            <br/>
+                        <AddOptionButton handler={handleOptionAdd} />
+                            </div>
 
                     }
                 </Form>

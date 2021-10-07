@@ -224,7 +224,7 @@ function ExistingTab(props) {
                 <div>
                     {props.stripe?.tab?.items && props.stripe.tab.items.map(item => {
                         return (
-                            <div className={styles.itemContainer}>
+                            <div className={styles.itemContainer} key={item.data.name}>
                                 <p style={{margin: 0}}>{item.data.name}</p>
                                 <p>${item.amount.toFixed(2)}</p>
                             </div>
@@ -279,7 +279,6 @@ const mapStateToProps = (state) => ({
     campaign: state.campaign
 })
 
-//TODO: Determine if those methods are being used or not. If not remove them....
 export default connect(mapStateToProps, {
     closeTab,
     submitCampaignData,

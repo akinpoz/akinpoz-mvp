@@ -22,7 +22,7 @@ const LocationsList = (props) => {
             {
                 props.locations.map(location => {
                     return (
-                        <Location location={location} />
+                        <Location key={location._id} location={location} />
                     )
                 })
             }

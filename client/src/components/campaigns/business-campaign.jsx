@@ -66,9 +66,9 @@ function FastPassList(props) {
                 }
             </thead>
             <tbody>
-                {props.options.length > 0 && props.options.map(option => {
+                {props.options.length > 0 && props.options.map((option, index) => {
                     return (
-                        <tr key={option} >
+                        <tr key={option + index} >
                             <td>{option}</td>
                             <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
                         </tr>

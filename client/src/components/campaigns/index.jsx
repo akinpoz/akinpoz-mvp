@@ -9,11 +9,12 @@ function Campaigns(props) {
     return (
         <div id="campaigns-container">
             {props.user_type === 'business' && campaigns && campaigns.length > 0 ? <CampaignList campaigns={campaigns} /> : <NoCampaigns />}
+            <br/>
             {props.user_type === 'business' && <ModalAddCampaign action={"add"} location={props.location_id} trigger={AddTrigger} />}
             {props.user_type === 'customer' &&
                 <CustomerCampaign />
             }
-            
+
         </div>
     )
 }
@@ -24,7 +25,7 @@ const CampaignList = (props) => {
             {
                 props.campaigns.map(campaign => {
                     return (
-                        <BusinessCampaign campaign={campaign} />
+                        <BusinessCampaign key={campaign._id} campaign={campaign} />
                     )
                 })
             }
@@ -40,19 +41,17 @@ const NoCampaigns = () => {
     )
 }
 
-const AddTrigger = <a style={{
+const AddTrigger = <div style={{
     display: 'flex',
     flexDirection: 'row',
     cursor: 'pointer',
     color: '#4183c4',
     fontWeight: 'bold'
 }}
-    icon
-    labelPosition='right'
     color='white'>
     <i className='add icon' />
     Add Campaign
-</a>
+</div>
 
 const mapStateToProps = state => ({
     user_type: state.auth.user.type,
