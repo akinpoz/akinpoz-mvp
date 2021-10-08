@@ -46,7 +46,7 @@ const initialState = {
     unpaidTabs: []
 }
 
-export default function (state = initialState, action) {
+export default function StripeReducer(state = initialState, action) {
     switch (action.type) {
         case CREATED_SETUP_INTENT:
             return {

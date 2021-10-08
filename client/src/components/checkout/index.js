@@ -15,37 +15,38 @@ import {queueSong} from "../../actions/spotifyActions";
  */
 function Checkout(props) {
     const [msg, setMsg] = useState()
+    const {stripe, spotify, campaign, location} = props
     // Needs to get open invoice if exists
 
     useEffect(() => {
-        if (props.stripe.msg) {
-            setMsg(props.stripe.msg?.msg ?? '')
+        if (stripe.msg) {
+            setMsg(stripe.msg?.msg ?? '')
         }
-    }, [props.stripe.msg])
+    }, [stripe.msg])
 
     useEffect(() => {
-        setMsg(props.spotify.error)
-    }, [props.spotify.error])
+        setMsg(spotify.error)
+    }, [spotify.error])
 
     useEffect(() => {
-        if (props.campaign.msg !== '') {
-            setMsg(props.campaign.msg)
+        if (campaign.msg !== '') {
+            setMsg(campaign.msg)
         }
-    }, [props.campaign.msg])
+    }, [campaign.msg])
 
 
     return (
         <div className={styles.checkoutContainer}>
             {msg && msg.msg && <Message><Message.Header>{msg.msg}<br/><a
-                href={`/#/location/?location_id=${props.location.select_location._id}`}>Participate in Another
+                href={`/#/location/?location_id=${location.select_location._id}`}>Participate in Another
                 Campaign!</a></Message.Header></Message>}
-            {props.stripe.tab &&
+            {stripe.tab &&
             <ExistingTab {...props} />
             }
-            {!props.stripe.tab && props.stripe.newItem &&
+            {!stripe.tab && stripe.newItem &&
             <NewTab {...props} />
             }
-            {!props.stripe.tab && !props.stripe.newItem &&
+            {!stripe.tab && !stripe.newItem &&
             <NoTab/>
             }
         </div>
@@ -65,21 +66,23 @@ function NewTab(props) {
     const [payAgreement, setPayAgreement] = useState(false)
     const [locked, setLocked] = useState(true)
 
+    const {stripe, submitCampaignData, queueSong} = props
+
     useEffect(() => {
-        if (props.stripe.unpaidTabs) {
-            setLocked(props.stripe.unpaidTabs.length !== 0)
+        if (stripe.unpaidTabs) {
+            setLocked(stripe.unpaidTabs.length !== 0)
         }
-    }, [props.stripe.unpaidTabs])
+    }, [stripe.unpaidTabs])
 
     const handleSubmit = async (event) => {
         // Block native form submission.
         event.preventDefault();
 
         if (tac && payAgreement) {
-            if (props.stripe.newItem.item.data.type !== 'song') {
-                props.submitCampaignData(props.stripe.newItem.item)
+            if (stripe.newItem.item.data.type !== 'song') {
+                submitCampaignData(stripe.newItem.item)
             } else {
-                props.queueSong(props.stripe.newItem.item)
+                queueSong(stripe.newItem.item)
             }
         }
     }
@@ -90,10 +93,10 @@ function NewTab(props) {
                 <h2>Open a New Tab</h2>
                 <div className={styles.divider}/>
                 <div>
-                    {props.stripe.newItem.item &&
+                    {stripe.newItem.item &&
                     <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>{props.stripe.newItem.item.data.name}</p>
-                        <p>${props.stripe.newItem.item.amount.toFixed(2)}</p>
+                        <p style={{margin: 0}}>{stripe.newItem.item.data.name}</p>
+                        <p>${stripe.newItem.item.amount.toFixed(2)}</p>
                     </div>
                     }
                     <div className={styles.itemContainer}>
@@ -102,7 +105,7 @@ function NewTab(props) {
                     </div>
                     <div className={styles.totalContainer}>
                         <b>Subtotal</b>
-                        <b>${(props.stripe.newItem.item.amount + feePrice).toFixed(2)}</b>
+                        <b>${(stripe.newItem.item.amount + feePrice).toFixed(2)}</b>
                     </div>
                 </div>
                 <br/>
@@ -126,7 +129,7 @@ function NewTab(props) {
                         {/* <Form.Button type={'button'} style={{ marginRight: 5 }}
                             onClick={() => history.push('/')}>Home</Form.Button> */}
                         <Form.Button primary
-                                     disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled' || !tac || !payAgreement || locked}>Open
+                                     disabled={stripe.loading || stripe.status !== 'unfulfilled' || !tac || !payAgreement || locked}>Open
                             Tab</Form.Button>
                     </div>
                 </Form>
@@ -142,9 +145,10 @@ function NewTab(props) {
  * @constructor
  */
 function ExistingTab(props) {
+    const {stripe, auth, closeTab} = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
     const calculateTimeLeft = () => {
-        let expTime = props?.stripe?.tab?.timeWillBeSubmitted ?? Date.now()
+        let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
         let difference = expTime - Date.now()
         let timeLeftComponents = {};
         let timeLeft = ''
@@ -188,9 +192,10 @@ function ExistingTab(props) {
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
     const [sum, setSum] = useState(0)
 
+
     // Sets time left every second
     useEffect(() => {
-        if (props.stripe?.tab ?? false) {
+        if (stripe?.tab ?? false) {
             const timer = setTimeout(() => {
                 setTimeLeft(calculateTimeLeft());
             }, 1000);
@@ -200,20 +205,20 @@ function ExistingTab(props) {
 
     // Calculates the sum owed on a current tab when loaded from stripe, then calculates time left
     useEffect(() => {
-        if (props.stripe) {
+        if (stripe) {
             let tempSum = 0
-            if (props.stripe.tab && (props.stripe.tab?.items?.length ?? 0) > 0) {
-                for (let item of props.stripe.tab.items) {
+            if (stripe.tab && (stripe.tab?.items?.length ?? 0) > 0) {
+                for (let item of stripe.tab.items) {
                     tempSum += item.amount
                 }
             }
-            if (props.stripe.newItem) {
-                tempSum += props.stripe.newItem.item.amount
+            if (stripe.newItem) {
+                tempSum += stripe.newItem.item.amount
             }
             setSum(tempSum)
             setTimeLeft(calculateTimeLeft())
         }
-    }, [props.stripe.tab])
+    }, [stripe])
 
 
     return (
@@ -222,7 +227,7 @@ function ExistingTab(props) {
                 <h2>Current Tab</h2>
                 <div className={styles.divider}/>
                 <div>
-                    {props.stripe?.tab?.items && props.stripe.tab.items.map(item => {
+                    {stripe?.tab?.items && stripe.tab.items.map(item => {
                         return (
                             <div className={styles.itemContainer} key={item.data.name}>
                                 <p style={{margin: 0}}>{item.data.name}</p>
@@ -230,10 +235,10 @@ function ExistingTab(props) {
                             </div>
                         )
                     })}
-                    {props.stripe?.newItem?.item &&
+                    {stripe?.newItem?.item &&
                     <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>{props.stripe.newItem.item.data.name}</p>
-                        <p>${props.stripe.newItem.item.amount.toFixed(2)}</p>
+                        <p style={{margin: 0}}>{stripe.newItem.item.data.name}</p>
+                        <p>${stripe.newItem.item.amount.toFixed(2)}</p>
                     </div>
                     }
                     <div className={styles.totalContainer}>
@@ -248,8 +253,8 @@ function ExistingTab(props) {
                     <div className={styles.cardFormButtonsContainer}>
                         <Button type={'button'} style={{marginRight: 5}}
                                 onClick={() => history.push(history.location.state)}>Go Back</Button>
-                        <Button primary disabled={props.stripe.loading || props.stripe.status !== 'unfulfilled'}
-                                onClick={() => props.closeTab(props.auth.user._id)}>Close
+                        <Button primary disabled={stripe.loading || stripe.status !== 'unfulfilled'}
+                                onClick={() => closeTab(auth.user._id)}>Close
                             Tab</Button>
                     </div>
                 </div>

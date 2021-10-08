@@ -10,7 +10,7 @@ const initialState = {
     error: '',
 }
 
-export default function (state = initialState, action) {
+export default function SpotifyReducer(state = initialState, action) {
     switch (action.type) {
         case SPOTIFY_USER_AUTH:
             return {

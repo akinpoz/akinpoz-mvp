@@ -8,7 +8,7 @@ const initialState = {
     selection: null
 }
 
-export default function (state = initialState, action) {
+export default function SearchReducer(state = initialState, action) {
     switch (action.type) {
         case CLEAN_QUERY:
             return initialState

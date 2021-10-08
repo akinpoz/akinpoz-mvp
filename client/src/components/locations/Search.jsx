@@ -1,31 +1,38 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import styles from './locations.module.css'
 import history from '../../history'
-import { connect } from 'react-redux'
-import { getLocations, setLocation } from '../../actions/locationActions'
+import {connect} from 'react-redux'
+import {getLocations, setLocation} from '../../actions/locationActions'
 import {Search as SemanticSearch} from 'semantic-ui-react'
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
-    const [locations, setLocations] = useState(props.locations)
+    const {locations, getLocations, setLocation} = props
+    const [filteredLocations, setFilteredLocations] = useState(locations)
+
     useEffect(() => {
-        if (locations.length === 0) props.getLocations()
-        setLocations(props.locations)
-    }, [props.locations])
+        if (locations.length === 0) {
+            getLocations()
+        }
+        setFilteredLocations(locations)
+    }, [locations, getLocations])
+
+
     function handleChange(e) {
         setSearchTerm(e.target.value)
         if (e.target.value === '') {
-            setLocations(props.locations)
-        }
-        else {
-            const filteredLocations = locations.filter(location => location.name.toLowerCase().includes(e.target.value.toLowerCase()))
-            setLocations(filteredLocations)
+            setFilteredLocations(locations)
+        } else {
+            const newFilteredLocations = filteredLocations.filter(location => location.name.toLowerCase().includes(e.target.value.toLowerCase()))
+            setFilteredLocations(newFilteredLocations)
         }
     }
+
     function handleClick(location) {
         setLocation(location)
         history.push(`/location/?location_id=${location._id}`)
     }
+
     return (
         <div id="search-container" className={styles.search_container}>
             <br/>
@@ -38,19 +45,27 @@ function Search(props) {
                 placeholder={'Search'}
             />
             <br/>
-            {locations.map(location => {
-                return (
-                    <div key={location._id} style={{ borderBottom: '.5px solid grey', width: "90%", maxWidth: 500, background: 'lightgrey', borderRadius: 15, marginBottom: 10 }}>
-                        <div id="search-item-container" style={{ width: "95%", margin: 'auto', cursor: 'pointer' }} onClick={handleClick.bind(null, location)}>
-                            <h1 style={{textAlign: 'center'}}>{location.name}</h1>
+            {filteredLocations.map(location => {
+                    return (
+                        <div key={location._id} style={{
+                            borderBottom: '.5px solid grey',
+                            width: "90%",
+                            maxWidth: 500,
+                            background: 'lightgrey',
+                            borderRadius: 15,
+                            marginBottom: 10
+                        }}>
+                            <div id="search-item-container" style={{width: "95%", margin: 'auto', cursor: 'pointer'}}
+                                 onClick={handleClick.bind(null, location)}>
+                                <h1 style={{textAlign: 'center'}}>{location.name}</h1>
+                            </div>
                         </div>
-                    </div>
-                )
+                    )
                 }
             )}
             <br/>
-            {locations.length === 0 &&
-                <h4>No Results :(</h4>
+            {filteredLocations.length === 0 &&
+            <h4>No Results :(</h4>
             }
         </div>
     )
@@ -60,4 +75,4 @@ const mapStateToProps = (state) => ({
     locations: state.location.locations
 })
 
-export default connect(mapStateToProps, { getLocations, setLocation })(Search)
+export default connect(mapStateToProps, {getLocations, setLocation})(Search)

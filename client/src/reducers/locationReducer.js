@@ -7,7 +7,7 @@ const initialState = {
 
 }
 
-export default function (state = initialState, action) {
+export default function LocationReducer(state = initialState, action) {
     switch (action.type) {
         case GET_LOCATIONS:
         case GET_LOCATIONS_BY_USER_ID:

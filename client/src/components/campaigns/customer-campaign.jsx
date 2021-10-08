@@ -9,33 +9,30 @@ import {getLocation} from "../../actions/locationActions";
 
 function CustomerCampaign(props) {
     const campaign_id = history.location.search.split('=')[1]
-    const [campaign, setCampaign] = useState(props.campaign)
     const [info, setInfo] = useState('')
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const [msg, setMsg] = useState()
     const [locked, setLocked] = useState(true)
 
+    const {auth, stripe, location, campaign, getLocation, clearStripeMsg, clearCampaignMsg, getCampaign, setupNewTab, submitCampaignData} = props
+
     useEffect(() => {
-        if (props.location.select_location === '' && campaign.location) {
-            props.getLocation(campaign.location)
+        if (location.select_location === '' && campaign.location) {
+            getLocation(campaign.location)
         }
 
-        if (!props.auth.isAuthenticated) {
+        if (!auth.isAuthenticated) {
             setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1})
         } else {
-            // set to normal unless higher priority exists
-            if (msg && msg.priority === 1) {
-                setMsg(null)
-            }
 
-            if (props.auth.user.paymentMethod && props.auth.user.paymentMethod.length === 0) {
+            if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
                 setMsgWithPriority({
                     msg: "Please add a payment method in the profile page before interacting with a campaign.",
                     priority: 2
                 })
             }
 
-            else if (props.auth.user?.campaigns?.includes(campaign._id)) {
+            else if (auth.user?.campaigns?.includes(campaign._id)) {
                 if (campaign.details.type === "Survey") {
                     setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3})
                 } else if (campaign.details.type === "Raffle") {
@@ -45,53 +42,52 @@ function CustomerCampaign(props) {
                 }
             }
         }
-    }, [props.auth])
+    }, [auth, campaign, getLocation, location])
 
     useEffect(() => {
-        if (props.campaign === "") {
-            props.getCampaign(campaign_id)
+        if (campaign === "") {
+            getCampaign(campaign_id)
         }
-        if (props.campaign.msg) {
-            setMsgWithPriority({...props.campaign.msg, priority: 3})
-            props.clearCampaignMsg()
+        if (campaign.msg) {
+            setMsgWithPriority({...campaign.msg, priority: 3})
+            clearCampaignMsg()
         }
-        if (props.campaign && props.campaign.details.type === 'Survey') {
+        if (campaign && campaign.details.type === 'Survey') {
             setLocked(false)
         }
-        setCampaign(props.campaign)
-    }, [props.campaign])
+    }, [campaign, getCampaign, clearCampaignMsg, campaign_id])
 
     useEffect(() => {
-        if (!props.stripe) {
+        if (!stripe) {
             return
         }
-        if (props.stripe.hasOpenTab) {
+        if (stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
         }
         else {
             setButtonLabel('Open New Tab')
         }
-        if (props.stripe.unpaidTabs) {
-            const hasUnpaidTabs = props.stripe.unpaidTabs.length !== 0
+        if (stripe.unpaidTabs) {
+            const hasUnpaidTabs = stripe.unpaidTabs.length !== 0
             if (hasUnpaidTabs) {
                 setMsgWithPriority({
                     msg: 'You currently have an unpaid tab.  Please check your email and settle this before opening a new tab.',
                     priority: 2
                 })
             }
-            if (props.campaign && props.campaign.details.type !== 'Survey') {
+            if (campaign && campaign.details.type !== 'Survey') {
                 setLocked(hasUnpaidTabs)
             }
         }
         else {
             setLocked(false)
         }
-        if (props.stripe.msg) {
-            setMsgWithPriority({...props.stripe.msg, priority: 2})
-            props.clearStripeMsg()
+        if (stripe.msg) {
+            setMsgWithPriority({...stripe.msg, priority: 2})
+            clearStripeMsg()
         }
 
-    }, [props.stripe])
+    }, [stripe, campaign, clearStripeMsg])
 
     function setMsgWithPriority(newMsg) {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
@@ -113,24 +109,24 @@ function CustomerCampaign(props) {
         let amount = type === "Survey" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
         const item = {
             amount,
-            user: props.auth.user,
+            user: auth.user,
             description: type,
             data: {
                 timestamp: new Date().toLocaleDateString("en-US"),
                 type,
                 campaign_id: campaign._id,
                 location_id: campaign.location,
-                transactionID: props.auth.user._id + Date.now(),
+                transactionID: auth.user._id + Date.now(),
                 name: campaign.title,
                 info
             }
         }
         if (type !== "Survey") {
-            props.setupNewTab(item)
-            if (props.stripe.hasOpenTab && parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
+            setupNewTab(item)
+            if (stripe.hasOpenTab && parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
                 if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                    if (parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
-                        props.submitCampaignData(item)
+                    if (parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+                        submitCampaignData(item)
                     } else {
                         history.push('/checkout')
                     }
@@ -139,12 +135,12 @@ function CustomerCampaign(props) {
                 history.push('/checkout')
             }
         } else {
-            props.submitCampaignData(item)
+            submitCampaignData(item)
         }
     }
 
     const hasPaymentMethod = () => {
-        return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
+        return auth.user.paymentMethod && auth.user.paymentMethod.length > 0
     }
 
     function handleRedirect() {
@@ -174,8 +170,8 @@ function CustomerCampaign(props) {
                         {msg.msg.includes("login") &&
                         <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a>
                         </p>}
-                        {msg.msg.includes("Participate") || msg.msg.includes("already") &&
-                        <p><a href={`/#/location/?location_id=${props.location.select_location._id}`}
+                        {(msg.msg.includes("Participate") || msg.msg.includes("already")) &&
+                        <p><a href={`/#/location/?location_id=${location.select_location._id}`}
                               onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
                     </Message.Header>
                 </Message>}
@@ -194,7 +190,7 @@ function CustomerCampaign(props) {
                               handleClick={handleClick} info={info}/>
                         <br/>
                     </Card.Content>
-                    {props.auth.isAuthenticated &&
+                    {auth.isAuthenticated &&
                     <Card.Content extra>
                         <div style={{flexDirection: "row-reverse", display: "flex"}}>
                             {campaign.details.type !== 'Survey' &&
@@ -217,15 +213,16 @@ function CustomerCampaign(props) {
 }
 
 function View(props) {
-    switch (props.type) {
+    const {type, campaign, handleClick, info, handleChange} = props
+    switch (type) {
         case "Survey":
             return (
                 <div>
-                    {props.campaign && props.campaign.details.options.map((option, index) => {
+                    {campaign && campaign.details.options.map((option, index) => {
                         return (
                             <div key={index}>
-                                <Radio label={option} name='radioGroup' value={option} onChange={props.handleClick}
-                                       checked={props.info === option}/>
+                                <Radio label={option} name='radioGroup' value={option} onChange={handleClick}
+                                       checked={info === option}/>
                             </div>
                         )
                     })}
@@ -237,8 +234,12 @@ function View(props) {
             return (
                 <div>
                     <Input fluid type="number" placeholder="Number of tickets"
-                           onChange={props.handleChange} value={props.info}/>
+                           onChange={handleChange} value={info}/>
                 </div>
+            )
+        default:
+            return (
+                <p>Error</p>
             )
     }
 }

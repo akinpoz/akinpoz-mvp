@@ -1,31 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import {connect} from 'react-redux'
 import BusinessCampaign from './business-campaign'
 import CustomerCampaign from './customer-campaign'
 import ModalAddCampaign from './Modal';
 
 function Campaigns(props) {
-    const campaigns = props.campaigns.filter(campaign => campaign.location === props.location_id)
+    const {campaigns, location_id, user_type} = props
+    const filteredCampaigns = campaigns.filter(campaign => campaign.location === location_id)
     return (
         <div id="campaigns-container">
-            {props.user_type === 'business' && campaigns && campaigns.length > 0 ? <CampaignList campaigns={campaigns} /> : <NoCampaigns />}
+            {user_type === 'business' && filteredCampaigns && filteredCampaigns.length > 0 ?
+                <CampaignList campaigns={filteredCampaigns}/> : <NoCampaigns/>}
             <br/>
-            {props.user_type === 'business' && <ModalAddCampaign action={"add"} location={props.location_id} trigger={AddTrigger} />}
-            {props.user_type === 'customer' &&
-                <CustomerCampaign />
+            {user_type === 'business' &&
+            <ModalAddCampaign action={"add"} location={location_id} trigger={AddTrigger}/>}
+            {user_type === 'customer' &&
+            <CustomerCampaign/>
             }
-
         </div>
     )
 }
 
 const CampaignList = (props) => {
+    const {campaigns} = props
     return (
         <div id="campaigns-list-container">
             {
-                props.campaigns.map(campaign => {
+                campaigns.map(campaign => {
                     return (
-                        <BusinessCampaign key={campaign._id} campaign={campaign} />
+                        <BusinessCampaign key={campaign._id} campaign={campaign}/>
                     )
                 })
             }
@@ -35,7 +38,7 @@ const CampaignList = (props) => {
 
 const NoCampaigns = () => {
     return (
-        <div style={{ display: 'grid', placeItems: 'center' }} id="no-campaigns-container">
+        <div style={{display: 'grid', placeItems: 'center'}} id="no-campaigns-container">
             <h4>No Campaigns added yet, click "Add Campaign" to get started!</h4>
         </div>
     )
@@ -48,8 +51,8 @@ const AddTrigger = <div style={{
     color: '#4183c4',
     fontWeight: 'bold'
 }}
-    color='white'>
-    <i className='add icon' />
+                        color='white'>
+    <i className='add icon'/>
     Add Campaign
 </div>
 

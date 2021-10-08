@@ -1,20 +1,33 @@
-import React, {useEffect, useRef, useCallback} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from './jukebox.module.css'
-import {Button, Card, Search, Message} from "semantic-ui-react";
+import {Button, Card, Message, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
 import history from '../../history'
-import {useState} from 'react';
 import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
 import {clearSpotifyErrors, queueSong} from "../../actions/spotifyActions";
 
 function Jukebox(props) {
     // Searching should be allowed for customers
     // Queueing needs to check for auth state first
-    const location_id = props.location.select_location || props.location.select_location._id
+    const {
+        auth,
+        search,
+        spotify,
+        stripe,
+        location,
+        cleanQuery,
+        clearSpotifyErrors,
+        clearStripeMsg,
+        updateSelection,
+        startSearch,
+        setupNewTab,
+        queueSong
+    } = props
+    const location_id = location.select_location || location.select_location._id
     const timeoutRef = useRef()
-    const [location, setLocation] = useState({name: ""})
+    const [loc, setLoc] = useState({name: ""})
     const [msg, setMsg] = useState(null)
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const [locked, setLocked] = useState(true)
@@ -31,16 +44,16 @@ function Jukebox(props) {
                 }
             })
         }
-        props.cleanQuery()
-    }, [])
+        cleanQuery()
+    }, [cleanQuery, location_id])
 
     useEffect(() => {
-        setLocation(props.location.locations.find(location => location._id === location_id) || props.location.select_location)
-    }, [props.location])
+        setLoc(location.locations.find(location => location._id === location_id) || location.select_location)
+    }, [location, location_id])
 
     useEffect(() => {
-        if (props.auth.isAuthenticated) {
-            if (props.auth.user.paymentMethod && props.auth.user.paymentMethod.length === 0) {
+        if (auth.isAuthenticated) {
+            if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
                 setMsgWithPriority({
                     msg: "Please add a payment method in the profile page before queuing a song.",
                     priority: 2
@@ -52,29 +65,29 @@ function Jukebox(props) {
                 priority: 1
             })
         }
-    }, [props.auth])
+    }, [auth])
 
     useEffect(() => {
-        if (props.spotify.error) {
-            setMsgWithPriority({...props.spotify.error, priority: 3})
-            props.clearSpotifyErrors()
+        if (spotify.error) {
+            setMsgWithPriority({...spotify.error, priority: 3})
+            clearSpotifyErrors()
         }
-    }, [props.spotify])
+    }, [spotify, clearSpotifyErrors])
 
     useEffect(() => {
-        if (props.stripe) {
-            if (props.stripe.hasOpenTab) {
+        if (stripe) {
+            if (stripe.hasOpenTab) {
                 setButtonLabel('Add To Tab')
             } else {
                 setButtonLabel('Open New Tab')
             }
 
-            if (props.stripe.msg) {
-                setMsgWithPriority({...props.stripe.msg, priority: 3})
-                props.clearStripeMsg()
+            if (stripe.msg) {
+                setMsgWithPriority({...stripe.msg, priority: 3})
+                clearStripeMsg()
             }
-            if (props.stripe.unpaidTabs) {
-                const hasUnpaidTabs = props.stripe.unpaidTabs.length !== 0
+            if (stripe.unpaidTabs) {
+                const hasUnpaidTabs = stripe.unpaidTabs.length !== 0
                 if (hasUnpaidTabs) {
                     setMsgWithPriority({
                         msg: 'You currently have an unpaid tab.  Please check your email and settle this before opening a new tab.',
@@ -82,27 +95,26 @@ function Jukebox(props) {
                     })
                 }
                 setLocked(hasUnpaidTabs)
-            }
-            else {
+            } else {
                 setLocked(false)
             }
         }
-    }, [props.stripe])
+    }, [stripe, clearStripeMsg])
 
     const handleSelectionChange = useCallback((e, data) => {
-        props.updateSelection(data.result);
-    }, [])
+        updateSelection(data.result);
+    }, [updateSelection])
 
     const handleSearchChange = useCallback((e, data) => {
         clearTimeout(timeoutRef.current)
-        props.startSearch(data.value)
-        props.updateSelection(null)
+        startSearch(data.value)
+        updateSelection(null)
         timeoutRef.current = setTimeout(() => {
             if (data.value.length === 0) {
-                props.cleanQuery()
+                cleanQuery()
             }
         }, 300)
-    }, [])
+    }, [updateSelection, startSearch, cleanQuery])
 
     function setMsgWithPriority(newMsg) {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
@@ -112,7 +124,7 @@ function Jukebox(props) {
     }
 
     const hasPaymentMethod = () => {
-        return props.auth.user.paymentMethod && props.auth.user.paymentMethod.length > 0
+        return auth.user.paymentMethod && auth.user.paymentMethod.length > 0
     }
 
     const resultRender = (item) => (
@@ -129,24 +141,24 @@ function Jukebox(props) {
         // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
         const item = {
             amount: 1,
-            user: props.auth.user,
+            user: auth.user,
             description: 'song',
             data: {
                 timestamp: new Date().toLocaleDateString("en-US"),
                 type: 'song',
-                campaign_id: 'jukebox_' + props.location.select_location._id,
-                location_id: props.location.select_location._id,
-                transactionID: props.auth.user._id + Date.now(),
-                name: props.search.selection.name,
-                songUri: props.search.selection.uri
+                campaign_id: 'jukebox_' + location.select_location._id,
+                location_id: location.select_location._id,
+                transactionID: auth.user._id + Date.now(),
+                name: search.selection.name,
+                songUri: search.selection.uri
             }
 
         }
-        props.setupNewTab(item)
-        if (props.stripe.hasOpenTab && parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
+        setupNewTab(item)
+        if (stripe.hasOpenTab && parseInt(stripe.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
             if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                if (parseInt(props.stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
-                    props.queueSong(item)
+                if (parseInt(stripe.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+                    queueSong(item)
                 } else {
                     history.push('/checkout')
                 }
@@ -154,7 +166,7 @@ function Jukebox(props) {
         } else {
             history.push('/checkout')
         }
-        props.cleanQuery()
+        cleanQuery()
     }
 
     function handleRedirect() {
@@ -164,7 +176,8 @@ function Jukebox(props) {
     return (
         <div className={styles.container}>
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
-            {msg && msg.msg && <Message color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid') || msg.msg.includes('issues')) ? "red" : "green"}>
+            {msg && msg.msg && <Message
+                color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid') || msg.msg.includes('issues')) ? "red" : "green"}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&
@@ -175,7 +188,7 @@ function Jukebox(props) {
 
                 </Message.Header>
             </Message>}
-            {props.auth.user && props.auth.user.type === 'business' &&
+            {auth.user && auth.user.type === 'business' &&
             <Message>
                 <Message.Header>You are seeing a preview of the jukebox feature.
                     <Message.Content>
@@ -191,7 +204,7 @@ function Jukebox(props) {
             <br/>
             <br/>
             <div className={styles.shiftUp}>
-                {location && <h2 style={{textAlign: 'center'}}>Playing @ {location.name}</h2>}
+                {loc && <h2 style={{textAlign: 'center'}}>Playing @ {loc.name}</h2>}
                 <Card fluid>
                     <div style={{
                         display: "flex",
@@ -205,21 +218,21 @@ function Jukebox(props) {
                         </h1>
                         <br/>
                         <Search
-                            loading={props.search.loading}
+                            loading={search.loading}
                             size='large'
                             onSearchChange={handleSearchChange}
-                            results={props.search.results?.result}
-                            value={props.search.value}
+                            results={search.results?.result}
+                            value={search.value}
                             resultRenderer={resultRender}
                             onResultSelect={handleSelectionChange}
                         />
                         <br/>
                         <div style={{flexDirection: "row-reverse", display: "flex"}}>
-                            {!locked && props.auth.isAuthenticated && props.auth.user.type === "customer" &&
+                            {!locked && auth.isAuthenticated && auth.user.type === "customer" &&
                             <div>
-                                <Button style={{marginRight: 10}} onClick={() => props.cleanQuery()}>
+                                <Button style={{marginRight: 10}} onClick={() => cleanQuery()}>
                                     Clear Selection</Button>
-                                {hasPaymentMethod() && <Button primary disabled={props.search.selection === null}
+                                {hasPaymentMethod() && <Button primary disabled={search.selection === null}
                                                                onClick={handleSubmit}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({pathname: '/profile'})

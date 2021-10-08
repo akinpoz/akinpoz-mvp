@@ -1,9 +1,10 @@
 import React, {useState} from "react";
-import { Button, Modal } from "semantic-ui-react";
+import {Button, Modal} from "semantic-ui-react";
 import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 
 function ShowQRCode(props) {
+    const {url} = props
     const [open, setOpen] = useState(false);
     return (
         <Modal onClose={() => setOpen(false)}
@@ -16,11 +17,11 @@ function ShowQRCode(props) {
             <Modal.Content>
                 <div style={{ display: 'flex', justifyContent: "center", padding: 15 }}>
                     <div id='QRCode' style={{ padding: 5 }}>
-                        <QRCode value={props.url} className="HpQrcode" />
+                        <QRCode value={url} className="HpQrcode" />
                     </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: "center", padding: 15 }}>
-                    <h4><a href={props.url} target="_blank">{props.url}</a></h4>
+                    <h4><a href={url} target="_blank">{url}</a></h4>
                 </div>
             </Modal.Content>
             <Modal.Actions>

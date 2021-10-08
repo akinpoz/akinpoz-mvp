@@ -7,7 +7,7 @@ function Analytics() {
             <i className='massive hourglass half icon'/>
             <h1>Coming Soon!</h1>
             <h4>
-                We're working hard to bring you new features to help you and your business.  Please check back here
+                We're working hard to bring you new features to help you and your business. Please check back here
                 in a few weeks to take advantage of the analytics we will compile from your patrons!
             </h4>
             <br/>

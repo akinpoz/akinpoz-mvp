@@ -7,8 +7,9 @@ const initialState = {}
 const middleware = [thunk]
 
 const store = createStore(rootReducer, initialState, compose(
+    //TODO: is this the intended functionality -->> added () around the && statement
     applyMiddleware(...middleware),
-    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__() || compose
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ && (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__() || compose)
 
 ))
 

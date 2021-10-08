@@ -1,16 +1,18 @@
-import React, { useState } from 'react'
-import { Card, Icon } from 'semantic-ui-react'
+import React, {useState} from 'react'
+import {Button, Card, Icon} from 'semantic-ui-react'
 import Modal from './Modal'
 import styles from './campaigns.module.css'
-import { connect } from 'react-redux'
-import { deleteCampaign } from '../../actions/campaignActions'
+import {connect} from 'react-redux'
+import {deleteCampaign} from '../../actions/campaignActions'
 import axios from 'axios'
-import { getHeaders } from '../../utils'
+import {getHeaders} from '../../utils'
 import ResultsModal from './results-modal'
 
 
 function BusinessCampaign(props) {
-    const { title, description, details, _id, user, location } = props.campaign
+    const {auth, campaign, deleteCampaign} = props
+    const { title, description, details, _id, user, location } = campaign
+
     const [options, setOptions] = useState(details.options)
     const [toggleList, setToggleList] = useState(false)
     function handleDelete() {
@@ -19,11 +21,11 @@ function BusinessCampaign(props) {
             user,
             location,
         }
-        if (window.confirm("Are you sure you want to delete this campaign?")) props.deleteCampaign(campaign)
+        if (window.confirm("Are you sure you want to delete this campaign?")) deleteCampaign(campaign)
     }
     function handleNameRemove(name) {
         const headers = getHeaders()
-        headers["x-auth-token"] = props.auth.token
+        headers["x-auth-token"] = auth.token
         if (window.confirm("Are you sure you want to remove this name?")) {
             axios.post('/api/campaigns/removeName', { name, _id, token: { headers: { ...headers } } }).then(res => {
                 setOptions(options.filter(option => option !== res.data.name))
@@ -34,7 +36,7 @@ function BusinessCampaign(props) {
         }
     }
     const UpdateTrigger = <Icon name='pencil' />
-    const ResultsTrigger = <a>View Results</a>
+    const ResultsTrigger = <Button basic>View Results</Button>
     return (
         <Card fluid>
             <Card.Content>
@@ -43,9 +45,9 @@ function BusinessCampaign(props) {
             </Card.Content>
             <Card.Content description={description} />
             <Card.Content className={styles.campaign_extra_div} extra>
-                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><a onClick={() => setToggleList(!toggleList)}>{toggleList === true ? "Hide" : "View"} List</a></abbr>}
-                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><ResultsModal trigger={ResultsTrigger} {...props.campaign} /></abbr>}
-                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={UpdateTrigger} {...props} {...props.campaign} /></abbr>
+                {details.type === "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View current list"><Button basic onClick={() => setToggleList(!toggleList)}>{toggleList === true ? "Hide" : "View"} List</Button></abbr>}
+                {details.type !== "Fastpass" && <abbr style={{ textDecoration: 'none' }} title="View Results"><ResultsModal trigger={ResultsTrigger} {...campaign} /></abbr>}
+                <abbr style={{ textDecoration: 'none' }} title="Edit Campaign"><Modal action={"update"} trigger={UpdateTrigger} {...props} {...campaign} /></abbr>
                 <Icon color="red" name="trash" onClick={handleDelete} />
             </Card.Content>
             {toggleList && <FastPassList options={options} handleNameRemove={handleNameRemove} />}
@@ -55,10 +57,11 @@ function BusinessCampaign(props) {
 
 // Fastpass "Results" equivalent.
 function FastPassList(props) {
+    const {options, handleNameRemove} = props
     return (
         <table style={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
             <thead>
-                {props.options.length > 0 &&
+                {options.length > 0 &&
                     <tr>
                         <th>Name</th>
                         <th style={{ textAlign: 'end' }}>Remove</th>
@@ -66,15 +69,15 @@ function FastPassList(props) {
                 }
             </thead>
             <tbody>
-                {props.options.length > 0 && props.options.map((option, index) => {
+                {options.length > 0 && options.map((option, index) => {
                     return (
                         <tr key={option + index} >
                             <td>{option}</td>
-                            <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={props.handleNameRemove.bind(null, option)} /></td>
+                            <td style={{ textAlign: 'end' }}><Icon name="remove" color="red" onClick={handleNameRemove.bind(null, option)} /></td>
                         </tr>
                     )
                 })}
-                {props.options.length === 0 &&
+                {options.length === 0 &&
                     <tr>
                         <td>There are no names on the list</td>
                     </tr>

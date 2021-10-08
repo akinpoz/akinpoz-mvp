@@ -17,7 +17,7 @@ const initialState = {
     msg: {}
 }
 
-export default function (state = initialState, action) {
+export default function CampaignReducer(state = initialState, action) {
     switch (action.type) {
         case GET_CAMPAIGNS:
         case GET_CAMPAIGNS_BY_USER_ID:

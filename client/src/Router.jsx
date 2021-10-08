@@ -26,24 +26,32 @@ const components = {
 
 
 function Router(props) {
+    const {
+        auth,
+        stripe,
+        location,
+        addInvoiceItem,
+        getDraftInvoice,
+        getUnpaidTabs
+    } = props
     useEffect(() => {
-        if (props.stripe && !props.stripe.loading && props.stripe.newItem) {
-            if (props.stripe.newItem.item.data.type !== 'Survey') {
-                if (props.stripe.newItem.status === 'processing') {
-                    props.addInvoiceItem(props.auth.user._id, props.stripe.newItem.item, props.location.select_location.name)
-                } else if (props.stripe.newItem.status === 'paid' && props.auth && props.auth.user) {
-                    props.getDraftInvoice(props.auth.user._id)
+        if (stripe && !stripe.loading && stripe.newItem) {
+            if (stripe.newItem.item.data.type !== 'Survey') {
+                if (stripe.newItem.status === 'processing') {
+                    addInvoiceItem(auth.user._id, stripe.newItem.item, location.select_location.name)
+                } else if (stripe.newItem.status === 'paid' && auth && auth.user) {
+                    getDraftInvoice(auth.user._id)
                 }
             }
         }
-    }, [props.stripe.newItem])
+    }, [addInvoiceItem, getDraftInvoice, location.select_location.name, auth, stripe])
 
     useEffect(() => {
-        if (props.auth.user) {
-            props.getDraftInvoice(props.auth.user._id)
-            props.getUnpaidTabs(props.auth.user._id)
+        if (auth.user) {
+            getDraftInvoice(auth.user._id)
+            getUnpaidTabs(auth.user._id)
         }
-    }, [props.auth.user])
+    }, [auth.user, getUnpaidTabs, getDraftInvoice])
 
     return (
         <HashRouter>
@@ -104,16 +112,16 @@ const PrivateRoute = (props) => {
         return (
             <Redirect to="/login"/>
         )
-    } else if (props.auth.isLoading === true || props.auth.isAuthenticated === null || (props.spotify && props.spotify.loading) || (props.campaign && props.campaign.loading)) {
-        return (
-            <div style={{display: 'grid', placeItems: 'center'}}>
-                <Loader active/>
-            </div>
-        )
     } else if (props.auth.isAuthenticated && props.auth.isLoading === false) {
         let Component = components[props.component]
         return (
             <Component/>
+        )
+    } else if (props.auth.isLoading === true || props.auth.isAuthenticated === null) {
+        return (
+            <div style={{display: 'grid', placeItems: 'center'}}>
+                <Loader active/>
+            </div>
         )
     }
 

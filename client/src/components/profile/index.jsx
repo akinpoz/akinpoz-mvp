@@ -1,19 +1,19 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
 import {Button, Card, Form, Message} from "semantic-ui-react";
 import {
     createSetupIntent,
+    getPastTabs,
     getPaymentDetails,
     markComplete,
     markProcessing,
-    updatePaymentMethod,
-    getPastTabs
+    updatePaymentMethod
 } from "../../actions/stripeActions";
 import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
-import {updateUser, deleteUser} from "../../actions/authActions";
+import {deleteUser, updateUser} from "../../actions/authActions";
 
 function Profile(props) {
     const [stripePromise] = useState(() => loadStripe('pk_test_51JWi5VF1ZFxObEV7LvPvFO1JN2lbNwc3HjjGRHeUnWsl8POZ2jR151PHL2tnjcpVdqeOn1rGZ7SQJSzUMxXPoSRa00opX0TiTk'))
@@ -27,18 +27,19 @@ function Profile(props) {
 }
 
 function EndUserDashboard(props) {
+    const {stripe, auth} = props
     const [msg, setMsg] = useState()
     useEffect(() => {
-        if (props.stripe) {
-            setMsg(props.stripe.msg)
+        if (stripe) {
+            setMsg(stripe.msg)
         }
-    }, [props.stripe])
+    }, [stripe])
 
     return (
         <div>
             <br/>
             <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                <h1 style={{textAlign: "center"}}>Welcome, {props.auth.user.name}!</h1>
+                <h1 style={{textAlign: "center"}}>Welcome, {auth.user.name}!</h1>
                 <div className={styles.divider}/>
             </div>
             <br/>
@@ -49,9 +50,9 @@ function EndUserDashboard(props) {
             }
             <Card.Group className={styles.endUserDashboardContainer}>
                 <AccountSettings {...props} />
-                {props.auth.user.type === 'customer' &&
+                {auth.user.type === 'customer' &&
                 <PaymentOptions {...props} setMsg={setMsg}/>}
-                {props.auth.user.type === 'customer' &&
+                {auth.user.type === 'customer' &&
                 <History {...props}/>
                 }
             </Card.Group>
@@ -60,8 +61,9 @@ function EndUserDashboard(props) {
 }
 
 function AccountSettings(props) {
-    const [name, setName] = useState(props.auth.user.name)
-    const [email, setEmail] = useState(props.auth.user.email)
+    const {auth, updateUser, deleteUser} = props
+    const [name, setName] = useState(auth.user.name)
+    const [email, setEmail] = useState(auth.user.email)
 
     function handleChange(e, data) {
         if (data.name === 'name') {
@@ -75,13 +77,13 @@ function AccountSettings(props) {
         const modifiedUser = {
             name: name,
             email: email,
-            _id: props.auth.user._id
+            _id: auth.user._id
         }
-        props.updateUser(modifiedUser)
+        updateUser(modifiedUser)
     }
 
     function handleDelete() {
-        if (window.confirm("Are you sure you want to delete your account? \nThis action is irreversible and will result in a lose of data.")) props.deleteUser(props.auth.user._id)
+        if (window.confirm("Are you sure you want to delete your account? \nThis action is irreversible and will result in a lose of data.")) deleteUser(auth.user._id)
     }
 
     return (
@@ -109,11 +111,13 @@ function AccountSettings(props) {
 
 function History(props) {
 
+    const {auth, stripe, getPastTabs} = props
+
     useEffect(() => {
-        if (props.auth?.user) {
-            props.getPastTabs(props.auth.user._id)
+        if (auth.user) {
+            getPastTabs(auth.user._id)
         }
-    }, [props.auth])
+    }, [auth.user, getPastTabs])
 
     return (
         <Card>
@@ -121,8 +125,8 @@ function History(props) {
                 <h2>History</h2>
                 <div className={styles.divider}/>
                 <br/>
-                {(props.stripe?.pastTabs?.length ?? 0) > 0 &&
-                props.stripe.pastTabs.map(tab => {
+                {(stripe?.pastTabs?.length ?? 0) > 0 &&
+                stripe.pastTabs.map(tab => {
                     const date = new Date(tab.timeWillBeSubmitted * 1);
                     // Returns 0-11 so must add 1 to month
                     const month = date.getMonth() + 1;
@@ -133,7 +137,8 @@ function History(props) {
                             <h4>{month}/{day}/{year} - {tab.locationName}</h4>
                             {tab.items.map(item => {
                                 return (
-                                    <li style={{marginLeft: 20}} key={`${tab.timeWillBeSubmitted}_${item.data.transactionID}`}>
+                                    <li style={{marginLeft: 20}}
+                                        key={`${tab.timeWillBeSubmitted}_${item.data.transactionID}`}>
                                         <p>{item.description}</p>
                                     </li>
                                 )
@@ -143,7 +148,7 @@ function History(props) {
                     )
                 })
                 }
-                {(props.stripe?.pastTabs?.length ?? 0) === 0 &&
+                {(stripe?.pastTabs?.length ?? 0) === 0 &&
                 <b>No campaign history. Participate in campaigns and view that history here!</b>
                 }
             </div>
@@ -153,14 +158,25 @@ function History(props) {
 
 function PaymentOptions(props) {
 
-    const stripe = useStripe();
+    const useStripeInst = useStripe();
     const elements = useElements();
     const [nameOnCard, setNameOnCard] = useState('')
     const [cardApproved, setCardApproved] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState(null);
     const [disabled, setDisabled] = useState(false);
 
-    useEffect(() => props.createSetupIntent(), [])
+    const {
+        createSetupIntent,
+        markProcessing,
+        markComplete,
+        stripe,
+        auth,
+        setMsg,
+        updatePaymentMethod,
+        getPaymentDetails
+    } = props
+
+    useEffect(() => createSetupIntent(), [createSetupIntent])
 
 
     useEffect(() => {
@@ -182,58 +198,58 @@ function PaymentOptions(props) {
             paymentRequest.removeAllListeners()
             paymentRequest.on('paymentmethod', async (event) => {
                 setDisabled(true)
-                props.markProcessing()
-                if (props.stripe.loading || props.stripe.status !== 'unfulfilled') {
+                markProcessing()
+                if (stripe.loading || stripe.status !== 'unfulfilled') {
                     event.complete('fail')
-                    props.setMsg({msg: 'Something\'s not right...  Lets try that again'})
+                    setMsg({msg: 'Something\'s not right...  Lets try that again'})
                     setDisabled(false)
                     return;
                 }
 
-                const result = await stripe.confirmCardSetup(
-                    props.stripe.clientSecret,
+                const result = await useStripeInst.confirmCardSetup(
+                    stripe.clientSecret,
                     {payment_method: event.paymentMethod.id}
                 );
                 if (result.error) {
                     event.complete('fail')
-                    props.markComplete('fail')
-                    props.setMsg({msg: 'Could not update payment.  Please try a different card'})
+                    markComplete('fail')
+                    setMsg({msg: 'Could not update payment.  Please try a different card'})
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
                     if (result.setupIntent.status === 'requires_action') {
                         // can redirect to bank for further action / confirmation, etc.
-                        const {error} = await stripe.confirmCardSetup(props.stripe.clientSecret);
+                        const {error} = await useStripeInst.confirmCardSetup(stripe.clientSecret);
                         if (error) {
                             console.error(error.message)
-                            props.markComplete('fail')
-                            props.setMsg({msg: 'Could not update payment.  Please try a different card'})
+                            markComplete('fail')
+                            setMsg({msg: 'Could not update payment.  Please try a different card'})
                         } else {
-                            props.markComplete('success')
+                            markComplete('success')
                         }
                     } else {
-                        props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
-                        props.markComplete('success')
+                        updatePaymentMethod(auth.user._id, result.setupIntent.payment_method)
+                        markComplete('success')
                     }
                 }
                 setDisabled(false)
             })
 
         }
-    }, [paymentRequest, props.stripe.clientSecret])
+    }, [paymentRequest, stripe, auth, markProcessing, markComplete, updatePaymentMethod, setMsg, useStripeInst])
 
     useEffect(() => {
         if (elements) {
-            props.createSetupIntent()
+            createSetupIntent()
             setNameOnCard('')
             elements.getElement(CardElement).clear()
         }
-    }, [props.auth.user.paymentMethod])
+    }, [auth.user.paymentMethod, createSetupIntent, elements])
 
     useEffect(() => {
-        if (stripe && elements) {
+        if (useStripeInst && elements) {
             // Creates payment request that checks if order can be fulfilled by and facilitates the use of apple/google pay
-            const pr = stripe.paymentRequest({
+            const pr = useStripeInst.paymentRequest({
                 country: 'US',
                 currency: 'usd',
                 total: {
@@ -252,25 +268,25 @@ function PaymentOptions(props) {
                 }
             });
         }
-    }, [stripe, elements])
+    }, [useStripeInst, elements])
 
     useEffect(() => {
-        if (props.auth?.user) {
-            props.getPaymentDetails(props.auth.user._id)
+        if (auth.user) {
+            getPaymentDetails(auth.user._id)
         }
-    }, [props.auth])
+    }, [auth.user, getPaymentDetails])
 
     const onSubmit = async e => {
         e.preventDefault()
-        const result = await stripe.confirmCardSetup(props.stripe.clientSecret, {
+        const result = await useStripeInst.confirmCardSetup(stripe.clientSecret, {
             payment_method: {
                 card: elements.getElement(CardElement), billing_details: {name: nameOnCard}
             }
         })
         if (result.error) {
-            props.setMsg({msg: 'Could not update payment.  Please try a different card'})
+            setMsg({msg: 'Could not update payment.  Please try a different card'})
         } else {
-            props.updatePaymentMethod(props.auth.user._id, result.setupIntent.payment_method)
+            updatePaymentMethod(auth.user._id, result.setupIntent.payment_method)
         }
     }
 
@@ -279,13 +295,13 @@ function PaymentOptions(props) {
             <div className={styles.userAccountSettings}>
                 <h2>Payment</h2>
                 <br/>
-                {props.stripe.paymentDetails &&
+                {stripe.paymentDetails &&
                 <div id={'payment-details'} style={{width: '100%'}}>
                     <Card>
                         <div className={styles.cardDetails}>
-                            <p>{props.stripe.paymentDetails.name}</p>
-                            <p>{props.stripe.paymentDetails.brand.toUpperCase()} {props.stripe.paymentDetails.last4}</p>
-                            <p>EXP: {props.stripe.paymentDetails.expMonth}/{props.stripe.paymentDetails.expYear}</p>
+                            <p>{stripe.paymentDetails.name}</p>
+                            <p>{stripe.paymentDetails.brand.toUpperCase()} {stripe.paymentDetails.last4}</p>
+                            <p>EXP: {stripe.paymentDetails.expMonth}/{stripe.paymentDetails.expYear}</p>
                         </div>
                     </Card>
                     <h4 style={{textAlign: 'center'}}>Change Payment</h4>
@@ -313,7 +329,8 @@ function PaymentOptions(props) {
                             <CardElement/>
                         </Card>
                         <div className={styles.buttonContainer}>
-                            <Form.Button primary content='Submit' disabled={nameOnCard === '' || !cardApproved || disabled}/>
+                            <Form.Button primary content='Submit'
+                                         disabled={nameOnCard === '' || !cardApproved || disabled}/>
                         </div>
                     </Form>
                 </div>

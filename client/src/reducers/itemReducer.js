@@ -5,7 +5,7 @@ const initialState = {
     loading: false
 }
 
-export default function (state = initialState, action) {
+export default function ItemReducer(state = initialState, action) {
     switch (action.type) {
         case GET_ITEMS:
             return {
@@ -13,14 +13,14 @@ export default function (state = initialState, action) {
                 items: action.payload,
                 loading: false
             }
-        case DELETE_ITEM: 
+        case DELETE_ITEM:
             return {
                 ...state,
                 items: state.items.filter(item => item.id !== action.payload)
             }
         case ADD_ITEM:
             return {
-                ...state, 
+                ...state,
                 items: [action.payload, ...state.items]
             }
         case ITEMS_LOADING:
