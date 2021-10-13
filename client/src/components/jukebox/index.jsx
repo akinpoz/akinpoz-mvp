@@ -32,6 +32,13 @@ function Jukebox(props) {
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
     const [locked, setLocked] = useState(true)
 
+    const setMsgWithPriority = useCallback((newMsg) => {
+        // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
+        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
+            setMsg(newMsg)
+        }
+    }, [msg])
+
     useEffect(() => {
         if (!location_id) {
             history.push({
@@ -65,14 +72,14 @@ function Jukebox(props) {
                 priority: 1
             })
         }
-    }, [auth])
+    }, [auth, setMsgWithPriority])
 
     useEffect(() => {
         if (spotify.error) {
             setMsgWithPriority({...spotify.error, priority: 3})
             clearSpotifyErrors()
         }
-    }, [spotify, clearSpotifyErrors])
+    }, [spotify, clearSpotifyErrors, setMsgWithPriority])
 
     useEffect(() => {
         if (stripe) {
@@ -99,7 +106,7 @@ function Jukebox(props) {
                 setLocked(false)
             }
         }
-    }, [stripe, clearStripeMsg])
+    }, [stripe, clearStripeMsg, setMsgWithPriority])
 
     const handleSelectionChange = useCallback((e, data) => {
         updateSelection(data.result);
@@ -115,13 +122,6 @@ function Jukebox(props) {
             }
         }, 300)
     }, [updateSelection, startSearch, cleanQuery])
-
-    function setMsgWithPriority(newMsg) {
-        // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
-            setMsg(newMsg)
-        }
-    }
 
     const hasPaymentMethod = () => {
         return auth.user.paymentMethod && auth.user.paymentMethod.length > 0

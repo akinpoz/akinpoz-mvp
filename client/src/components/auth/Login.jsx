@@ -15,8 +15,9 @@ function Login(props) {
     useEffect(() => {
         if (error.id === 'LOGIN_FAIL') {
             setMsg(error.msg)
+            clearErrors()
         }
-    }, [error])
+    }, [error, clearErrors])
 
     const handleChange = e => {
         setValues({...values, [e.target.name]: e.target.value})

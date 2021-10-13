@@ -21,7 +21,7 @@ function ShowQRCode(props) {
                     </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: "center", padding: 15 }}>
-                    <h4><a href={url} target="_blank">{url}</a></h4>
+                    <h6><a href={url} target="_blank" rel="noopener noreferrer">{url}</a></h6>
                 </div>
             </Modal.Content>
             <Modal.Actions>

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import styles from './profile.module.css'
 import {Button, Card, Form, Message} from "semantic-ui-react";
 import {
+    clearStripeMsg,
     createSetupIntent,
     getPastTabs,
     getPaymentDetails,
@@ -27,13 +28,14 @@ function Profile(props) {
 }
 
 function EndUserDashboard(props) {
-    const {stripe, auth} = props
+    const {stripe, auth, clearStripeMsg} = props
     const [msg, setMsg] = useState()
     useEffect(() => {
         if (stripe) {
             setMsg(stripe.msg)
+            clearStripeMsg()
         }
-    }, [stripe])
+    }, [stripe, clearStripeMsg])
 
     return (
         <div>
@@ -263,7 +265,6 @@ function PaymentOptions(props) {
             // Check the availability of the Payment Request API.
             pr.canMakePayment().then(result => {
                 if (result) {
-                    paymentRequest?.removeAllListeners()
                     setPaymentRequest(pr);
                 }
             });
@@ -358,5 +359,6 @@ export default connect(mapStateToProps, {
     createSetupIntent,
     updateUser,
     deleteUser,
-    getPastTabs
+    getPastTabs,
+    clearStripeMsg
 })(Profile)

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
@@ -14,13 +14,36 @@ function CustomerCampaign(props) {
     const [msg, setMsg] = useState()
     const [locked, setLocked] = useState(true)
 
-    const {auth, stripe, location, campaign, getLocation, clearStripeMsg, clearCampaignMsg, getCampaign, setupNewTab, submitCampaignData} = props
+    const {
+        auth,
+        stripe,
+        location,
+        campaign,
+        getLocation,
+        clearStripeMsg,
+        clearCampaignMsg,
+        getCampaign,
+        setupNewTab,
+        submitCampaignData
+    } = props
+
+    const setMsgWithPriority = useCallback((newMsg) => {
+        // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
+        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
+            setMsg(newMsg)
+        }
+    }, [msg])
+
+    const safeSetLocked = useCallback(() => {
+        if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && campaign.details.type !== 'Survey') {
+            setLocked(true)
+        }
+        else {
+            setLocked(false)
+        }
+    }, [stripe, campaign])
 
     useEffect(() => {
-        if (location.select_location === '' && campaign.location) {
-            getLocation(campaign.location)
-        }
-
         if (!auth.isAuthenticated) {
             setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1})
         } else {
@@ -30,19 +53,29 @@ function CustomerCampaign(props) {
                     msg: "Please add a payment method in the profile page before interacting with a campaign.",
                     priority: 2
                 })
-            }
-
-            else if (auth.user?.campaigns?.includes(campaign._id)) {
+            } else if (auth.user?.campaigns?.includes(campaign._id)) {
                 if (campaign.details.type === "Survey") {
                     setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3})
                 } else if (campaign.details.type === "Raffle") {
-                    setMsgWithPriority({msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!", priority: 3})
+                    setMsgWithPriority({
+                        msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!",
+                        priority: 3
+                    })
                 } else if (campaign.details.type === "Fastpass") {
-                    setMsgWithPriority({msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account.", priority: 3})
+                    setMsgWithPriority({
+                        msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account.",
+                        priority: 3
+                    })
                 }
             }
         }
-    }, [auth, campaign, getLocation, location])
+    }, [auth, campaign, setMsgWithPriority])
+
+    useEffect(() => {
+        if (location.select_location === '' && campaign.location) {
+            getLocation(campaign.location)
+        }
+    }, [location, getLocation, campaign])
 
     useEffect(() => {
         if (campaign === "") {
@@ -52,10 +85,8 @@ function CustomerCampaign(props) {
             setMsgWithPriority({...campaign.msg, priority: 3})
             clearCampaignMsg()
         }
-        if (campaign && campaign.details.type === 'Survey') {
-            setLocked(false)
-        }
-    }, [campaign, getCampaign, clearCampaignMsg, campaign_id])
+        safeSetLocked()
+    }, [campaign, getCampaign, clearCampaignMsg, campaign_id, setMsgWithPriority, safeSetLocked])
 
     useEffect(() => {
         if (!stripe) {
@@ -63,8 +94,7 @@ function CustomerCampaign(props) {
         }
         if (stripe.hasOpenTab) {
             setButtonLabel('Add To Tab')
-        }
-        else {
+        } else {
             setButtonLabel('Open New Tab')
         }
         if (stripe.unpaidTabs) {
@@ -75,26 +105,14 @@ function CustomerCampaign(props) {
                     priority: 2
                 })
             }
-            if (campaign && campaign.details.type !== 'Survey') {
-                setLocked(hasUnpaidTabs)
-            }
-        }
-        else {
-            setLocked(false)
+            safeSetLocked()
         }
         if (stripe.msg) {
             setMsgWithPriority({...stripe.msg, priority: 2})
             clearStripeMsg()
         }
 
-    }, [stripe, campaign, clearStripeMsg])
-
-    function setMsgWithPriority(newMsg) {
-        // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
-            setMsg(newMsg)
-        }
-    }
+    }, [stripe, clearStripeMsg, setMsgWithPriority, safeSetLocked])
 
     function handleChange(e, data) {
         setInfo(data.value)
@@ -162,9 +180,11 @@ function CustomerCampaign(props) {
 
     return (
         <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
-            <div id="customer-campaign-card-message_container" style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div id="customer-campaign-card-message_container"
+                 style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                 {msg && msg.msg &&
-                <Message color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid')) ? "red" : "green"}>
+                <Message
+                    color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid')) ? "red" : "green"}>
                     <Message.Header>
                         {msg.msg}
                         {msg.msg.includes("login") &&

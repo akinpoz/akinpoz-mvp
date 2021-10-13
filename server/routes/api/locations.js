@@ -16,7 +16,12 @@ const Campaign = require('../../models/Campaign');
 router.get('/', async function (req, res) {
     try {
         let locations = await Location.find()
-        res.status(200).send(locations)
+        let returnableLocations = []
+        for (const location of locations) {
+            let loc = await formatLocation(location)
+            returnableLocations.push(loc)
+        }
+        res.status(200).send(returnableLocations)
 
     } catch (e) {
         console.error(e)
@@ -31,8 +36,13 @@ router.get('/', async function (req, res) {
  */
 router.get('/user_id', auth, async function (req, res) {
     try {
-        let locations = await Location.find({ user: req.query.user })
-        res.status(200).send(locations)
+        let locations = await Location.find({user: req.query.user})
+        let returnableLocations = []
+        for (const location of locations) {
+            let loc = await formatLocation(location)
+            returnableLocations.push(loc)
+        }
+        res.status(200).send(returnableLocations)
 
     } catch (e) {
         console.error(e)
@@ -46,25 +56,13 @@ router.get('/user_id', auth, async function (req, res) {
  * @note O(n + m) runtime where n is the number of locations and m is the number of campaigns for each location. Possible improvement: O(n + m) -> O(n). Tried: Redux, but there were too many use cases where it would fail. Tried separate axios calls but React would not update the state/loop update forever.
  */
 router.get('/location_id', async function (req, res) {
-    try {
-        let location = await Location.findOne({ _id: req.query.location_id })
-        let campaigns = []
-        if (location.campaigns) {
-            for (const campaign of location.campaigns) {
-                campaigns.push(await Campaign.findOne({ _id: campaign }))
-            }
-        }
-        let relevantLocation = {}
-        relevantLocation.campaigns = JSON.parse(JSON.stringify(campaigns))
-        relevantLocation._id = location._id
-        relevantLocation.name = location.name
-        relevantLocation.music = location.music
-        relevantLocation.menu_url = location.menu_url
-        res.status(200).send(relevantLocation)
-
-    } catch (e) {
-        console.error(e)
+    let location = await Location.findOne({_id: req.query.location_id})
+    if (!location) {
+        res.status(400).send(null)
+        return
     }
+    const relevantLocation = await formatLocation(location)
+    res.status(200).send(relevantLocation)
 })
 
 /**
@@ -78,7 +76,7 @@ router.post('/add', auth, (req, res) => {
         newLocation.save(async function (err, location) {
             if (err) res.status(500).send(err);
             if (location) {
-                await User.findOneAndUpdate({ _id: req.body.user }, { $push: { locations: location._id } }, { new: true })
+                await User.findOneAndUpdate({_id: req.body.user}, {$push: {locations: location._id}}, {new: true})
                 res.status(200).send(location);
             }
         })
@@ -94,7 +92,12 @@ router.post('/add', auth, (req, res) => {
  */
 router.post('/update', auth, async (req, res) => {
     try {
-        const location = await Location.findOneAndUpdate({ _id: req.body.location_id }, { name: req.body.name, description: req.body.description, menu_url: req.body.menu_url, address: req.body.address }, { useFindAndModify: false, new: true })
+        const location = await Location.findOneAndUpdate({_id: req.body.location_id}, {
+            name: req.body.name,
+            description: req.body.description,
+            menu_url: req.body.menu_url,
+            address: req.body.address
+        }, {useFindAndModify: false, new: true})
         res.status(200).send(location)
     } catch (e) {
         console.error(e)
@@ -109,15 +112,15 @@ router.post('/update', auth, async (req, res) => {
  */
 router.post('/delete', auth, async (req, res) => {
     try {
-        const location = await Location.findOne({ _id: req.body._id })
-        const user = await User.findOne({ _id: req.body.user })
+        const location = await Location.findOne({_id: req.body._id})
+        const user = await User.findOne({_id: req.body.user})
         user.locations.splice(user.locations.indexOf(req.body._id), 1)
         for (const campaign of location.campaigns) {
             user.campaigns.splice(user.campaigns.indexOf(campaign), 1)
         }
         await user.save()
-        await Campaign.deleteMany({ location: req.body._id })
-        await Location.remove({ _id: req.body._id }, { useFindAndModify: false })
+        await Campaign.deleteMany({location: req.body._id})
+        await Location.remove({_id: req.body._id}, {useFindAndModify: false})
         res.status(200).send(location._id)
     } catch (e) {
         console.error(e)
@@ -132,13 +135,29 @@ router.post('/delete', auth, async (req, res) => {
  */
 router.post('/toggleMusic', auth, async (req, res) => {
     try {
-        const { music, _id } = req.body;
-        const location = await Location.findOneAndUpdate({ _id }, { music }, { useFindAndModify: false, new: true })
+        const {music, _id} = req.body;
+        const location = await Location.findOneAndUpdate({_id}, {music}, {useFindAndModify: false, new: true})
         res.status(200).send(location)
     } catch (e) {
         console.error(e)
         res.status(500).send(e)
     }
 })
+
+async function formatLocation(location) {
+    let campaigns = []
+    if (location.campaigns) {
+        for (const campaign of location.campaigns) {
+            campaigns.push(await Campaign.findOne({_id: campaign}))
+        }
+    }
+    let loc = {}
+    loc.campaigns = JSON.parse(JSON.stringify(campaigns))
+    loc._id = location._id
+    loc.name = location.name
+    loc.music = location.music
+    loc.menu_url = location.menu_url
+    return loc
+}
 
 module.exports = router

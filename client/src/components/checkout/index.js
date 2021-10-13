@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Button, Card, Form, Message} from "semantic-ui-react";
 import styles from './checkout.module.css'
-import {closeTab} from "../../actions/stripeActions";
-import {submitCampaignData} from "../../actions/campaignActions"
+import {clearStripeMsg, closeTab} from "../../actions/stripeActions";
+import {clearCampaignMsg, submitCampaignData} from "../../actions/campaignActions"
 import {connect} from "react-redux";
 import history from '../../history'
-import {queueSong} from "../../actions/spotifyActions";
+import {clearSpotifyErrors, queueSong} from "../../actions/spotifyActions";
 
 /**
  * Checkout form for rendering tabs (3 conditions -- Has open tab, wants to open tab, has no tab and doesnt want to start a tab)
@@ -15,24 +15,29 @@ import {queueSong} from "../../actions/spotifyActions";
  */
 function Checkout(props) {
     const [msg, setMsg] = useState()
-    const {stripe, spotify, campaign, location} = props
+    const {stripe, spotify, campaign, location, clearStripeMsg, clearSpotifyErrors, clearCampaignMsg} = props
     // Needs to get open invoice if exists
 
     useEffect(() => {
         if (stripe.msg) {
             setMsg(stripe.msg?.msg ?? '')
+            clearStripeMsg()
         }
-    }, [stripe.msg])
+    }, [stripe.msg, clearStripeMsg])
 
     useEffect(() => {
-        setMsg(spotify.error)
-    }, [spotify.error])
+        if (spotify.error) {
+            setMsg(spotify.error)
+            clearSpotifyErrors()
+        }
+    }, [spotify.error, clearSpotifyErrors])
 
     useEffect(() => {
         if (campaign.msg !== '') {
             setMsg(campaign.msg)
+            clearCampaignMsg()
         }
-    }, [campaign.msg])
+    }, [campaign.msg, clearCampaignMsg])
 
 
     return (
@@ -147,7 +152,7 @@ function NewTab(props) {
 function ExistingTab(props) {
     const {stripe, auth, closeTab} = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
-    const calculateTimeLeft = () => {
+    const calculateTimeLeft = useCallback(() => {
         let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
         let difference = expTime - Date.now()
         let timeLeftComponents = {};
@@ -187,7 +192,7 @@ function ExistingTab(props) {
         }
 
         return timeLeft;
-    }
+    }, [stripe])
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
     const [sum, setSum] = useState(0)
@@ -218,7 +223,7 @@ function ExistingTab(props) {
             setSum(tempSum)
             setTimeLeft(calculateTimeLeft())
         }
-    }, [stripe])
+    }, [stripe, calculateTimeLeft])
 
 
     return (
@@ -287,5 +292,8 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
     closeTab,
     submitCampaignData,
-    queueSong
+    queueSong,
+    clearStripeMsg,
+    clearCampaignMsg,
+    clearSpotifyErrors
 })(Checkout);

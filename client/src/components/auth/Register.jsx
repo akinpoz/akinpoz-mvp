@@ -59,7 +59,7 @@ function RegisterForm(props) {
 
     useEffect(() => {
 
-        if (useStripeInst && elements) {
+        if (useStripeInst && elements && !paymentAuthenticatedByMobile) {
             // Creates payment request that checks if order can be fulfilled by and facilitates the use of apple/google pay
             const pr = useStripeInst.paymentRequest({
                 country: 'US',
@@ -75,12 +75,11 @@ function RegisterForm(props) {
             // Check the availability of the Payment Request API.
             pr.canMakePayment().then(result => {
                 if (result) {
-                    paymentRequest?.removeAllListeners()
                     setPaymentRequest(pr)
                 }
             });
         }
-    }, [useStripeInst, elements])
+    }, [useStripeInst, elements, paymentAuthenticatedByMobile])
 
     useEffect(() => {
         if (paymentRequest) {
@@ -89,6 +88,7 @@ function RegisterForm(props) {
                 markProcessing()
                 if (stripe.loading || stripe.status !== 'unfulfilled') {
                     event.complete('fail')
+                    setMsg({msg: 'Could Not Process Card Information'})
                     return;
                 }
 
@@ -99,6 +99,7 @@ function RegisterForm(props) {
                 if (result.error) {
                     event.complete('fail')
                     markComplete('fail')
+                    setMsg({msg: 'Could Not Process Card Information'})
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
@@ -108,18 +109,17 @@ function RegisterForm(props) {
                         if (error) {
                             console.error(error.message)
                             markComplete('fail')
-                            // TODO: Error handling
+                            setMsg({msg: 'Could Not Process Card Information'})
                         } else {
-                            console.log('Needed action but successful')
                             markComplete('success')
-                            // TODO: Success Logic
+                            setMsg({msg: 'Successfully Added Card Information!'})
                         }
                     } else {
-                        console.log('successful')
                         setPaymentMethod(result.setupIntent.payment_method)
                         setPaymentAuthenticatedByMobile(true)
                         markComplete('success')
-                        // TODO: Success Logic
+                        setMsg({msg: 'Successfully Added Card Information!'})
+
                     }
                 }
             })
@@ -129,8 +129,9 @@ function RegisterForm(props) {
     useEffect(() => {
         if (error.id === 'REGISTER_FAIL') {
             setMsg(error.msg)
+            clearErrors()
         }
-    }, [error])
+    }, [error, clearErrors])
 
     useEffect(() => {
         if (auth.isAuthenticated) {
@@ -297,7 +298,7 @@ function RegisterForm(props) {
             </Accordion>
             <div id={'paymentAuthenticated'} style={{marginBottom: 20}} hidden={!paymentAuthenticatedByMobile}>
                 <Icon name={"check"} color={'green'}/>
-                <b>Payment Authenticated Via Browser Card</b>
+                <b>Payment Authenticated</b>
             </div>
             {!loading &&
             <Form.Button content={"Register"} type="submit" color="blue" disabled={!isValid() || stripe.loading}/>}

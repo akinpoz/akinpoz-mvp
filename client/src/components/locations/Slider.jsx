@@ -32,18 +32,18 @@ function Slider(props) {
     const [speed, setSpeed] = useState(0);
     const scrollWrapperCurrent = scrollWrapperRef.current
     const {location, getLocation, setCampaign} = props
-    const handleLastScrollX = useCallback(
+    const handleLastScrollX = useCallback(() =>
         throttle(screenX => {
             setLastScrollX(screenX);
         }, timing),
         []
     );
-    const handleMomentum = useCallback(
+    const handleMomentum = useCallback(() =>
         throttle(nextMomentum => {
             setMomentum(nextMomentum);
             scrollWrapperRef.current.scrollLeft = scrollWrapperRef.current.scrollLeft + nextMomentum * timing * direction;
         }, timing),
-        [scrollWrapperCurrent, direction]
+        [direction]
     );
     useEffect(() => {
         if (direction !== 0) {
@@ -56,14 +56,17 @@ function Slider(props) {
             }
         }
     }, [momentum, isDragging, speed, direction, handleMomentum]);
-    const location_id = history.location.search.split('=')[1]
+    const location_id = window.location.href.split('=')[1]
     const [loc, setLoc] = useState(location || {music: false, campaigns: [], menu_url: ""})
     useEffect(() => {
-        if (location === "") {
+        if (location_id && location_id !== '') {
             getLocation(location_id)
         }
+    }, [getLocation, location_id])
+
+    useEffect(() => {
         setLoc(location)
-    }, [location, getLocation, location_id])
+    }, [location])
 
     function handleClick(campaign) {
         setCampaign(campaign)
@@ -115,7 +118,7 @@ function Slider(props) {
                 <div className={styles.scroll_box_container} role="list"
                      style={{pointerEvents: isDragging ? 'none' : undefined}}>
                     <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-menu`}>
-                        <a target="_blank" href={loc.menu_url}>
+                        <a target="_blank" href={loc.menu_url} rel="noopener noreferrer">
                             <Card>
                                 <Image src={MenuImage} wrapped ui={false}/>
                                 <Card.Content>
@@ -139,11 +142,12 @@ function Slider(props) {
                             </Card.Content>
                         </Card>
                     </div>}
-                    {loc && loc.campaigns.length > 0 && loc.campaigns.map(campaign => {
+                    {loc && loc.campaigns.length > 0 && loc.campaigns.map((campaign, index) => {
+                        const key = `scroll-box-item-${campaign._id}_${index}`
                         if (campaign.active) {
                             return (
                                 <div className={styles.scroll_box__item} role="listitem"
-                                     key={`scroll-box-item-${campaign._id}`}>
+                                     key={key}>
                                     <Card style={{cursor: 'pointer'}} onClick={handleClick.bind(null, campaign)}>
                                         <Image src={icons[campaign.details["type"]]} wrapped ui={false}/>
                                         <Card.Content>
@@ -158,7 +162,7 @@ function Slider(props) {
                         }
                     })}
                     <div className={styles.scroll_box__item} role="listitem" key={`scroll-box-item-menumarket`}>
-                        <a target="_blank" href="https://apokoz.com/">
+                        <a target="_blank" href="https://apokoz.com/" rel="noopener noreferrer">
                             <Card>
                                 <Image src={MenuMarketImage} wrapped ui={false}/>
                                 <Card.Content>

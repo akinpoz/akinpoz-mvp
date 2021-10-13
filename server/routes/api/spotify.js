@@ -29,6 +29,7 @@ router.get('/search', async function (req, res) {
             let resultsArray = []
             for (let i of resultObj) {
                 const song = {
+                    title: i.name,
                     name: i.name,
                     artist: i.artists[0].name,
                     uri: i.uri
