@@ -34,7 +34,7 @@ function Jukebox(props) {
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
+        if (newMsg && newMsg.priority <= (msg?.priority ?? 5)) {
             setMsg(newMsg)
         }
     }, [msg])
@@ -63,13 +63,17 @@ function Jukebox(props) {
             if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
                 setMsgWithPriority({
                     msg: "Please add a payment method in the profile page before queuing a song.",
-                    priority: 2
+                    priority: 2,
+                    negative: true,
+                    positive: false
                 })
             }
         } else {
             setMsgWithPriority({
                 msg: "Please login to queue a song.",
-                priority: 1
+                priority: 1,
+                negative: true,
+                positive: false
             })
         }
     }, [auth, setMsgWithPriority])
@@ -98,7 +102,9 @@ function Jukebox(props) {
                 if (hasUnpaidTabs) {
                     setMsgWithPriority({
                         msg: 'You currently have an unpaid tab.  Please check your email and settle this before opening a new tab.',
-                        priority: 2
+                        priority: 2,
+                        negative: true,
+                        positive: false
                     })
                 }
                 setLocked(hasUnpaidTabs)
@@ -176,8 +182,7 @@ function Jukebox(props) {
     return (
         <div className={styles.container}>
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
-            {msg && msg.msg && <Message
-                color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid') || msg.msg.includes('issues')) ? "red" : "green"}>
+            {msg && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&

@@ -70,7 +70,7 @@ export default function CampaignReducer(state = initialState, action) {
         case SUBMIT_CAMPAIGN_ERROR:
             return {
                 ...state,
-                msg: {msg: 'Error Submitting Campaign'}
+                msg: {msg: 'Error Submitting Campaign', negative: true, positive: false}
             }
 
         case CLEAR_CAMPAIGN_MSG:

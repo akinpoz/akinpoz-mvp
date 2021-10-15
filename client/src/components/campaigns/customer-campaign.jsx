@@ -29,7 +29,7 @@ function CustomerCampaign(props) {
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority < (msg?.priority ?? 5)) {
+        if (newMsg && newMsg.priority <= (msg?.priority ?? 5)) {
             setMsg(newMsg)
         }
     }, [msg])

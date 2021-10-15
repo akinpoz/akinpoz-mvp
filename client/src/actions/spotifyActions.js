@@ -1,4 +1,4 @@
-import {NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
+import {CLEAR_SPOTIFY_ERRORS, NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADING, SPOTIFY_QUEUE_SONG,} from "./types";
 import axios from 'axios';
 import {tokenConfig} from "./authActions";
 
@@ -45,7 +45,7 @@ export const queueSong = (item) => (dispatch, getState) => {
 }
 
 export const clearSpotifyErrors = () => (dispatch) => {
-    dispatch({type: SPOTIFY_ERROR, error: null})
+    dispatch({type: CLEAR_SPOTIFY_ERRORS})
 }
 
 export const setSpotifyLoading = () => {
