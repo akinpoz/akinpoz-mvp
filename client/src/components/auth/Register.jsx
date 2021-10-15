@@ -256,7 +256,7 @@ function RegisterForm(props) {
     return (
         <Form className={styles.formContainer} onSubmit={onSubmit}>
             {msg && msg.msg &&
-            <Message negative className={styles.message}>
+            <Message negative={!msg.msg.includes('Successfully')} positive={msg.msg.includes('Successfully')} className={styles.message}>
                 <Message.Header>{msg.msg}</Message.Header>
             </Message>
             }

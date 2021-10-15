@@ -31,7 +31,7 @@ function EndUserDashboard(props) {
     const {stripe, auth, clearStripeMsg} = props
     const [msg, setMsg] = useState()
     useEffect(() => {
-        if (stripe) {
+        if (stripe && stripe.msg) {
             setMsg(stripe.msg)
             clearStripeMsg()
         }

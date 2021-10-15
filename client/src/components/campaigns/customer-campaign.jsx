@@ -45,26 +45,26 @@ function CustomerCampaign(props) {
 
     useEffect(() => {
         if (!auth.isAuthenticated) {
-            setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1})
+            setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1, negative: true, positive: false})
         } else {
 
             if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
                 setMsgWithPriority({
                     msg: "Please add a payment method in the profile page before interacting with a campaign.",
-                    priority: 2
+                    priority: 2, negative: true, positive: false
                 })
             } else if (auth.user?.campaigns?.includes(campaign._id)) {
                 if (campaign.details.type === "Survey") {
-                    setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3})
+                    setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3, negative: false, positive: false})
                 } else if (campaign.details.type === "Raffle") {
                     setMsgWithPriority({
                         msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!",
-                        priority: 3
+                        priority: 3, negative: false, positive: false
                     })
                 } else if (campaign.details.type === "Fastpass") {
                     setMsgWithPriority({
                         msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account.",
-                        priority: 3
+                        priority: 3, negative: false, positive: false
                     })
                 }
             }
@@ -82,7 +82,7 @@ function CustomerCampaign(props) {
             getCampaign(campaign_id)
         }
         if (campaign.msg) {
-            setMsgWithPriority({...campaign.msg, priority: 3})
+            setMsgWithPriority({...campaign.msg, priority: 3, negative: true, positive: false})
             clearCampaignMsg()
         }
         safeSetLocked()
@@ -102,13 +102,13 @@ function CustomerCampaign(props) {
             if (hasUnpaidTabs) {
                 setMsgWithPriority({
                     msg: 'You currently have an unpaid tab.  Please check your email and settle this before opening a new tab.',
-                    priority: 2
+                    priority: 2, negative: true, positive: false
                 })
             }
             safeSetLocked()
         }
         if (stripe.msg) {
-            setMsgWithPriority({...stripe.msg, priority: 2})
+            setMsgWithPriority({...stripe.msg, priority: 2, negative: true, positive: false})
             clearStripeMsg()
         }
 
@@ -184,7 +184,7 @@ function CustomerCampaign(props) {
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                 {msg && msg.msg &&
                 <Message
-                    color={(msg.msg.includes("login") || msg.msg.includes("payment") || msg.msg.includes('unpaid')) ? "red" : "green"}>
+                    positive={msg.positive} negative={msg.negative}>
                     <Message.Header>
                         {msg.msg}
                         {msg.msg.includes("login") &&
