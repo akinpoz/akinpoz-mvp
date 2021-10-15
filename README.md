@@ -63,7 +63,7 @@
 
 ### 200 empty response
 
-- The server is likly down. This is mainly a development error/bug.
+- The server is likely down. This is mainly a development error/bug.
 
 #### Example
   
@@ -99,7 +99,7 @@
     - Added tab logic
     - Participating in a campaign will either:
       - if you have a tab open this will prompt window.confirm to add to your tab
-      - if you dont you will be taken to the open tab screen where you will have to confirm
+      - if you don't you will be taken to the open tab screen where you will have to confirm
         you have read the terms and conditions and agree that your saved card will be charged in 24
         hours (unless they close it sooner).
     - As of right now, there is no way to change your payment method after opening a tab.
@@ -110,7 +110,7 @@
       - What if draft exists but time has expired?
       - Others
     - Do we want to let users open / close tab using different payment
-    - Make adding to tab trigger campaign fulfilment
+    - Make adding to tab trigger campaign fulfillment
 
 - 9/9
   - What to expect:
