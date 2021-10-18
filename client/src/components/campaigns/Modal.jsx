@@ -45,7 +45,7 @@ function CampaignModal(props) {
         }
 
         if (!values.title || !values.description || !values.details || !values.question) {
-            setMsg("Please fill in all required fields and verify you have at least two options");
+            setMsg({msg: "Please fill in all required fields and verify you have at least two options"});
         } else {
             if (values.details.type === "Fastpass") {
                 values.details.options = []

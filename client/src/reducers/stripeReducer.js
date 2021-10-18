@@ -168,13 +168,13 @@ export default function StripeReducer(state = initialState, action) {
                 ...state,
                 loading: false,
                 pastTabs: action.pastTabs,
-                msg: action.error
+                msg: {...action.error, negative: false, positive: true}
             }
         case ERROR_PAST_TABS:
             return {
                 ...state,
                 loading: false,
-                msg: action.error
+                msg: {...action.error, negative: true, positive: false}
             }
         case RESET_STRIPE:
             return initialState;
@@ -192,7 +192,11 @@ export default function StripeReducer(state = initialState, action) {
         case RETRIEVED_UNPAID_TABS:
             let newMessage = null
             if (action.unpaidTabs.length !== 0) {
-                newMessage = {msg: 'Account is locked.  Check your email for an unpaid tab invoice.'}
+                newMessage = {
+                    msg: 'Account is locked.  Check your email for an unpaid tab invoice.',
+                    negative: true,
+                    positive: false
+                }
             }
             return {
                 ...state,
@@ -240,7 +244,7 @@ export default function StripeReducer(state = initialState, action) {
                 ...state,
                 loading: false,
                 status: action.status,
-                msg: action.msg
+                msg: {...action.msg, negative: false, positive: true}
             }
 
         default:

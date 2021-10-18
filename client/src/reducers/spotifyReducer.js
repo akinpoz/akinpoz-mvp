@@ -1,4 +1,5 @@
 import {
+    CLEAR_SPOTIFY_ERRORS,
     SPOTIFY_ERROR,
     SPOTIFY_LOADING,
     SPOTIFY_QUEUE_SONG,
@@ -28,13 +29,19 @@ export default function SpotifyReducer(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                error: {msg: 'Successfully added song!'},
+                error: {msg: 'Successfully added song!', negative: false, positive: true},
 
             }
         case SPOTIFY_ERROR:
             return {
                 ...state,
-                error: action.error
+                error: {...action.error, negative: true, positive: false}
+            }
+
+        case CLEAR_SPOTIFY_ERRORS:
+            return {
+                ...state,
+                error: null
             }
 
         default:

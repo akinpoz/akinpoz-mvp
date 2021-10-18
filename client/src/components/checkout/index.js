@@ -20,7 +20,7 @@ function Checkout(props) {
 
     useEffect(() => {
         if (stripe.msg) {
-            setMsg(stripe.msg?.msg ?? '')
+            setMsg(stripe.msg)
             clearStripeMsg()
         }
     }, [stripe.msg, clearStripeMsg])
