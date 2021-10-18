@@ -39,32 +39,36 @@ const Welcome = (props) => {
                 <Message.Header>
                     {msg.text}
                 </Message.Header></Message>}
-            <div id="cards-wrapper" className={styles.cards_wrapper}>
+            <Card.Group id="cards-wrapper" doubling>
                 <a href="/#/login">
-                    <Card>
-                        <Image src={BusinessOwnerImage} wrapped ui={false}/>
-                        <Card.Content>
-                            <Card.Header>Business Owner</Card.Header>
-                            <Card.Meta>
-                                <p>
-                                    Sign in or register to manage your business with Akopoz
-                                </p>
-                            </Card.Meta>
-                        </Card.Content>
-                    </Card>
+                    <div className={styles.welcome_item}>
+                        <Card fluid>
+                            <Image src={BusinessOwnerImage} wrapped ui={false}/>
+                            <Card.Content extra>
+                                <Card.Header>Business Owner</Card.Header>
+                                <Card.Meta>
+                                    <p>
+                                        Sign in or sign up to manage your business with Akopoz
+                                    </p>
+                                </Card.Meta>
+                            </Card.Content>
+                        </Card>
+                    </div>
                 </a>
                 <a href="/#/customer-home">
-                    <Card>
-                        <Image src={PatronImage} wrapped ui={false}/>
-                        <Card.Content>
-                            <Card.Header>Patron</Card.Header>
-                            <Card.Meta>
-                                <p>Whether you are just looking for ready to order, click here to get started</p>
-                            </Card.Meta>
-                        </Card.Content>
-                    </Card>
+                    <div className={styles.welcome_item}>
+                        <Card fluid>
+                            <Image src={PatronImage} wrapped ui={false}/>
+                            <Card.Content extra>
+                                <Card.Header>Patron</Card.Header>
+                                <Card.Meta>
+                                    <p>Whether you are just looking for ready to order, click here to get started</p>
+                                </Card.Meta>
+                            </Card.Content>
+                        </Card>
+                    </div>
                 </a>
-            </div>
+            </Card.Group>
         </div>
     )
 }

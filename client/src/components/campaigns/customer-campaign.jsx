@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
-import {Button, Card, Input, Message, Radio} from 'semantic-ui-react'
+import {Button, Card, Icon, Input, Message, Radio} from 'semantic-ui-react'
 import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
 import {getLocation} from "../../actions/locationActions";
 
@@ -29,13 +29,13 @@ function CustomerCampaign(props) {
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority <= (msg?.priority ?? 5)) {
+        if (newMsg && newMsg.priority <= (msg?.priority ?? 5) && newMsg.msg !== (msg?.msg ?? '')) {
             setMsg(newMsg)
         }
     }, [msg])
 
     const safeSetLocked = useCallback(() => {
-        if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && campaign.details.type !== 'Survey') {
+        if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && campaign.details.type !== 'Product Pluck') {
             setLocked(true)
         }
         else {
@@ -54,7 +54,7 @@ function CustomerCampaign(props) {
                     priority: 2, negative: true, positive: false
                 })
             } else if (auth.user?.campaigns?.includes(campaign._id)) {
-                if (campaign.details.type === "Survey") {
+                if (campaign.details.type === "Product Pluck") {
                     setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3, negative: false, positive: false})
                 } else if (campaign.details.type === "Raffle") {
                     setMsgWithPriority({
@@ -124,7 +124,7 @@ function CustomerCampaign(props) {
 
     function handleSubmit() {
         const type = campaign.details.type
-        let amount = type === "Survey" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
+        let amount = type === "Product Pluck" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
         const item = {
             amount,
             user: auth.user,
@@ -139,7 +139,7 @@ function CustomerCampaign(props) {
                 info
             }
         }
-        if (type !== "Survey") {
+        if (type !== "Product Pluck") {
             setupNewTab(item)
             if (stripe.hasOpenTab && parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
                 if (window.confirm('Are you sure you would you like to add this to your tab?')) {
@@ -167,7 +167,7 @@ function CustomerCampaign(props) {
 
     function campaignLabel() {
         switch (campaign.details.type) {
-            case 'Survey':
+            case 'Product Pluck':
                 return campaign.question
             case 'Raffle':
                 return `Cost per ticket: $ ${campaign.question}`
@@ -182,13 +182,14 @@ function CustomerCampaign(props) {
         <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
             <div id="customer-campaign-card-message_container"
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
                 {msg && msg.msg &&
                 <Message
                     positive={msg.positive} negative={msg.negative}>
                     <Message.Header>
                         {msg.msg}
                         {msg.msg.includes("login") &&
-                        <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Register</a>
+                        <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Sign Up</a>
                         </p>}
                         {(msg.msg.includes("Participate") || msg.msg.includes("already")) &&
                         <p><a href={`/#/location/?location_id=${location.select_location._id}`}
@@ -213,7 +214,7 @@ function CustomerCampaign(props) {
                     {auth.isAuthenticated &&
                     <Card.Content extra>
                         <div style={{flexDirection: "row-reverse", display: "flex"}}>
-                            {campaign.details.type !== 'Survey' &&
+                            {campaign.details.type !== 'Product Pluck' &&
                             <div id="submit-button-div">
                                 {hasPaymentMethod() && <Button primary onClick={handleSubmit}
                                                                disabled={(campaign.details.type !== 'Fastpass' && info === '') || locked}>{buttonLabel}</Button>}
@@ -221,7 +222,7 @@ function CustomerCampaign(props) {
                                     history.push({pathname: '/profile'})
                                 }}>Add a Payment Method</Button>}
                             </div>}
-                            {campaign.details.type === 'Survey' &&
+                            {campaign.details.type === 'Product Pluck' &&
                             <Button primary disabled={locked} onClick={handleSubmit}>Submit Vote</Button>}
                         </div>
                     </Card.Content>
@@ -235,7 +236,7 @@ function CustomerCampaign(props) {
 function View(props) {
     const {type, campaign, handleClick, info, handleChange} = props
     switch (type) {
-        case "Survey":
+        case "Product Pluck":
             return (
                 <div>
                     {campaign && campaign.details.options.map((option, index) => {

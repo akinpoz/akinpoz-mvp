@@ -28,7 +28,13 @@ import {
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS,
     ERROR_PAST_TABS,
-    RESET_STRIPE, ERROR_UNPAID_TABS, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, NEW_ITEM_SUBMITTED, CLEAR_STRIPE_MSG
+    RESET_STRIPE,
+    ERROR_UNPAID_TABS,
+    REQUESTED_UNPAID_TABS,
+    RETRIEVED_UNPAID_TABS,
+    NEW_ITEM_SUBMITTED,
+    CLEAR_STRIPE_MSG,
+    RESET_CUSTOMER
 } from '../actions/types';
 
 const initialState = {
@@ -168,13 +174,13 @@ export default function StripeReducer(state = initialState, action) {
                 ...state,
                 loading: false,
                 pastTabs: action.pastTabs,
-                msg: {...action.error, negative: false, positive: true}
+                msg: action.error
             }
         case ERROR_PAST_TABS:
             return {
                 ...state,
                 loading: false,
-                msg: {...action.error, negative: true, positive: false}
+                msg: action.error
             }
         case RESET_STRIPE:
             return initialState;
@@ -209,6 +215,12 @@ export default function StripeReducer(state = initialState, action) {
             return {
                 ...state,
                 msg: null
+            }
+
+        case RESET_CUSTOMER:
+            return {
+                ...state,
+                customer: ''
             }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

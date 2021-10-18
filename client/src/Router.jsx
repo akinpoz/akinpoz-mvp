@@ -34,10 +34,10 @@ function Router(props) {
         getDraftInvoice,
         getUnpaidTabs
     } = props
-    
+
     useEffect(() => {
         if (stripe && !stripe.loading && stripe.newItem) {
-            if (stripe.newItem.item.data.type !== 'Survey') {
+            if (stripe.newItem.item.data.type !== 'Product Pluck') {
                 if (stripe.newItem.status === 'processing') {
                     addInvoiceItem(auth.user._id, stripe.newItem.item, location.select_location.name)
                 } else if (stripe.newItem.status === 'paid' && auth && auth.user) {

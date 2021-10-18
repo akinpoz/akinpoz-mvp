@@ -10,18 +10,20 @@
     position: relative;
 }
 .formContainer {
-    padding: 10% 5% 10% 5%;
+    padding: 40px 20px 40px 20px;
     border: 1.5px solid #dbdbdb;
     border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 .auth {
-    display: grid;
-    place-items: center;
-    margin-left: auto;
-    margin-right: auto;
-    grid-template-rows: 100%;
-    width: 50%;
-    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 10px;
 }
 .logo {
     width: 50%;
@@ -31,7 +33,8 @@
 }
 
 .message {
-    height: 90% !important;
+    display: block;
+
 }
 
 input {
@@ -43,19 +46,6 @@ input {
     height: 100%;
 }
 
-.registerConatiner {
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: repeat(7, 1fr);
-    grid-gap: 5%;
-    height: 500px;
-    width: 25%;
-    padding: 8px;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid #dbdbdb;
-}
-
 .divider {
     height: 1px;
     width: 100%;
@@ -65,5 +55,4 @@ input {
 
 @media screen and (max-width: 800px) {
     .loginContainer {width: 80%;}
-    .registerConatiner {width: 80%;}
 }

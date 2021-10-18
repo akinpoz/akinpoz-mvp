@@ -29,7 +29,7 @@ import {
     CLEAR_MSG,
     REQUESTED_PAST_TABS,
     RETRIEVED_PAST_TABS, ERROR_PAST_TABS,
-    USER_LOADING, REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS, CLEAR_STRIPE_MSG, UPDATE_USER
+    REQUESTED_UNPAID_TABS, RETRIEVED_UNPAID_TABS, ERROR_UNPAID_TABS, CLEAR_STRIPE_MSG, UPDATE_USER, RESET_CUSTOMER
 } from "./types";
 
 /**
@@ -204,13 +204,13 @@ export const getPastTabs = (userID) => (dispatch, getState) => {
             let error
             for (const tab of res.data) {
                 if (tab.open) {
-                    error = 'You currently have an open tab.  Your account will be locked until it is paid'
+                    error = {msg: 'You currently have an open tab.  Your account will be locked until it is paid', negative: true, positive: false}
                 }
             }
             dispatch({type: RETRIEVED_PAST_TABS, pastTabs: res.data, error: error})
         }
         else {
-            dispatch({type: ERROR_PAST_TABS, error: 'Could not load past tabs due to a server error.'})
+            dispatch({type: ERROR_PAST_TABS, error: {msg: 'Could not load past tabs due to a server error.', negative: true, positive: false}})
         }
     })
 }
@@ -279,7 +279,11 @@ export const markProcessing = () => (dispatch) => {
 export const markComplete = (status) => (dispatch) => {
     let msg
     if (status === 'fail') {
-        msg = {msg: 'Stripe could not process card.  Please try another card.'}
+        msg = {msg: 'Stripe could not process card.  Please try another card.', positive: false, negative: true}
     }
     dispatch({type: PAYMENT_COMPLETE, status: status, msg: msg})
+}
+
+export const resetCustomer = () => (dispatch) => {
+    dispatch({type: RESET_CUSTOMER})
 }

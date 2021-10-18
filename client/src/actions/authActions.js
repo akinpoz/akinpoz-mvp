@@ -42,7 +42,7 @@ export const register = ({name, email, password, type, customerID, paymentMethod
             payload: res.data
         })
     }).catch(e => {
-        dispatch(returnErrors(e.response.data, e.response.status, 'REGISTER_FAIL'))
+        dispatch(returnErrors(e.response.data.msg, e.response.status, 'REGISTER_FAIL'))
         dispatch({
             type: REGISTER_FAIL
         })

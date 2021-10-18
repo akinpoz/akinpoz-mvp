@@ -58,49 +58,36 @@ i:hover {
 }
 
 .welcome_container {
-    height: 100%; 
+    height: 100%;
     width: 90%;
     margin: auto;
-    display: grid;
-    place-items: center;
-}
-.cards_wrapper {
-    display: grid;
-    grid-template-columns: 49% 49%;
-    grid-gap: 2%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
-@media only screen and (max-width: 750px) {
-    .button {
-        width: 20% !important;
-    }
-    .cards_wrapper {
-        grid-template-columns: 100%;
-        grid-template-rows: 49% 49%;
-        row-gap: 2%;
+.welcome_item {
+    width: 150px;
+    padding: 10px;
+}
+
+@media screen and (max-width: 500px) {
+    .welcome_item {
+        width: 150px;
     }
 }
 
-@media only screen and (max-width: 600px) {
-    .button {
-        width: 30% !important;
+@media screen and (min-width: 500px) {
+    .welcome_item {
+        width: 180px;
     }
 }
 
-@media only screen and (max-width: 400px) {
-    .button {
-        width: 90% !important;
+@media screen and (min-width: 600px) {
+    .welcome_item {
+        width: 220px;
     }
 }
 
-/*Here is where the magic happens, media query listens to when screen is resized at <992px(md) and container properties change*/
-
-@media only screen and (max-width: 992px) {
-    .container {
-        display: flex;
-        flex-wrap: nowrap;
-        height: 300px;
-        overflow-x: auto;
-        width: auto;
-    }
-}

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Icon, Message, Modal} from "semantic-ui-react";
+import {Button, Form, Message, Modal} from "semantic-ui-react";
 import {connect} from "react-redux"
 import {addCampaign, updateCampaign} from "../../actions/campaignActions"
 
@@ -13,7 +13,7 @@ function CampaignModal(props) {
             title: title || "",
             description: description || "",
             question: question || "",
-            details: details || {type: "Survey", options: [""], results: new Map()},
+            details: details || {type: "Product Pluck", options: ["", ""], results: new Map()},
 
         });
 
@@ -25,7 +25,7 @@ function CampaignModal(props) {
                 title: title || "",
                 description: description || "",
                 question: question || "",
-                details: details || {type: "Survey", options: [""], results: new Map()},
+                details: details || {type: "Product Pluck", options: ["", ""], results: new Map()},
 
             }
         );
@@ -33,10 +33,22 @@ function CampaignModal(props) {
 
     function submit(e) {
         e.preventDefault();
+
+        if (values.details.type === 'Fastpass' && parseInt(values.question) < 25) {
+            setMsg({msg: 'Please enter an amount greater than $24.99', positive: false, negative: true})
+            return;
+        }
+
+        let question = values.question
+        let title = values.title
+        if (values.details.type === 'Product Pluck' && values.details.options[0] !== '' && values.details.options[1] !== '') {
+            question = values.details.options[0] + ' vs ' + values.details.options[1]
+            title = 'Product Pluck'
+        }
         const campaignDetails = {
-            title: values.title,
+            title: title,
             description: values.description,
-            question: values.question,
+            question: question,
             details: values.details,
             user: auth.user._id,
             location: location,
@@ -44,8 +56,8 @@ function CampaignModal(props) {
             active: true
         }
 
-        if (!values.title || !values.description || !values.details || !values.question) {
-            setMsg({msg: "Please fill in all required fields and verify you have at least two options"});
+        if (!title || !values.description || !values.details || !question) {
+            setMsg({msg: "Please fill in all required fields"});
         } else {
             if (values.details.type === "Fastpass") {
                 values.details.options = []
@@ -75,53 +87,57 @@ function CampaignModal(props) {
         setValues({...values, details: {...values.details, options}})
     }
 
-    function handleOptionAdd() {
-        let options = values.details.options
-        options.push("")
-        setValues({...values, details: {...values.details, options}})
-    }
-
-    function handleOptionRemove(index) {
-        let options = values.details.options
-        options.splice(index, 1)
-        setValues({...values, details: {...values.details, options}})
-    }
+    // function handleOptionAdd() {
+    //     let options = values.details.options
+    //     options.push("")
+    //     setValues({...values, details: {...values.details, options}})
+    // }
+    //
+    // function handleOptionRemove(index) {
+    //     let options = values.details.options
+    //     options.splice(index, 1)
+    //     setValues({...values, details: {...values.details, options}})
+    // }
 
     const campaignTitle = action?.substring(0, 1).toUpperCase() + action?.substring(1)
     return (
         <Modal onClose={() => setOpen(false)}
-               onOpen={() => setOpen(true)}
+               onOpen={() => {
+                   setOpen(true)
+                   setMsg(null)
+               }}
                open={open}
-               trigger={trigger}
-               closeIcon>
+               trigger={trigger}>
             <Modal.Header>{campaignTitle} Campaign</Modal.Header>
             <Modal.Content scrolling>
                 {/* {props.action === "add" &&  <Tab panes={panes} /> } */}
                 {action === "add" && <Button.Group basic>
-                    <Button toggle active={values.details.type === "Survey"} onClick={handleClick}>Survey</Button>
+                    <Button toggle active={values.details.type === "Product Pluck"} onClick={handleClick}>Product Pluck</Button>
                     <Button toggle active={values.details.type === "Raffle"} onClick={handleClick}>Raffle</Button>
                     <Button toggle active={values.details.type === "Fastpass"} onClick={handleClick}>Fastpass</Button>
                 </Button.Group>}
-                <Form>
-                    {msg && msg.msg && <Message negative>
+                <Form style={{marginTop: 10}}>
+                    {msg && msg.msg &&
+                    <Message negative style={{marginTop: 20}}>
                         <Message.Header>{msg.msg}</Message.Header>
                     </Message>}
-                    <br/>
-                    <Form.Input required label={`${values.details.type} Title`} placeholder='enter title...'
+                    {values.details.type !== 'Product Pluck' &&
+                    <Form.Input required label={`${values.details.type} Title`} placeholder='Enter title...'
                                 value={values.title} onChange={handleChange} name="title"/>
-                    <Form.TextArea required label='Description' placeholder='enter description...'
+                    }
+                    <Form.TextArea required label='Description' placeholder='Enter description...'
                                    value={values.description} name="description" onChange={handleChange}/>
-                    {values.details.type === "Survey" &&
-                    <Form.Input required label='What do you want to ask?' placeholder='enter question...'
-                                onChange={handleChange} value={values.question} name="question"/>}
+                    {/*{values.details.type === "Product Pluck" &&*/}
+                    {/*<Form.Input required label='What products would you like to offer?'*/}
+                    {/*            onChange={handleChange} value={values.question} name="question"/>}*/}
                     {values.details.type === "Raffle" &&
                     <Form.Input required value={values.question} label='Cost Per Ticket' type="number"
-                                placeholder='enter in dollar amount...' onChange={handleChange} name="question"/>}
+                                placeholder='Enter in dollar amount...' onChange={handleChange} name="question"/>}
                     {values.details.type === "Fastpass" &&
                     <Form.Input required value={values.question} label='Cost to Skip' type="number"
-                                placeholder='enter in dollar amount...' onChange={handleChange} name="question"/>}
-                    {values.details.type === "Survey" &&
-                    <div id={'survey-options'}>
+                                placeholder='Enter in dollar amount greater than $24.99...' onChange={handleChange} name="question"/>}
+                    {values.details.type === "Product Pluck" &&
+                    <div id={'product-pluck-options'}>
                         <table style={{width: '100%'}}>
                             <thead>
                             <tr>
@@ -133,31 +149,32 @@ function CampaignModal(props) {
                                 return (
                                     <tr key={index}>
                                         <td>
-                                            <Form.Input placeholder={`enter option ${index + 1}...`}
+                                            <Form.Input placeholder={`Enter option ${index + 1}...`}
                                                         name={`${values.details.options}_${index}`}
                                                         value={values.details.options[index]}
-                                                        onChange={(e, data) => handleOptionChange(data, index)}/>
+                                                        onChange={(e, data) => handleOptionChange(data, index)}
+                                                        required/>
                                         </td>
-                                        <td>
-                                            <div style={{
-                                                display: 'flex',
-                                                flexDirection: 'row',
-                                                cursor: 'pointer',
-                                                color: 'red',
-                                                fontWeight: 'bold'
-                                            }}
-                                                 color='white'
-                                                 onClick={handleOptionRemove.bind(null, index)}>
-                                                <Icon name="trash"/>
-                                            </div>
-                                        </td>
+                                        {/*<td>*/}
+                                            {/*<div style={{*/}
+                                            {/*    display: 'flex',*/}
+                                            {/*    flexDirection: 'row',*/}
+                                            {/*    cursor: 'pointer',*/}
+                                            {/*    color: 'red',*/}
+                                            {/*    fontWeight: 'bold'*/}
+                                            {/*}}*/}
+                                            {/*     color='white'*/}
+                                            {/*     onClick={handleOptionRemove.bind(null, index)}>*/}
+                                            {/*    <Icon name="trash"/>*/}
+                                            {/*</div>*/}
+                                        {/*</td>*/}
                                     </tr>
                                 )
                             })}
                             </tbody>
                         </table>
                         <br/>
-                        <AddOptionButton handler={handleOptionAdd}/>
+                        {/*<AddOptionButton handler={handleOptionAdd}/>*/}
                     </div>
 
                     }
@@ -176,24 +193,24 @@ function CampaignModal(props) {
         </Modal>
     )
 }
-
-function AddOptionButton(props) {
-    const {handler} = props
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            cursor: 'pointer',
-            color: '#4183c4',
-            fontWeight: 'bold'
-        }}
-             color='white'
-             onClick={handler}>
-            <i className='add icon'/>
-            Add Option
-        </div>
-    )
-}
+//
+// function AddOptionButton(props) {
+//     const {handler} = props
+//     return (
+//         <div style={{
+//             display: 'flex',
+//             flexDirection: 'row',
+//             cursor: 'pointer',
+//             color: '#4183c4',
+//             fontWeight: 'bold'
+//         }}
+//              color='white'
+//              onClick={handler}>
+//             <i className='add icon'/>
+//             Add Option
+//         </div>
+//     )
+// }
 
 const mapStateToProps = (state) => ({
     auth: state.auth,

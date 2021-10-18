@@ -9,7 +9,13 @@ import {Accordion, Card, Dropdown, Form, Icon, Loader, Message} from 'semantic-u
 import PasswordStrengthBar from 'react-password-strength-bar';
 import {CardElement, Elements, PaymentRequestButtonElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
-import {createCustomer, createSetupIntent, markComplete, markProcessing} from "../../actions/stripeActions";
+import {
+    createCustomer,
+    createSetupIntent,
+    markComplete,
+    markProcessing,
+    resetCustomer
+} from "../../actions/stripeActions";
 
 
 function Register(props) {
@@ -53,7 +59,8 @@ function RegisterForm(props) {
         error,
         createSetupIntent,
         createCustomer,
-        clearErrors
+        clearErrors,
+        resetCustomer
     } = props
 
     useEffect(() => {
@@ -87,7 +94,7 @@ function RegisterForm(props) {
                 markProcessing()
                 if (stripe.loading || stripe.status !== 'unfulfilled') {
                     event.complete('fail')
-                    setMsg({msg: 'Could Not Process Card Information'})
+                    setMsg({msg: 'Could Not Process Card Information', positive: false, negative: true})
                     return;
                 }
 
@@ -98,7 +105,7 @@ function RegisterForm(props) {
                 if (result.error) {
                     event.complete('fail')
                     markComplete('fail')
-                    setMsg({msg: 'Could Not Process Card Information'})
+                    setMsg({msg: 'Could Not Process Card Information', positive: false, negative: true})
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
@@ -108,16 +115,16 @@ function RegisterForm(props) {
                         if (error) {
                             console.error(error.message)
                             markComplete('fail')
-                            setMsg({msg: 'Could Not Process Card Information'})
+                            setMsg({msg: 'Could Not Process Card Information', positive: false, negative: true})
                         } else {
                             markComplete('success')
-                            setMsg({msg: 'Successfully Added Card Information!'})
+                            setMsg({msg: 'Successfully Added Card Information!', positive: true, negative: false})
                         }
                     } else {
                         setPaymentMethod(result.setupIntent.payment_method)
                         setPaymentAuthenticatedByMobile(true)
                         markComplete('success')
-                        setMsg({msg: 'Successfully Added Card Information!'})
+                        setMsg({msg: 'Successfully Added Card Information!', positive: true, negative: false})
 
                     }
                 }
@@ -129,8 +136,9 @@ function RegisterForm(props) {
         if (error.id === 'REGISTER_FAIL') {
             setMsg(error.msg)
             clearErrors()
+            resetCustomer()
         }
-    }, [error, clearErrors])
+    }, [error, clearErrors, resetCustomer])
 
     useEffect(() => {
         if (auth.isAuthenticated) {
@@ -200,10 +208,10 @@ function RegisterForm(props) {
         // clear prev errors
         clearErrors()
         if (!isValid()) {
-            setMsg({msg: 'Please fill in all the fields'})
+            setMsg({msg: 'Please fill in all the fields', positive: false, negative: true})
             return;
         } else {
-            setMsg({msg: ''})
+            setMsg(null)
         }
 
         let result = ''
@@ -253,7 +261,7 @@ function RegisterForm(props) {
     return (
         <Form className={styles.formContainer} onSubmit={onSubmit}>
             {msg && msg.msg &&
-            <Message negative={!msg.msg.includes('Successfully')} positive={msg.msg.includes('Successfully')} className={styles.message}>
+            <Message positive={msg.positive} negative={msg.negative} className={styles.message}>
                 <Message.Header>{msg.msg}</Message.Header>
             </Message>
             }
@@ -327,5 +335,6 @@ export default connect(mapStateToProps, {
     createCustomer,
     createSetupIntent,
     markProcessing,
-    markComplete
+    markComplete,
+    resetCustomer
 })(Register)

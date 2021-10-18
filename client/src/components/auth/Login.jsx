@@ -50,7 +50,7 @@ function Login(props) {
                             value={values.password} name="password"/>
                 <Form.Button content="Login" color="blue" type="submit"/>
                 <Message>
-                    <Message.Header>Don't have an account? <a href="/#/register">Register Here</a></Message.Header>
+                    <Message.Header>Don't have an account? <a href="/#/register">Sign Up</a></Message.Header>
                 </Message>
             </Form>
         </div>

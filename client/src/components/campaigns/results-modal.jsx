@@ -32,7 +32,7 @@ function ResultsModal(props) {
         updateCampaign(campaignDetails)
     }
 
-    // Ending survey logic
+    // Ending Product Pluck logic
     function handleEnd() {
         const options = Object.entries(details.results).sort((a, b) => a[1] - b[1]);
         const winner = options[0][0];
@@ -63,7 +63,7 @@ function ResultsModal(props) {
                 </h6>}
             </Modal.Header>
             <Modal.Content>
-                {details.type === "Survey" &&
+                {details.type === "Product Pluck" &&
                 <div>
                     {active && results && results.map((result, index) => {
                         return (
@@ -100,7 +100,7 @@ function ResultsModal(props) {
                 }
             </Modal.Content>
             <Modal.Actions>
-                {details.type === 'Survey' && active && results.length > 0 &&
+                {details.type === 'Product Pluck' && active && results.length > 0 &&
                 <Button primary onClick={handleEnd}>End Campaign</Button>
                 }
                 {details.type === 'Raffle' && active && results.length > 0 &&

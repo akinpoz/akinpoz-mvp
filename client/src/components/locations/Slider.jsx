@@ -3,7 +3,7 @@ import history from '../../history'
 import FastpassImage from '../../assets/images/day20-rocket.png'
 import RaffleImage from '../../assets/images/raffle_logo.png'
 import MenuImage from '../../assets/images/day82-burger.png'
-import SurveyImage from '../../assets/images/120-power-of-pen.png'
+import ProductPluckImage from '../../assets/images/120-power-of-pen.png'
 import MenuMarketImage from '../../assets/images/day4-polariod.png'
 import JukeboxImage from '../../assets/images/113-workstation.png'
 import {Card, Image} from 'semantic-ui-react'
@@ -20,7 +20,7 @@ function Slider(props) {
     const icons = {
         'Fastpass': FastpassImage,
         'Raffle': RaffleImage,
-        'Survey': SurveyImage,
+        'Product Pluck': ProductPluckImage,
     }
     const scrollWrapperRef = useRef()
     const [clickStartX, setClickStartX] = useState();
@@ -142,17 +142,21 @@ function Slider(props) {
                             </Card.Content>
                         </Card>
                     </div>}
-                    {loc && loc.campaigns.length > 0 && loc.campaigns.map((campaign, index) => {
-                        const key = `scroll-box-item-${campaign._id}_${index}`
+                    {loc && loc.campaigns.length > 0 && loc.campaigns.map((campaign) => {
+                        const key = `scroll-box-item-${campaign._id}`
                         if (campaign.active) {
                             return (
-                                <div className={styles.scroll_box__item} role="listitem"
-                                     key={key}>
+                                <div className={styles.scroll_box__item} role="listitem" key={key}>
                                     <Card style={{cursor: 'pointer'}} onClick={handleClick.bind(null, campaign)}>
                                         <Image src={icons[campaign.details["type"]]} wrapped ui={false}/>
                                         <Card.Content>
                                             <Card.Header>{campaign.title}</Card.Header>
-                                            <Card.Meta>{campaign.details.type}</Card.Meta>
+                                            {campaign.details.type !== 'Product Pluck' &&
+                                                <Card.Meta>{campaign.details.type}</Card.Meta>
+                                            }
+                                            {campaign.details.type === 'Product Pluck' &&
+                                                <Card.Meta>{campaign.question}</Card.Meta>
+                                            }
                                         </Card.Content>
                                     </Card>
                                 </div>

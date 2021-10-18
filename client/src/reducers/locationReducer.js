@@ -12,11 +12,12 @@ export default function LocationReducer(state = initialState, action) {
     switch (action.type) {
         case GET_LOCATIONS:
         case GET_LOCATIONS_BY_USER_ID:
+            const noLocations =  (action.payload?.length ?? 0) === 0
             return {
                 ...state,
                 locations: action.payload,
                 loading: false,
-                no_locations: (action.payload?.length() ?? 0) === 0
+                no_locations: noLocations
             }
         case GET_LOCATION:
             return {
@@ -38,11 +39,12 @@ export default function LocationReducer(state = initialState, action) {
                 no_locations: false
             }
         case DELETE_LOCATION:
+            const noLocs =  (state.locations.filter(location => location._id !== action.payload).length ?? 0) === 0
             return {
                 ...state,
                 locations: state.locations.filter(location => location._id !== action.payload),
                 loading: false,
-                no_locations: (state.locations?.length() ?? 0) === 0
+                no_locations: noLocs
             }
         case TOGGLE_MUSIC:
             return {

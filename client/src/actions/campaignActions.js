@@ -84,11 +84,11 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
             }
             dispatch({type: SUBMITTED_CAMPAIGN, last_submitted: item.transactionID, payload: res.data})
 
-            if (item.data.type !== 'Survey') {
+            if (item.data.type !== 'Product Pluck') {
                 // dispatches to stripe reducer to change status from unprocessed to processing
                 dispatch({type: NEW_ITEM_PROCESSING, newItem: newItem})
             } else {
-                // if survey then doesnt need to do anything else -- will trigger adding to stripe otherwise
+                // if Product Pluck then doesnt need to do anything else -- will trigger adding to stripe otherwise
                 dispatch({type: NEW_ITEM_PROCESSING, newItem: null})
             }
         }

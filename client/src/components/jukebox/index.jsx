@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from './jukebox.module.css'
-import {Button, Card, Message, Search} from "semantic-ui-react";
+import {Button, Card, Icon, Message, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
@@ -34,7 +34,7 @@ function Jukebox(props) {
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority <= (msg?.priority ?? 5)) {
+        if (newMsg && newMsg.priority <= (msg?.priority ?? 5) && newMsg.msg !== (msg?.msg ?? '')) {
             setMsg(newMsg)
         }
     }, [msg])
@@ -181,13 +181,15 @@ function Jukebox(props) {
 
     return (
         <div className={styles.container}>
+            <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
+
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
             {msg && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&
                     <div><a href="/#/login" onClick={handleRedirect}>Login</a> or <a href="/#/register"
-                                                                                     onClick={handleRedirect}>Register</a>
+                                                                                     onClick={handleRedirect}>Sign Up</a>
                     </div>
                     }
 
@@ -209,7 +211,7 @@ function Jukebox(props) {
             <br/>
             <br/>
             <div className={styles.shiftUp}>
-                {loc && <h2 style={{textAlign: 'center'}}>Playing @ {loc.name}</h2>}
+                {loc && <h4 style={{textAlign: 'center'}}>Playing @ {loc.name}</h4>}
                 <Card fluid>
                     <div style={{
                         display: "flex",
@@ -218,13 +220,12 @@ function Jukebox(props) {
                         justifyContent: "center",
                         padding: 40
                     }}>
-                        <h1>
+                        <h3 style={{fontWeight: 'bold'}}>
                             Search For a Song
-                        </h1>
+                        </h3>
                         <br/>
                         <Search
                             loading={search.loading}
-                            size='large'
                             onSearchChange={handleSearchChange}
                             results={search.results?.result}
                             value={search.value}
@@ -232,19 +233,17 @@ function Jukebox(props) {
                             onResultSelect={handleSelectionChange}
                         />
                         <br/>
-                        <div style={{flexDirection: "row-reverse", display: "flex"}}>
                             {!locked && auth.isAuthenticated && auth.user.type === "customer" &&
-                            <div>
-                                <Button style={{marginRight: 10}} onClick={() => cleanQuery()}>
+                            <div style={{flexDirection: "row", display: "flex"}}>
+                                <Button style={{marginRight: 10}} onClick={() => cleanQuery()} size={"small"}>
                                     Clear Selection</Button>
                                 {hasPaymentMethod() && <Button primary disabled={search.selection === null}
-                                                               onClick={handleSubmit}>{buttonLabel}</Button>}
+                                                               onClick={handleSubmit} size={"small"}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({pathname: '/profile'})
-                                }}>Add a Payment Method</Button>}
+                                }} size={"small"}>Add a Payment Method</Button>}
                             </div>
                             }
-                        </div>
                     </div>
                 </Card>
             </div>

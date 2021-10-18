@@ -177,11 +177,11 @@ router.post('/submitData', auth, async (req, res) => {
     const {user, data, description} = req.body
     const {campaign_id, info} = data
     switch (description) {
-        case "Survey":
+        case "Product Pluck":
             try {
                 let campaign = await Campaign.findOne({_id: campaign_id})
                 let results = campaign.details.results
-                // Info {String} - The name of one of the options of the survey.
+                // Info {String} - The name of one of the options of the Product Pluck.
                 if (results[info]) {
                     results[info]++
                 } else {

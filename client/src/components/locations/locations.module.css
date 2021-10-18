@@ -58,6 +58,7 @@
 
 .scroll_box__item {
     padding: 10px;
+    max-width: 250px;
 }
 
 .search_container {

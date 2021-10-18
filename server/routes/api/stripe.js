@@ -229,7 +229,7 @@ router.post('/add-invoice-item', async function (req, res) {
         let item = await stripe.invoiceItems.create({
             customer: customerID,
             invoice: invoice.id,
-            amount: params.item.amount,
+            amount: params.item.amount * 100, // multiply by 100 to get amount in cents
             description: params.item.description,
             currency: 'usd',
             metadata: {
@@ -252,7 +252,7 @@ router.post('/add-invoice-item', async function (req, res) {
     } else {
         let item = await stripe.invoiceItems.create({
             customer: customerID,
-            amount: params.item.amount,
+            amount: params.item.amount * 100, // multiply by 100 to get amount in cents
             description: params.item.description,
             currency: 'usd',
             metadata: {
@@ -266,7 +266,7 @@ router.post('/add-invoice-item', async function (req, res) {
         })
         let fee = await stripe.invoiceItems.create({
             customer: customerID,
-            amount: feeAmount,
+            amount: feeAmount, // already in cents
             description: feeDescription,
             currency: 'usd',
             metadata: {

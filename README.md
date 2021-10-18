@@ -25,7 +25,7 @@
   - [ ] implement stripe
   - [ ] design history management - CRUD
   - [ ] connect history to redux (front / back)
-  - [ ] add to jukebox, raffle and survey
+  - [ ] add to jukebox, raffle and Product Pluck
 
 #### Completed (Summary of work)
 
@@ -186,7 +186,7 @@
   - Left to do:
     - design history management - CRUD
     - connect history to redux (front / back)
-    - add to jukebox, raffle and survey
+    - add to jukebox, raffle and Product Pluck
 
 - 8/23: Added Spotify integration
   - How to use:

@@ -11,9 +11,10 @@ import history from '../../history'
 
 
 function MyNavbar(props) {
-    const {auth, stripe} = props
+    const {auth, stripe, location} = props
     const [isLoggedIn, setIsLoggedIn] = useState(auth.isAuthenticated)
     const [toggle, setToggle] = useState(true)
+    const [redirectURL, setRedirectURL] = useState('')
 
     function toggleHamburger() {
         setToggle(!toggle)
@@ -23,15 +24,29 @@ function MyNavbar(props) {
         setIsLoggedIn(auth.isAuthenticated)
     }, [auth.isAuthenticated])
 
+    useEffect(() => {
+        if (location.select_location !== '') {
+            setRedirectURL('location/?location_id=' + location.select_location._id)
+        }
+        else {
+            setRedirectURL('')
+        }
+    }, [location])
+
     function handleRedirect() {
-        history.push('/')
+        if (location.select_location !== '') {
+            history.push('/location/?location_id=' + location.select_location._id)
+        }
+        else {
+            history.push('/')
+        }
     }
 
     return (
         <nav
             className={cx(globalStyles.navbar, globalStyles["navbar-expand-lg"], globalStyles["navbar-dark"], history.location.pathname !== '/customer-home/' ? styles.business_background : styles.customer_background)}
             expand="lg" bg="dark" variant="dark">
-            <a href="/#/" onClick={handleRedirect} className={cx(globalStyles["navbar-brand"])}>
+            <a href={`/#/${redirectURL}`} onClick={handleRedirect} className={cx(globalStyles["navbar-brand"])}>
                 <img
                     alt=""
                     src={logo}
@@ -53,6 +68,10 @@ function MyNavbar(props) {
                     {/* {isLoggedIn && <a href="/#/" data-rb-event-key="/#/" className={cx(globalStyles["nav-link"])}>Home</a>} */}
                 </div>
                 <div className={cx(globalStyles["navbar-nav"])}>
+                    {(!isLoggedIn || (isLoggedIn && auth.user && auth.user.type !== 'business')) &&
+                    <a href={'/#/search'} onClick={() => history.push('/')} className={cx(globalStyles["nav-link"])}
+                       style={{lineHeight: "25px"}}>Search for Location</a>
+                    }
                     {isLoggedIn &&
                     <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])}
                        style={{lineHeight: "25px"}}>{toggle ?
@@ -81,6 +100,7 @@ MyNavbar.propTypes = {
 
 const mapStateToProps = (state) => ({
     auth: state.auth,
-    stripe: state.stripe
+    stripe: state.stripe,
+    location: state.location
 })
 export default connect(mapStateToProps, null)(MyNavbar)
