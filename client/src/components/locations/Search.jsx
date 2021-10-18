@@ -7,15 +7,14 @@ import {Search as SemanticSearch} from 'semantic-ui-react'
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
-    const {locations, getLocations, setLocation} = props
+    const {locations, getLocations, setLocation, no_locations} = props
     const [filteredLocations, setFilteredLocations] = useState(locations)
-
     useEffect(() => {
         if (locations.length === 0) {
             getLocations()
         }
         setFilteredLocations(locations)
-    }, [locations, getLocations])
+    }, [locations, getLocations, no_locations])
 
 
     function handleChange(e) {
@@ -72,7 +71,8 @@ function Search(props) {
 }
 
 const mapStateToProps = (state) => ({
-    locations: state.location.locations
+    locations: state.location.locations,
+    no_locations: state.location.no_locations
 })
 
 export default connect(mapStateToProps, {getLocations, setLocation})(Search)

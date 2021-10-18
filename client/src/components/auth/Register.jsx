@@ -24,7 +24,6 @@ function Register(props) {
 }
 
 function RegisterForm(props) {
-
     const useStripeInst = useStripe()
     const elements = useElements();
 
@@ -158,12 +157,10 @@ function RegisterForm(props) {
             })
         }
     }, [elements, values])
-
     useEffect(() => {
         if (stripe.customer !== '' && !auth.isLoading) {
             const {name, email, password, type} = values
             const customerID = stripe.customer;
-
             let newUser
             if (paymentActive) {
                 newUser = {

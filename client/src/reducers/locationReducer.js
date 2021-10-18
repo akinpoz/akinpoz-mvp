@@ -4,6 +4,7 @@ const initialState = {
     locations: [],
     loading: false,
     select_location: "",
+    no_locations: false
 
 }
 
@@ -14,7 +15,8 @@ export default function LocationReducer(state = initialState, action) {
             return {
                 ...state,
                 locations: action.payload,
-                loading: false
+                loading: false,
+                no_locations: (action.payload?.length() ?? 0) === 0
             }
         case GET_LOCATION:
             return {
@@ -25,19 +27,22 @@ export default function LocationReducer(state = initialState, action) {
             return {
                 ...state,
                 locations: [...state.locations, action.payload],
-                loading: false
+                loading: false,
+                no_locations: false
             }
         case UPDATE_LOCATION:
             return {
                 ...state,
                 locations: [action.payload, ...state.locations.filter(location => location._id !== action.payload._id)],
-                loading: false
+                loading: false,
+                no_locations: false
             }
         case DELETE_LOCATION:
             return {
                 ...state,
                 locations: state.locations.filter(location => location._id !== action.payload),
-                loading: false
+                loading: false,
+                no_locations: (state.locations?.length() ?? 0) === 0
             }
         case TOGGLE_MUSIC:
             return {

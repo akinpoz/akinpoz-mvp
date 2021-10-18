@@ -41,7 +41,6 @@ import {
  */
 export const createCustomer = (name, email, paymentMethod) => (dispatch) => {
     dispatch({type: REQUESTED_CUSTOMER})
-    dispatch({type: USER_LOADING})
     const params = {
         name, email, paymentMethod
     }
