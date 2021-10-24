@@ -52,7 +52,8 @@ function CampaignModal(props) {
             campaign_id: _id,
             active: true
         }
-        if (!title || !values.description || !values.details || !question) {
+
+        if (!values.details) {
             setMsg({ msg: "Please fill in all required fields" });
         } else {
             if (values.details.type === "Fastpass") {
