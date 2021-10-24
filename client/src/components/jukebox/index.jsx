@@ -61,8 +61,9 @@ function Jukebox(props) {
     useEffect(() => {
         if (auth.isAuthenticated) {
             if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
+                const profile = <a href="/#/profile">profile page</a>
                 setMsgWithPriority({
-                    msg: "Please add a payment method in the profile page before queuing a song.",
+                    msg: `Please add a payment method in the ${profile} before queuing a song.`,
                     priority: 2,
                     negative: true,
                     positive: false
@@ -184,7 +185,7 @@ function Jukebox(props) {
             <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
 
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
-            {msg && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
+            {msg && auth.user.type === "customer" && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&
@@ -192,7 +193,6 @@ function Jukebox(props) {
                                                                                      onClick={handleRedirect}>Sign Up</a>
                     </div>
                     }
-
                 </Message.Header>
             </Message>}
             {auth.user && auth.user.type === 'business' &&

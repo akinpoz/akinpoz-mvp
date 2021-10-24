@@ -70,7 +70,7 @@ function MyNavbar(props) {
                 <div className={cx(globalStyles["navbar-nav"])}>
                     {(!isLoggedIn || (isLoggedIn && auth.user && auth.user.type !== 'business')) &&
                     <a href={'/#/search'} onClick={() => history.push('/')} className={cx(globalStyles["nav-link"])}
-                       style={{lineHeight: "25px"}}>Search for Location</a>
+                       style={{lineHeight: "25px"}}>Search</a>
                     }
                     {isLoggedIn &&
                     <a href="/#/profile" data-rb-event-key="/#/profile" className={cx(globalStyles["nav-link"])}

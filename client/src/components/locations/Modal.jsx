@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Form, Message, Modal} from "semantic-ui-react";
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Message, Modal } from "semantic-ui-react";
 import styles from './locations.module.css'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 function LocationModal(props) {
-    const {name, description, _id, menu_url, address, auth, action, trigger} = props
+    const { name, description, _id, menu_url, address, auth, action, trigger } = props
     const [open, setOpen] = useState(false);
     const [values, setValues] = useState({
         name: name || "",
@@ -14,7 +14,7 @@ function LocationModal(props) {
     });
     const [msg, setMsg] = useState();
     useEffect(() => {
-        setValues({name: name, description: description, menu_url: menu_url, address: address});
+        setValues({ name: name, description: description, menu_url: menu_url, address: address });
     }, [open, name, description, menu_url, address]);
 
     function submit(e) {
@@ -37,11 +37,11 @@ function LocationModal(props) {
     }
 
     function handleChange(e) {
-        setValues({...values, [e.target.name]: e.target.value});
+        setValues({ ...values, [e.target.name]: e.target.value });
     }
 
     function clear() {
-        setValues({...values, name: "", description: ""});
+        setValues({ ...values, name: "", description: "" });
     }
 
     function close() {
@@ -52,31 +52,32 @@ function LocationModal(props) {
     const title = action.substring(0, 1).toUpperCase() + action.substring(1)
     return (
         <Modal onClose={() => setOpen(false)}
-               onOpen={() => setOpen(true)}
-               open={open}
-               trigger={trigger}
-               closeIcon>
+            onOpen={() => setOpen(true)}
+            open={open}
+            trigger={trigger}
+            closeIcon>
             <Modal.Header>{title} Location</Modal.Header>
             <Modal.Content>
                 <Form>
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                        {msg && msg.msg && <Message style={{height: '100%', width: '100%', margin: 'auto auto'}}
-                                                    negative={msg.msg.includes("Failed")}
-                                                    positive={msg.msg.includes("Success")} className={styles.message}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        {msg && msg.msg && <Message style={{ height: '100%', width: '100%', margin: 'auto auto' }}
+                            negative={msg.msg.includes("Failed")}
+                            positive={msg.msg.includes("Success")} className={styles.message}>
                             <Message.Header>{msg.msg}</Message.Header>
                         </Message>}
                         {/* <img src={imageData} className={styles.image} /> */}
                         {/* <input type="file" accept="image/*" onChange={handleUpload} placeholder="Upload your logo"/> */}
                     </div>
                     <Form.Input required value={values.name || ""} name="name" label='Location Name'
-                                placeholder='Enter Name' onChange={handleChange}/>
+                        placeholder='Enter Name' onChange={handleChange} />
                     <Form.TextArea value={values.description || ""} name="description"
-                                   label={'Location Description (any notes you want to include about this location)'}
-                                   placeholder='Enter Description' onChange={handleChange}/>
-                    <Form.Input value={values.menu_url || ""} name="menu_url" label={'Menu URL'}
-                                placeholder='Enter Menu URL' onChange={handleChange}/>
+                        label={'Location Description (any notes you want to include about this location)'}
+                        placeholder='Enter Description' onChange={handleChange} />
                     <Form.Input required value={values.address || ""} name="address" label={'Address'}
-                                placeholder='Enter Address' onChange={handleChange}/>
+                        placeholder='Enter Address' onChange={handleChange} />
+                    <Form.Input value={values.menu_url || ""} name="menu_url" label={'Menu URL'}
+                        placeholder='Enter Menu URL' onChange={handleChange} />
+
                 </Form>
             </Modal.Content>
             <Modal.Actions>

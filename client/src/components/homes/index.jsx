@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import BusinessHome from './business-home'
 import CustomerHome from './customer-home'
 import history from '../../history'
-import BusinessOwnerImage from '../../assets/images/day13-it-girl.png'
-import PatronImage from '../../assets/images/patron-image.png'
+import BusinessOwnerImage from '../../assets/images/day42-imac.png'
+import PatronImage from '../../assets/images/120-power-of-pen.png'
 import {Card, Image, Message} from 'semantic-ui-react'
 import styles from './home.module.css'
 
@@ -46,11 +46,6 @@ const Welcome = (props) => {
                             <Image src={BusinessOwnerImage} wrapped ui={false}/>
                             <Card.Content extra>
                                 <Card.Header>Business Owner</Card.Header>
-                                <Card.Meta>
-                                    <p>
-                                        Sign in or sign up to manage your business with Akopoz
-                                    </p>
-                                </Card.Meta>
                             </Card.Content>
                         </Card>
                     </div>
@@ -60,10 +55,7 @@ const Welcome = (props) => {
                         <Card fluid>
                             <Image src={PatronImage} wrapped ui={false}/>
                             <Card.Content extra>
-                                <Card.Header>Patron</Card.Header>
-                                <Card.Meta>
-                                    <p>Whether you are just looking for ready to order, click here to get started</p>
-                                </Card.Meta>
+                                <Card.Header>Customer</Card.Header>
                             </Card.Content>
                         </Card>
                     </div>

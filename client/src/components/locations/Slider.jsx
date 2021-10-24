@@ -123,11 +123,6 @@ function Slider(props) {
                                 <Image src={MenuImage} wrapped ui={false}/>
                                 <Card.Content>
                                     <Card.Header>Menu</Card.Header>
-                                    <Card.Meta>
-                                        <p style={{color: 'transparent'}}>
-                                            -----
-                                        </p>
-                                    </Card.Meta>
                                 </Card.Content>
                             </Card>
                         </a>
@@ -137,8 +132,7 @@ function Slider(props) {
                         <Card style={{cursor: 'pointer'}} onClick={() => history.push('/customer-jukebox')}>
                             <Image src={JukeboxImage} wrapped ui={false}/>
                             <Card.Content>
-                                <Card.Header>Jukebox</Card.Header>
-                                <Card.Meta>Play a Song!</Card.Meta>
+                                <Card.Header>Tunes</Card.Header>
                             </Card.Content>
                         </Card>
                     </div>}
@@ -150,13 +144,8 @@ function Slider(props) {
                                     <Card style={{cursor: 'pointer'}} onClick={handleClick.bind(null, campaign)}>
                                         <Image src={icons[campaign.details["type"]]} wrapped ui={false}/>
                                         <Card.Content>
-                                            <Card.Header>{campaign.title}</Card.Header>
-                                            {campaign.details.type !== 'Product Pluck' &&
-                                                <Card.Meta>{campaign.details.type}</Card.Meta>
-                                            }
-                                            {campaign.details.type === 'Product Pluck' &&
-                                                <Card.Meta>{campaign.question}</Card.Meta>
-                                            }
+                                            {/* <Card.Header>{campaign.title}</Card.Header> */}
+                                            <Card.Header>{campaign?.details?.type}</Card.Header>
                                         </Card.Content>
                                     </Card>
                                 </div>
@@ -171,11 +160,6 @@ function Slider(props) {
                                 <Image src={MenuMarketImage} wrapped ui={false}/>
                                 <Card.Content>
                                     <Card.Header>Join our Menu Market Waitlist!</Card.Header>
-                                    <Card.Meta>
-                                        <p style={{color: 'transparent'}}>
-                                            -----
-                                        </p>
-                                    </Card.Meta>
                                 </Card.Content>
                             </Card>
                         </a>

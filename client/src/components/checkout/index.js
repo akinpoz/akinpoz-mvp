@@ -1,11 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Button, Card, Form, Message} from "semantic-ui-react";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Card, Form, Message } from "semantic-ui-react";
 import styles from './checkout.module.css'
-import {clearStripeMsg, closeTab} from "../../actions/stripeActions";
-import {clearCampaignMsg, submitCampaignData} from "../../actions/campaignActions"
-import {connect} from "react-redux";
+import { clearStripeMsg, closeTab } from "../../actions/stripeActions";
+import { clearCampaignMsg, submitCampaignData } from "../../actions/campaignActions"
+import { connect } from "react-redux";
 import history from '../../history'
-import {clearSpotifyErrors, queueSong} from "../../actions/spotifyActions";
+import { clearSpotifyErrors, queueSong } from "../../actions/spotifyActions";
 
 /**
  * Checkout form for rendering tabs (3 conditions -- Has open tab, wants to open tab, has no tab and doesnt want to start a tab)
@@ -15,7 +15,7 @@ import {clearSpotifyErrors, queueSong} from "../../actions/spotifyActions";
  */
 function Checkout(props) {
     const [msg, setMsg] = useState()
-    const {stripe, spotify, campaign, location, clearStripeMsg, clearSpotifyErrors, clearCampaignMsg} = props
+    const { stripe, spotify, campaign, location, clearStripeMsg, clearSpotifyErrors, clearCampaignMsg } = props
     // Needs to get open invoice if exists
 
     useEffect(() => {
@@ -42,17 +42,17 @@ function Checkout(props) {
 
     return (
         <div className={styles.checkoutContainer}>
-            {msg && msg.msg && <Message><Message.Header>{msg.msg}<br/><a
+            {msg && msg.msg && <Message><Message.Header>{msg.msg}<br /><a
                 href={`/#/location/?location_id=${location.select_location._id}`}>Participate in Another
                 Campaign!</a></Message.Header></Message>}
             {stripe.tab &&
-            <ExistingTab {...props} />
+                <ExistingTab {...props} />
             }
             {!stripe.tab && stripe.newItem &&
-            <NewTab {...props} />
+                <NewTab {...props} />
             }
             {!stripe.tab && !stripe.newItem &&
-            <NoTab/>
+                <NoTab />
             }
         </div>
     )
@@ -71,7 +71,7 @@ function NewTab(props) {
     const [payAgreement, setPayAgreement] = useState(false)
     const [locked, setLocked] = useState(true)
 
-    const {stripe, submitCampaignData, queueSong} = props
+    const { stripe, submitCampaignData, queueSong } = props
 
     useEffect(() => {
         if (stripe.unpaidTabs) {
@@ -94,47 +94,47 @@ function NewTab(props) {
 
     return (
         <div>
-            <Card style={{padding: 15}}>
+            <Card style={{ padding: 15 }}>
                 <h2>Open a New Tab</h2>
-                <div className={styles.divider}/>
+                <div className={styles.divider} />
                 <div>
-                    {stripe.newItem.item &&
+                    {/* {stripe.newItem.item &&
                     <div className={styles.itemContainer}>
                         <p style={{margin: 0}}>{stripe.newItem.item.data.name}</p>
                         <p>${stripe.newItem.item.amount.toFixed(2)}</p>
                     </div>
-                    }
-                    <div className={styles.itemContainer}>
+                    } */}
+                    {/* <div className={styles.itemContainer}>
                         <p style={{margin: 0}}>Fee to open new tab</p>
                         <p>${feePrice.toFixed(2)}</p>
-                    </div>
+                    </div> */}
                     <div className={styles.totalContainer}>
                         <b>Subtotal</b>
                         <b>${(stripe.newItem.item.amount + feePrice).toFixed(2)}</b>
                     </div>
                 </div>
-                <br/>
+                {/* <br/>
                 <b style={{textAlign: "center"}}>*Payment will be captured in 24 hours from the card stored in
                     profile*</b>
-                <br/>
+                <br/> */}
 
                 <Form onSubmit={handleSubmit}>
                     <div className={styles.termsAndConditions}>
-                        <Form.Checkbox style={{marginRight: 10}} checked={tac} onChange={() => setTac(!tac)}/>
+                        <Form.Checkbox style={{ marginRight: 10 }} checked={tac} onChange={() => setTac(!tac)} />
                         <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.termsAndConditions}>
-                        <Form.Checkbox style={{marginRight: 10}} checked={payAgreement}
+                        {/* <Form.Checkbox style={{marginRight: 10}} checked={payAgreement}
                                        onChange={() => setPayAgreement(!payAgreement)}/>
-                        <p>I understand my saved card will be charged in 24 hours to settle my tab.</p>
+                        <p>I understand my saved card will be charged in 24 hours to settle my tab.</p> */}
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.cardFormButtonsContainer}>
                         {/* <Form.Button type={'button'} style={{ marginRight: 5 }}
                             onClick={() => history.push('/')}>Home</Form.Button> */}
                         <Form.Button primary
-                                     disabled={stripe.loading || stripe.status !== 'unfulfilled' || !tac || !payAgreement || locked}>Open
+                            disabled={stripe.loading || stripe.status !== 'unfulfilled' || !tac || !payAgreement || locked}>Open
                             Tab</Form.Button>
                     </div>
                 </Form>
@@ -150,7 +150,7 @@ function NewTab(props) {
  * @constructor
  */
 function ExistingTab(props) {
-    const {stripe, auth, closeTab, location} = props
+    const { stripe, auth, closeTab, location } = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
     const calculateTimeLeft = useCallback(() => {
         let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
@@ -167,7 +167,7 @@ function ExistingTab(props) {
         }
 
         if (timeLeftComponents.hours > 0) {
-            timeLeft += timeLeftComponents.hours.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+            timeLeft += timeLeftComponents.hours.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })
             timeLeft += ':'
         }
         if (timeLeftComponents.minutes > 0 || timeLeft !== '') {
@@ -228,38 +228,38 @@ function ExistingTab(props) {
 
     return (
         <div>
-            <Card style={{padding: 15}}>
+            <Card style={{ padding: 15 }}>
                 <h2>Current Tab</h2>
-                <div className={styles.divider}/>
+                <div className={styles.divider} />
+                <div className={styles.totalContainer}>
+                    <b>Subtotal</b>
+                    <b>${sum.toFixed(2)}</b>
+                </div>
                 <div>
                     {stripe?.tab?.items && stripe.tab.items.map(item => {
                         return (
                             <div className={styles.itemContainer} key={item.data.name}>
-                                <p style={{margin: 0}}>{item.data.name}</p>
+                                <p style={{ margin: 0 }}>{item.data.name}</p>
                                 <p>${item.amount.toFixed(2)}</p>
                             </div>
                         )
                     })}
                     {stripe?.newItem?.item &&
-                    <div className={styles.itemContainer}>
-                        <p style={{margin: 0}}>{stripe.newItem.item.data.name}</p>
-                        <p>${stripe.newItem.item.amount.toFixed(2)}</p>
-                    </div>
+                        <div className={styles.itemContainer}>
+                            <p style={{ margin: 0 }}>{stripe.newItem.item.data.name}</p>
+                            <p>${stripe.newItem.item.amount.toFixed(2)}</p>
+                        </div>
                     }
-                    <div className={styles.totalContainer}>
-                        <b>Subtotal</b>
-                        <b>${sum.toFixed(2)}</b>
-                    </div>
-                    <br/>
+                    <br />
                     <div className={styles.timerBox}>
                         <b>{timeLeft}</b>
                     </div>
-                    <br/>
+                    <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        <Button type={'button'} style={{marginRight: 5}}
-                                href={`/#/location/?location_id=${location.select_location._id}`}>Go Back</Button>
+                        <Button type={'button'} style={{ marginRight: 5 }}
+                            href={`/#/location/?location_id=${location.select_location._id}`}>Go Back</Button>
                         <Button primary disabled={stripe.loading || stripe.status !== 'unfulfilled'}
-                                onClick={() => closeTab(auth.user._id)}>Close
+                            onClick={() => closeTab(auth.user._id)}>Close
                             Tab</Button>
                     </div>
                 </div>

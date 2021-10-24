@@ -47,16 +47,18 @@ function Search(props) {
             {filteredLocations.map(location => {
                     return (
                         <div key={location._id} style={{
-                            borderBottom: '.5px solid grey',
+                            borderBottom: '2px solid #0ac7b7',
                             width: "90%",
                             maxWidth: 500,
-                            background: 'lightgrey',
+                            background: '#5704d4',
                             borderRadius: 15,
-                            marginBottom: 10
+                            marginBottom: 10,
+                            color: 'white'
+
                         }}>
                             <div id="search-item-container" style={{width: "95%", margin: 'auto', cursor: 'pointer'}}
                                  onClick={handleClick.bind(null, location)}>
-                                <h1 style={{textAlign: 'center'}}>{location.name}</h1>
+                                <h2 style={{textAlign: 'center'}}>{location.name}</h2>
                             </div>
                         </div>
                     )

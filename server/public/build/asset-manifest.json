@@ -1,33 +1,32 @@
 {
   "files": {
-    "main.css": "/static/css/main.cf8315ca.chunk.css",
-    "main.js": "/static/js/main.52202a6f.chunk.js",
-    "main.js.map": "/static/js/main.52202a6f.chunk.js.map",
+    "main.css": "/static/css/main.987a6530.chunk.css",
+    "main.js": "/static/js/main.8fad02ad.chunk.js",
+    "main.js.map": "/static/js/main.8fad02ad.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.7545a8a1.js",
     "runtime-main.js.map": "/static/js/runtime-main.7545a8a1.js.map",
     "static/css/2.929b618d.chunk.css": "/static/css/2.929b618d.chunk.css",
-    "static/js/2.d3c4a378.chunk.js": "/static/js/2.d3c4a378.chunk.js",
-    "static/js/2.d3c4a378.chunk.js.map": "/static/js/2.d3c4a378.chunk.js.map",
+    "static/js/2.cb7bc0e1.chunk.js": "/static/js/2.cb7bc0e1.chunk.js",
+    "static/js/2.cb7bc0e1.chunk.js.map": "/static/js/2.cb7bc0e1.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.929b618d.chunk.css.map": "/static/css/2.929b618d.chunk.css.map",
-    "static/css/main.cf8315ca.chunk.css.map": "/static/css/main.cf8315ca.chunk.css.map",
-    "static/js/2.d3c4a378.chunk.js.LICENSE.txt": "/static/js/2.d3c4a378.chunk.js.LICENSE.txt",
+    "static/css/main.987a6530.chunk.css.map": "/static/css/main.987a6530.chunk.css.map",
+    "static/js/2.cb7bc0e1.chunk.js.LICENSE.txt": "/static/js/2.cb7bc0e1.chunk.js.LICENSE.txt",
     "static/media/113-workstation.4a3ffed6.png": "/static/media/113-workstation.4a3ffed6.png",
     "static/media/120-power-of-pen.d4753a8e.png": "/static/media/120-power-of-pen.d4753a8e.png",
     "static/media/semantic.min.css": "/static/media/outline-icons.ddae9b1b.woff",
-    "static/media/day13-it-girl.c7d3e645.png": "/static/media/day13-it-girl.c7d3e645.png",
     "static/media/day20-rocket.48cb37c7.png": "/static/media/day20-rocket.48cb37c7.png",
     "static/media/day4-polariod.22bb1e68.png": "/static/media/day4-polariod.22bb1e68.png",
+    "static/media/day42-imac.a9bf1857.png": "/static/media/day42-imac.a9bf1857.png",
     "static/media/day82-burger.6cfe4a81.png": "/static/media/day82-burger.6cfe4a81.png",
     "static/media/logo.3d182b21.png": "/static/media/logo.3d182b21.png",
-    "static/media/patron-image.fa5d0a22.png": "/static/media/patron-image.fa5d0a22.png",
     "static/media/raffle_logo.55bd6ac4.png": "/static/media/raffle_logo.55bd6ac4.png"
   },
   "entrypoints": [
     "static/js/runtime-main.7545a8a1.js",
     "static/css/2.929b618d.chunk.css",
-    "static/js/2.d3c4a378.chunk.js",
-    "static/css/main.cf8315ca.chunk.css",
-    "static/js/main.52202a6f.chunk.js"
+    "static/js/2.cb7bc0e1.chunk.js",
+    "static/css/main.987a6530.chunk.css",
+    "static/js/main.8fad02ad.chunk.js"
   ]
 }
