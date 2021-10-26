@@ -11,7 +11,7 @@ dotenv.config();
 function auth(req, res, next) {
     const token = req.header('x-auth-token') || req.body.token.headers['x-auth-token']
     // Check for token
-    if (!token) return res.status(401).json({ msg: 'Unauthorized' })
+    if (!token) return res.status(401).json({ msg: 'Unauthorized', positive: false, negative: true})
     try {
         // Verify Token
         const decoded = jwt.verify(token, process.env.JWTSECRET)
@@ -21,7 +21,7 @@ function auth(req, res, next) {
     }
     catch (e) {
         console.error(e);
-        res.status(400).json({msg: "Token is not valid"})
+        res.status(400).json({msg: "Token is not valid", positive: false, negative: true})
     }
 }
 

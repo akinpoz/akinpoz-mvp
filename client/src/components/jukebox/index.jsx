@@ -147,7 +147,7 @@ function Jukebox(props) {
         // Add the name/number of tickets to the select campaign redux object
         // Grab user's email from redux store on payment & send to stripe backend/campaign list endpoint
         const item = {
-            amount: 1,
+            amount: 3,
             user: auth.user,
             description: 'song',
             data: {
@@ -185,7 +185,7 @@ function Jukebox(props) {
             <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
 
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
-            {msg && auth.user.type === "customer" && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
+            {msg && auth.user && auth.user.type === "customer" && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&

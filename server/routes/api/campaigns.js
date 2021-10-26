@@ -161,10 +161,10 @@ router.post('/removeName', auth, async (req, res) => {
                 type: campaign.details.type
             }
         }, {useFindAndModify: false, new: true})
-        res.status(200).send({msg: "Successfully removed name", name})
+        res.status(200).send({msg: "Successfully removed name", name, positive: true, negative: false})
     } catch (e) {
         console.error(e)
-        res.status(500).send({msg: `Failed: ${e.message}`})
+        res.status(500).send({msg: `Failed: ${e.message}`, positive: false, negative: true})
     }
 })
 
@@ -195,10 +195,10 @@ router.post('/submitData', auth, async (req, res) => {
                         results: newResults
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks for your vote!"})
+                res.status(200).send({msg: "Thanks for your vote!", positive: true, negative: false})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({msg: error.message})
+                res.status(400).send({msg: error.message, positive: false, negative: true})
             }
             break
         case "Fastpass":
@@ -214,10 +214,10 @@ router.post('/submitData', auth, async (req, res) => {
                         results: campaign.details.results
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment."})
+                res.status(200).send({msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment.", positive: true, negative: false})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({msg: error.message})
+                res.status(400).send({msg: error.message, positive: false, negative: true})
             }
             break
         case "Raffle":
@@ -237,10 +237,10 @@ router.post('/submitData', auth, async (req, res) => {
                         results: newResults
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks for participating in our raffle! We will let you know if you won."})
+                res.status(200).send({msg: "Thanks for participating in our raffle! We will let you know if you won.", positive: true, negative: false})
             } catch (error) {
                 console.error(error)
-                res.status(400).send({msg: error.message})
+                res.status(400).send({msg: error.message, positive: false, negative: true})
             }
             break
     }

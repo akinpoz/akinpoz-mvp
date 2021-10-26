@@ -21,7 +21,7 @@ router.post('/', function (req, res) {
     const { name, email, password, type, customerID, paymentMethod } = req.body;
     // Simple validation
     if (!name || !email || !password || !type || !customerID) {
-        return res.status(400).json({ msg: 'Please Enter all fields' })
+        return res.status(400).json({ msg: 'Please Enter all fields', positive: false, negative: true})
     }
 
     const encryptedCustomerID = encrypt(customerID)
@@ -29,7 +29,7 @@ router.post('/', function (req, res) {
 
     // Check for existing user
     User.findOne({ email }).then(user => {
-        if (user) return res.status(400).json({ msg: 'User already exists' })
+        if (user) return res.status(400).json({ msg: 'User already exists', positive: false, negative: true})
         const newUser = new User({ name, email, password, type, locations: [], customerID: encryptedCustomerID, paymentMethod: encryptedPaymentMethod })
         // Create salt & hash
         bcrypt.genSalt(10, (err, salt) => {
@@ -95,7 +95,7 @@ router.post('/update', auth, function (req, res) {
         })
         .catch(e => {
             console.error(e);
-            res.status(500).send({msg: 'Server Error'})
+            res.status(500).send({msg: 'Server Error', positive: false, negative: true})
         })
 })
 

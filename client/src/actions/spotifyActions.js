@@ -31,7 +31,7 @@ export const queueSong = (item) => (dispatch, getState) => {
             dispatch({
                 type: SPOTIFY_ERROR,
                 error: {msg:'Looks like the jukebox feature is experiencing some issues.' +
-                    '  If you would like to use this feature, please report the error to this location.'}
+                    '  If you would like to use this feature, please report the error to this location.', positive: false, negative: true}
             })
             console.error('failed: ' + res.status)
         }
@@ -39,7 +39,7 @@ export const queueSong = (item) => (dispatch, getState) => {
         dispatch({
             type: SPOTIFY_ERROR,
             error: {msg: 'Looks like the jukebox feature is experiencing some issues.' +
-                '  If you would like to use this feature, please report the error to this location.'}
+                '  If you would like to use this feature, please report the error to this location.', positive: false, negative: true}
         })
     })
 }

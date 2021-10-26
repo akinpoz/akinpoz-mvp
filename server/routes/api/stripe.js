@@ -103,7 +103,7 @@ router.post('/update-payment', async function (req, res) {
 
     if (!user) {
         console.error('User not found')
-        res.status(400).send({msg: 'User not found'})
+        res.status(400).send({msg: 'User not found', positive: false, negative: true})
         return;
     }
 
@@ -159,7 +159,7 @@ router.post('/get-draft-invoice', async function (req, res) {
 
     if (!customerID || customerID === '') {
         console.error('Could not get customer ID')
-        res.status(400).send({msg: 'Could not get customer ID'})
+        res.status(400).send({msg: 'Could not get customer ID', positive: false, negative: true})
         return;
     }
 
@@ -218,7 +218,7 @@ router.post('/add-invoice-item', async function (req, res) {
     let {customerID, paymentID} = await getCustomerAndPaymentID(params.userID, res)
     if (!customerID || customerID === '') {
         console.error('User has no customer ID')
-        res.status(400).send({msg: 'User has no customer ID'})
+        res.status(400).send({msg: 'User has no customer ID', positive: false, negative: true})
         return
     }
 
@@ -243,7 +243,7 @@ router.post('/add-invoice-item', async function (req, res) {
             }
         })
         if (item.invoice === invoice.id) {
-            res.status(200).send({msg: 'Success'})
+            res.status(200).send({msg: 'Success', positive: true, negative: false})
         } else {
             // should this be different? (still invoice item, just on next invoice)
             res.status(400).send({error: 'Could not add invoice item to current invoice'})
@@ -305,9 +305,9 @@ router.post('/add-invoice-item', async function (req, res) {
             }
             res.status(200).send(tab)
         } else if (item && fee) {
-            res.status(200).send({msg: 'Added Items to customer, could not create invoice'})
+            res.status(200).send({msg: 'Added Items to customer, could not create invoice', positive: false, negative: true})
         } else {
-            res.status(400).send({msg: 'Could not add items to account'})
+            res.status(400).send({msg: 'Could not add items to account', positive: false, negative: true})
         }
     }
 })
@@ -320,7 +320,7 @@ router.post('/close-tab', async function(req, res) {
         let paid = true;
         let errors = [];
         if (!invoices.data ||invoices.data.length === 0) {
-            res.status(400).send({msg: 'No Tab to Close'})
+            res.status(400).send({msg: 'No Tab to Close', positive: false, negative: true})
         }
         for (const invoice of invoices.data) {
             const invoiceRes = await stripe.invoices.pay(invoice.id)
@@ -330,7 +330,7 @@ router.post('/close-tab', async function(req, res) {
             }
         }
         if (paid) {
-            res.status(200).send({msg: 'Invoices paid'})
+            res.status(200).send({msg: 'Invoices paid', positive: true, negative: false})
         }
         else {
             res.status(400).send(errors)
@@ -346,7 +346,7 @@ router.post('/get-past-tabs', async function(req, res) {
 
     if (errorOpen || errorPaid) {
         console.error('Could Not get Invoices')
-        res.status(400).send({msg: 'Could Not Get Invoices'})
+        res.status(400).send({msg: 'Could Not Get Invoices', positive: false, negative: true})
         return
     }
 
@@ -363,7 +363,7 @@ router.post('/get-unpaid-tabs', async function (req, res) {
     let errorOpen, openInvoices = await stripe.invoices.list({customer: customerID, status: "open"})
     if (errorOpen) {
         console.error('Could Not get Invoices')
-        res.status(400).send({msg: 'Could Not Get Invoices'})
+        res.status(400).send({msg: 'Could Not Get Invoices', positive: false, negative: true})
         return
     }
     let tabs = createTabs(openInvoices, true)

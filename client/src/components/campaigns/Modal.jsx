@@ -54,7 +54,7 @@ function CampaignModal(props) {
         }
 
         if (!values.details) {
-            setMsg({ msg: "Please fill in all required fields" });
+            setMsg({ msg: "Please fill in all required fields", positive: false, negative: true});
         } else {
             if (values.details.type === "Fastpass") {
                 values.details.options = []
@@ -115,7 +115,7 @@ function CampaignModal(props) {
                 </Button.Group>}
                 <Form style={{ marginTop: 10 }}>
                     {msg && msg.msg &&
-                        <Message negative style={{ marginTop: 20 }}>
+                        <Message negative={msg.negative} positive={msg.positive} style={{ marginTop: 20 }}>
                             <Message.Header>{msg.msg}</Message.Header>
                         </Message>}
                     {values.details.type === 'Raffle' &&

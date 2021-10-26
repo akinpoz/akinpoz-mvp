@@ -203,7 +203,7 @@ function PaymentOptions(props) {
                 markProcessing()
                 if (stripe.loading || stripe.status !== 'unfulfilled') {
                     event.complete('fail')
-                    setMsg({msg: 'Something\'s not right...  Lets try that again'})
+                    setMsg({msg: 'Something\'s not right...  Lets try that again', positive: false, negative: true})
                     setDisabled(false)
                     return;
                 }
@@ -215,7 +215,7 @@ function PaymentOptions(props) {
                 if (result.error) {
                     event.complete('fail')
                     markComplete('fail')
-                    setMsg({msg: 'Could not update payment.  Please try a different card'})
+                    setMsg({msg: 'Could not update payment.  Please try a different card', positive: false, negative: true})
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
@@ -225,7 +225,7 @@ function PaymentOptions(props) {
                         if (error) {
                             console.error(error.message)
                             markComplete('fail')
-                            setMsg({msg: 'Could not update payment.  Please try a different card'})
+                            setMsg({msg: 'Could not update payment.  Please try a different card', positive: false, negative: true})
                         } else {
                             markComplete('success')
                         }
@@ -285,7 +285,7 @@ function PaymentOptions(props) {
             }
         })
         if (result.error) {
-            setMsg({msg: 'Could not update payment.  Please try a different card'})
+            setMsg({msg: 'Could not update payment.  Please try a different card', positive: false, negative: true})
         } else {
             updatePaymentMethod(auth.user._id, result.setupIntent.payment_method)
         }

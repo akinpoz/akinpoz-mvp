@@ -45,7 +45,7 @@ function MyNavbar(props) {
     return (
         <nav
             className={cx(globalStyles.navbar, globalStyles["navbar-expand-lg"], globalStyles["navbar-dark"], history.location.pathname !== '/customer-home/' ? styles.business_background : styles.customer_background)}
-            expand="lg" bg="dark" variant="dark">
+            expand="lg" bg="dark" variant="dark" style={{zIndex: 10}}> {/* z index needed to go over back button*/}
             <a href={`/#/${redirectURL}`} onClick={handleRedirect} className={cx(globalStyles["navbar-brand"])}>
                 <img
                     alt=""

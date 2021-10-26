@@ -42,7 +42,7 @@ function Checkout(props) {
 
     return (
         <div className={styles.checkoutContainer}>
-            {msg && msg.msg && <Message><Message.Header>{msg.msg}<br /><a
+            {msg && msg.msg && <Message positive={msg.positive} negative={msg.negative}><Message.Header>{msg.msg}<br /><a
                 href={`/#/location/?location_id=${location.select_location._id}`}>Participate in Another
                 Campaign!</a></Message.Header></Message>}
             {stripe.tab &&
@@ -68,7 +68,6 @@ function NewTab(props) {
     const feePrice = 0.40;
 
     const [tac, setTac] = useState(false);
-    const [payAgreement, setPayAgreement] = useState(false)
     const [locked, setLocked] = useState(true)
 
     const { stripe, submitCampaignData, queueSong } = props
@@ -83,7 +82,7 @@ function NewTab(props) {
         // Block native form submission.
         event.preventDefault();
 
-        if (tac && payAgreement) {
+        if (tac) {
             if (stripe.newItem.item.data.type !== 'song') {
                 submitCampaignData(stripe.newItem.item)
             } else {
@@ -113,10 +112,7 @@ function NewTab(props) {
                         <b>${(stripe.newItem.item.amount + feePrice).toFixed(2)}</b>
                     </div>
                 </div>
-                {/* <br/>
-                <b style={{textAlign: "center"}}>*Payment will be captured in 24 hours from the card stored in
-                    profile*</b>
-                <br/> */}
+                <br/>
 
                 <Form onSubmit={handleSubmit}>
                     <div className={styles.termsAndConditions}>
@@ -124,17 +120,9 @@ function NewTab(props) {
                         <p>I have read the <a href='https://www.google.com'>Terms and Conditions</a>.</p>
                     </div>
                     <br />
-                    <div className={styles.termsAndConditions}>
-                        {/* <Form.Checkbox style={{marginRight: 10}} checked={payAgreement}
-                                       onChange={() => setPayAgreement(!payAgreement)}/>
-                        <p>I understand my saved card will be charged in 24 hours to settle my tab.</p> */}
-                    </div>
-                    <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        {/* <Form.Button type={'button'} style={{ marginRight: 5 }}
-                            onClick={() => history.push('/')}>Home</Form.Button> */}
                         <Form.Button primary
-                            disabled={stripe.loading || stripe.status !== 'unfulfilled' || !tac || !payAgreement || locked}>Open
+                            disabled={stripe.loading || stripe.status !== 'unfulfilled' || !tac || locked}>Open
                             Tab</Form.Button>
                     </div>
                 </Form>

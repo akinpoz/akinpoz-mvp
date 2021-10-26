@@ -35,7 +35,7 @@ export default function SpotifyReducer(state = initialState, action) {
         case SPOTIFY_ERROR:
             return {
                 ...state,
-                error: {...action.error, negative: true, positive: false}
+                error: action.error
             }
 
         case CLEAR_SPOTIFY_ERRORS:

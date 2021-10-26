@@ -32,7 +32,7 @@ function LocationModal(props) {
             props[`${action}Location`](locationDetails)
             close()
         } else {
-            setMsg("Failed to add location: Please fill out all required fields")
+            setMsg({msg: "Failed to add location: Please fill out all required fields", positive: false, negative: true})
         }
     }
 
@@ -60,9 +60,9 @@ function LocationModal(props) {
             <Modal.Content>
                 <Form>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                        {msg && msg.msg && <Message style={{ height: '100%', width: '100%', margin: 'auto auto' }}
-                            negative={msg.msg.includes("Failed")}
-                            positive={msg.msg.includes("Success")} className={styles.message}>
+                        {msg && msg?.msg && <Message style={{ height: '100%', width: '100%', margin: 'auto auto' }}
+                            negative={msg.negative}
+                            positive={msg.positive} className={styles.message}>
                             <Message.Header>{msg.msg}</Message.Header>
                         </Message>}
                         {/* <img src={imageData} className={styles.image} /> */}

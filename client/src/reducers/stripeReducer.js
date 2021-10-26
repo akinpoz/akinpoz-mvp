@@ -256,7 +256,7 @@ export default function StripeReducer(state = initialState, action) {
                 ...state,
                 loading: false,
                 status: action.status,
-                msg: {...action.msg, negative: false, positive: true}
+                msg: action.msg
             }
 
         default:
