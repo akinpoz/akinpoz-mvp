@@ -69,6 +69,7 @@
     flex-direction: row;
     align-content: center;
     width: 100%;
+    margin-top: 10;
 }
 
 .timerBox {
