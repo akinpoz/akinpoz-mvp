@@ -8,7 +8,12 @@ import {
     GET_CAMPAIGN,
     SET_CAMPAIGN,
     GET_ERRORS,
-    SUBMITTING_CAMPAIGN, SUBMITTED_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, NEW_ITEM_PROCESSING, CLEAR_CAMPAIGN_MSG
+    SUBMITTING_CAMPAIGN,
+    SUBMITTED_CAMPAIGN,
+    SUBMIT_CAMPAIGN_ERROR,
+    NEW_ITEM_PROCESSING,
+    CLEAR_CAMPAIGN_MSG,
+    UPDATE_USER_CAMPAIGNS
 } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
@@ -82,7 +87,8 @@ export const submitCampaignData = (item) => (dispatch, getState) => {
                 item: item,
                 status: 'processing'
             }
-            dispatch({type: SUBMITTED_CAMPAIGN, last_submitted: item.transactionID, payload: res.data})
+            dispatch({type: SUBMITTED_CAMPAIGN, message: res.data.msg})
+            dispatch({type: UPDATE_USER_CAMPAIGNS, campaign_id: res.data.campaign_id})
 
             if (item.data.type !== 'Product Pluck') {
                 // dispatches to stripe reducer to change status from unprocessed to processing

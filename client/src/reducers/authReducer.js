@@ -1,8 +1,19 @@
-import { USER_LOADED, USER_LOADING, AUTH_ERROR, LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT_SUCCESS, REGISTER_SUCCESS, REGISTER_FAIL, UPDATE_USER } from '../actions/types'
+import {
+    USER_LOADED,
+    USER_LOADING,
+    AUTH_ERROR,
+    LOGIN_SUCCESS,
+    LOGIN_FAIL,
+    LOGOUT_SUCCESS,
+    REGISTER_SUCCESS,
+    REGISTER_FAIL,
+    UPDATE_USER,
+    UPDATE_USER_CAMPAIGNS
+} from '../actions/types'
 
 const initialState = {
     token: localStorage.getItem("token"),
-    isAuthenticated: null,
+    isAuthenticated: false,
     isLoading: false,
     user: null
 }
@@ -47,6 +58,15 @@ export default function AuthReducer(state = initialState, action) {
                 user: null,
                 isAuthenticated: false,
                 isLoading: false
+            }
+        case UPDATE_USER_CAMPAIGNS:
+            const updatedUser = state.user
+            if (updatedUser) {
+                updatedUser.campaigns.push(action.campaign_id)
+            }
+            return {
+                ...state,
+                user: updatedUser
             }
         default:
             return state

@@ -28,16 +28,18 @@ function Jukebox(props) {
     const location_id = location.select_location || location.select_location._id
     const timeoutRef = useRef()
     const [loc, setLoc] = useState({name: ""})
-    const [msg, setMsg] = useState(null)
-    const [buttonLabel, setButtonLabel] = useState('Open New Tab')
+    const msgRef = useRef()
+    const [msg, setMsg] = useState()
+    const [buttonLabel, setButtonLabel] = useState('Add Song')
     const [locked, setLocked] = useState(true)
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority <= (msg?.priority ?? 5) && newMsg.msg !== (msg?.msg ?? '')) {
+        if (newMsg && newMsg.priority <= (msgRef.current?.priority ?? 5) && newMsg.msg !== (msgRef.current?.msg ?? '')) {
+            msgRef.current = newMsg
             setMsg(newMsg)
         }
-    }, [msg])
+    }, [])
 
     useEffect(() => {
         if (!location_id) {
@@ -61,9 +63,8 @@ function Jukebox(props) {
     useEffect(() => {
         if (auth.isAuthenticated) {
             if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
-                const profile = <a href="/#/profile">profile page</a>
                 setMsgWithPriority({
-                    msg: `Please add a payment method in the ${profile} before queuing a song.`,
+                    msg: `Please add a payment method in your profile before queuing a song.`,
                     priority: 2,
                     negative: true,
                     positive: false
@@ -89,9 +90,9 @@ function Jukebox(props) {
     useEffect(() => {
         if (stripe) {
             if (stripe.hasOpenTab) {
-                setButtonLabel('Add To Tab')
+                setButtonLabel('Add Song')
             } else {
-                setButtonLabel('Open New Tab')
+                setButtonLabel('Add Song')
             }
 
             if (stripe.msg) {
@@ -182,10 +183,10 @@ function Jukebox(props) {
 
     return (
         <div className={styles.container}>
-            <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
+            <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>
 
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
-            {msg && auth.user && auth.user.type === "customer" && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
+            {msg && (!auth.user || (auth.user && auth.user.type === "customer")) && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
                     {msg.msg.includes("login") &&

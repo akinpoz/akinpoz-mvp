@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
-import {Button, Card, Icon, Input, Message, Radio} from 'semantic-ui-react'
+import {Button, Card, Icon, Message, Radio} from 'semantic-ui-react'
 import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
 import {getLocation} from "../../actions/locationActions";
 
@@ -11,6 +11,7 @@ function CustomerCampaign(props) {
     const campaign_id = history.location.search.split('=')[1]
     const [info, setInfo] = useState('')
     const [buttonLabel, setButtonLabel] = useState('Open New Tab')
+    const msgRef = useRef()
     const [msg, setMsg] = useState()
     const [locked, setLocked] = useState(true)
 
@@ -18,6 +19,7 @@ function CustomerCampaign(props) {
         auth,
         stripe,
         location,
+        selectCampaign,
         campaign,
         getLocation,
         clearStripeMsg,
@@ -29,39 +31,58 @@ function CustomerCampaign(props) {
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
-        if (newMsg && newMsg.priority <= (msg?.priority ?? 5) && newMsg.msg !== (msg?.msg ?? '')) {
+        if (newMsg && newMsg.priority <= (msgRef.current?.priority ?? 5) && newMsg.msg !== (msgRef.current?.msg ?? '')) {
+            msgRef.current = newMsg
             setMsg(newMsg)
         }
-    }, [msg])
+    }, [])
 
     const safeSetLocked = useCallback(() => {
-        if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && campaign.details.type !== 'Product Pluck') {
+        if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && selectCampaign.details.type !== 'Product Pluck') {
+            setLocked(true)
+        } else if (selectCampaign.details.type === 'Product Pluck' && auth.user?.campaigns?.includes(selectCampaign._id)) {
             setLocked(true)
         }
         else {
             setLocked(false)
         }
-    }, [stripe, campaign])
+    }, [stripe, selectCampaign, auth.user?.campaigns])
 
     useEffect(() => {
+        if (selectCampaign === '') {
+            return
+        }
         if (!auth.isAuthenticated) {
-            setMsgWithPriority({msg: `Please login to participate in a campaign`, priority: 1, negative: true, positive: false})
+            setMsgWithPriority({
+                msg: `Please login to participate in a campaign`,
+                priority: 1,
+                negative: true,
+                positive: false
+            })
         } else {
-
-            if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0) {
+            if (msgRef.current?.msg?.includes('login')) {
+                setMsg(null)
+                msgRef.current = null
+            }
+            if (auth.user.paymentMethod && auth.user.paymentMethod.length === 0 && selectCampaign.details.type !== 'Product Pluck') {
                 setMsgWithPriority({
                     msg: "Please add a payment method in the profile page before interacting with a campaign.",
                     priority: 2, negative: true, positive: false
                 })
-            } else if (auth.user?.campaigns?.includes(campaign._id)) {
-                if (campaign.details.type === "Product Pluck") {
-                    setMsgWithPriority({msg: "You have already submitted your vote!", priority: 3, negative: false, positive: false})
-                } else if (campaign.details.type === "Raffle") {
+            } else if (auth.user?.campaigns?.includes(selectCampaign._id)) {
+                if (selectCampaign.details.type === "Product Pluck") {
+                    setMsgWithPriority({
+                        msg: "You have already submitted your vote!",
+                        priority: 3,
+                        negative: false,
+                        positive: false
+                    })
+                } else if (selectCampaign.details.type === "Raffle") {
                     setMsgWithPriority({
                         msg: "You have already entered the raffle! Buy more tickets for a greater chance to win!",
                         priority: 3, negative: false, positive: false
                     })
-                } else if (campaign.details.type === "Fastpass") {
+                } else if (selectCampaign.details.type === "Fastpass") {
                     setMsgWithPriority({
                         msg: "You have already purchased a fastpass! If you would like to purchase for a friend, please have them sign up for an account.",
                         priority: 3, negative: false, positive: false
@@ -69,24 +90,34 @@ function CustomerCampaign(props) {
                 }
             }
         }
-    }, [auth, campaign, setMsgWithPriority])
+    }, [auth, selectCampaign, setMsgWithPriority])
 
     useEffect(() => {
-        if (location.select_location === '' && campaign.location) {
-            getLocation(campaign.location)
+        if (location.select_location === '' && selectCampaign.location) {
+            getLocation(selectCampaign.location)
         }
-    }, [location, getLocation, campaign])
+    }, [location, getLocation, selectCampaign])
 
     useEffect(() => {
-        if (campaign === "") {
+        if (selectCampaign === "") {
             getCampaign(campaign_id)
         }
-        if (campaign.msg) {
-            setMsgWithPriority({...campaign.msg, priority: 3, negative: true, positive: false})
-            clearCampaignMsg()
+        if (selectCampaign.details && selectCampaign.details.type === 'Raffle') {
+            setInfo(0)
         }
         safeSetLocked()
-    }, [campaign, getCampaign, clearCampaignMsg, campaign_id, setMsgWithPriority, safeSetLocked])
+    }, [selectCampaign, getCampaign, clearCampaignMsg, campaign_id, setMsgWithPriority, safeSetLocked])
+
+    useEffect(() => {
+        if (campaign.msg !== null) {
+            let priority = 3
+            if (campaign.msg.msg.includes('Thanks')) {
+                priority = 0
+            }
+            setMsgWithPriority({...campaign.msg, priority: priority})
+            clearCampaignMsg()
+        }
+    }, [campaign.msg, clearCampaignMsg, setMsgWithPriority])
 
     useEffect(() => {
         if (!stripe) {
@@ -114,17 +145,13 @@ function CustomerCampaign(props) {
 
     }, [stripe, clearStripeMsg, setMsgWithPriority, safeSetLocked])
 
-    function handleChange(e, data) {
-        setInfo(data.value)
-    }
-
     function handleClick(e, {value}) {
         setInfo(value)
     }
 
     function handleSubmit() {
-        const type = campaign.details.type
-        let amount = type === "Product Pluck" ? 0 : type === "Raffle" ? parseInt(campaign.question) * parseInt(info) : parseInt(campaign.question)
+        const type = selectCampaign.details.type
+        let amount = type === "Product Pluck" ? 0 : type === "Raffle" ? parseInt(selectCampaign.question) * parseInt(info) : parseInt(selectCampaign.question)
         const item = {
             amount,
             user: auth.user,
@@ -132,10 +159,10 @@ function CustomerCampaign(props) {
             data: {
                 timestamp: new Date().toLocaleDateString("en-US"),
                 type,
-                campaign_id: campaign._id,
-                location_id: campaign.location,
+                campaign_id: selectCampaign._id,
+                location_id: selectCampaign.location,
                 transactionID: auth.user._id + Date.now(),
-                name: campaign.title,
+                name: selectCampaign.title,
                 info
             }
         }
@@ -166,13 +193,13 @@ function CustomerCampaign(props) {
     }
 
     function campaignLabel() {
-        switch (campaign.details.type) {
+        switch (selectCampaign.details.type) {
             case 'Product Pluck':
-                return campaign.question
+                return selectCampaign.question
             case 'Raffle':
-                return `Cost per ticket: $ ${campaign.question}`
+                return `Cost per ticket: $ ${selectCampaign.question}`
             case 'Fastpass':
-                return `Cost for Fastpass: $ ${campaign.question}`
+                return `Cost for Fastpass: $ ${selectCampaign.question}`
             default:
                 return '';
         }
@@ -182,7 +209,8 @@ function CustomerCampaign(props) {
         <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
             <div id="customer-campaign-card-message_container"
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => history.go(-1)}><Icon name={'angle left'}/>Back</Button>
+                <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}}
+                        onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>
                 {msg && msg.msg &&
                 <Message
                     positive={msg.positive} negative={msg.negative}>
@@ -196,34 +224,36 @@ function CustomerCampaign(props) {
                               onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
                     </Message.Header>
                 </Message>}
-                {campaign &&
+                {selectCampaign &&
                 <Card>
                     <Card.Content>
-                        <Card.Header>{campaign.title}</Card.Header>
-                        <Card.Meta>{campaign.details.type}</Card.Meta>
+                        <Card.Header>{selectCampaign.title}</Card.Header>
+                        {selectCampaign.details && selectCampaign.details.type === 'Raffle' &&
+                        <Card.Meta>{selectCampaign.details.type}</Card.Meta>
+                        }
                         <br/>
                         <b>
                             {campaignLabel()}
                         </b>
                         <br/>
                         <br/>
-                        <View type={campaign.details.type} campaign={campaign} handleChange={handleChange}
+                        <View type={selectCampaign.details.type} campaign={selectCampaign} setInfo={setInfo}
                               handleClick={handleClick} info={info}/>
                         <br/>
                     </Card.Content>
                     {auth.isAuthenticated &&
                     <Card.Content extra>
                         <div style={{flexDirection: "row-reverse", display: "flex"}}>
-                            {campaign.details.type !== 'Product Pluck' &&
+                            {selectCampaign.details.type !== 'Product Pluck' &&
                             <div id="submit-button-div">
                                 {hasPaymentMethod() && <Button primary onClick={handleSubmit}
-                                                               disabled={(campaign.details.type !== 'Fastpass' && info === '') || locked}>{buttonLabel}</Button>}
+                                                               disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>{buttonLabel}</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({pathname: '/profile'})
                                 }}>Add a Payment Method</Button>}
                             </div>}
-                            {campaign.details.type === 'Product Pluck' &&
-                            <Button primary disabled={locked} onClick={handleSubmit}>Submit Vote</Button>}
+                            {selectCampaign.details.type === 'Product Pluck' &&
+                            <Button primary disabled={locked || !info || info === '' || (msg?.msg.includes('Thanks') ?? false)} onClick={handleSubmit}>Submit Vote</Button>}
                         </div>
                     </Card.Content>
                     }
@@ -234,7 +264,15 @@ function CustomerCampaign(props) {
 }
 
 function View(props) {
-    const {type, campaign, handleClick, info, handleChange} = props
+    const {type, campaign, handleClick, info, setInfo} = props
+
+    function safeSetInfo(value) {
+        const newInfo = info + value
+        if (newInfo >= 0) {
+            setInfo(newInfo)
+        }
+    }
+
     switch (type) {
         case "Product Pluck":
             return (
@@ -253,9 +291,10 @@ function View(props) {
             return (<div/>)
         case "Raffle":
             return (
-                <div>
-                    <Input fluid type="number" placeholder="Number of tickets"
-                           onChange={handleChange} value={info}/>
+                <div style={{display: "flex", flexDirection: 'row', justifyContent: 'center'}}>
+                    <Button icon={'minus'} style={{margin: 0}} onClick={() => safeSetInfo(-1)} disabled={info === 0}/>
+                    <h3 style={{marginLeft: 10, marginRight: 10}}>{info}</h3>
+                    <Button icon={'plus'} style={{margin: 0}} onClick={() => safeSetInfo(1)}/>
                 </div>
             )
         default:
@@ -267,7 +306,8 @@ function View(props) {
 
 
 const mapStateToProps = state => ({
-    campaign: state.campaign.select_campaign,
+    selectCampaign: state.campaign.select_campaign,
+    campaign: state.campaign,
     auth: state.auth,
     stripe: state.stripe,
     location: state.location

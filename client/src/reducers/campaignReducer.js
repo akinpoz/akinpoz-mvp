@@ -14,7 +14,7 @@ const initialState = {
     campaigns: [],
     loading: false,
     select_campaign: '',
-    msg: {}
+    msg: null
 }
 
 export default function CampaignReducer(state = initialState, action) {
@@ -60,12 +60,13 @@ export default function CampaignReducer(state = initialState, action) {
             return {
                 ...state,
                 loading: true,
-                msg: {}
+                msg: null
             }
         case SUBMITTED_CAMPAIGN:
             return {
                 ...state,
                 loading: false,
+                msg: action.message
             }
         case SUBMIT_CAMPAIGN_ERROR:
             return {

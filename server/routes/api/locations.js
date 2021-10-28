@@ -157,6 +157,7 @@ async function formatLocation(location) {
     loc.name = location.name
     loc.music = location.music
     loc.menu_url = location.menu_url
+    loc.user = location.user
     return loc
 }
 

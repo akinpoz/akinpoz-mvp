@@ -192,6 +192,10 @@ function RegisterForm(props) {
         }
     }, [stripe.customer, auth.isLoading, register, paymentActive, paymentMethod, values])
 
+    useEffect(() => {
+        setMsg({msg: 'Adding card information is required before participating in a campaign', positive: false, negative: false})
+    }, [])
+
     const handleChange = e => {
         setValues({...values, [e.target.name]: e.target.value})
     }
@@ -297,7 +301,7 @@ function RegisterForm(props) {
                           }/>
             </Form.Field>
             <Accordion style={{marginBottom: 20}} hidden={paymentAuthenticatedByMobile}>
-                <Accordion.Title active={paymentActive} content='Payment (optional)'
+                <Accordion.Title active={paymentActive} content='Payment (recommended)'
                                  onClick={() => setPaymentActive(!paymentActive)}/>
                 <Accordion.Content active={paymentActive} content={PaymentForm}/>
             </Accordion>

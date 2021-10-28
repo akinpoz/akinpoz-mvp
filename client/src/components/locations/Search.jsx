@@ -4,10 +4,11 @@ import history from '../../history'
 import {connect} from 'react-redux'
 import {getLocations, setLocation} from '../../actions/locationActions'
 import {Search as SemanticSearch} from 'semantic-ui-react'
+import {setCampaign} from "../../actions/campaignActions";
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
-    const {locations, getLocations, setLocation, no_locations} = props
+    const {locations, getLocations, setLocation, no_locations, setCampaign} = props
     const [filteredLocations, setFilteredLocations] = useState(locations)
     useEffect(() => {
         if (locations.length === 0) {
@@ -15,6 +16,10 @@ function Search(props) {
         }
         setFilteredLocations(locations)
     }, [locations, getLocations, no_locations])
+
+    useEffect(() => {
+        setCampaign('')
+    }, [setCampaign])
 
 
     function handleChange(e) {
@@ -77,4 +82,4 @@ const mapStateToProps = (state) => ({
     no_locations: state.location.no_locations
 })
 
-export default connect(mapStateToProps, {getLocations, setLocation})(Search)
+export default connect(mapStateToProps, {getLocations, setLocation, setCampaign})(Search)

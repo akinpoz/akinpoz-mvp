@@ -166,6 +166,7 @@ function PaymentOptions(props) {
     const [cardApproved, setCardApproved] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState(null);
     const [disabled, setDisabled] = useState(false);
+    const [firstPayment, setFirstPayment] = useState(false)
 
     const {
         createSetupIntent,
@@ -175,7 +176,8 @@ function PaymentOptions(props) {
         auth,
         setMsg,
         updatePaymentMethod,
-        getPaymentDetails
+        getPaymentDetails,
+        campaign
     } = props
 
     useEffect(() => createSetupIntent(), [createSetupIntent])
@@ -247,6 +249,18 @@ function PaymentOptions(props) {
             elements.getElement(CardElement).clear()
         }
     }, [auth.user.paymentMethod, createSetupIntent, elements])
+
+    useEffect(() => {
+        if (auth.user.paymentMethod.length > 0 && firstPayment && campaign.select_campaign !== '') {
+            window.location.href = `/#/campaign/?campaign_id=${campaign.select_campaign._id}`
+        }
+    }, [auth.user.paymentMethod, campaign, firstPayment])
+
+    useEffect(() => {
+        if (auth.user.paymentMethod.length === 0) {
+            setFirstPayment(true)
+        }
+    }, [auth.user.paymentMethod])
 
     useEffect(() => {
         if (useStripeInst && elements) {
@@ -349,7 +363,8 @@ Profile.propTypes = {
 
 const mapStateToProps = (state) => ({
     auth: state.auth,
-    stripe: state.stripe
+    stripe: state.stripe,
+    campaign: state.campaign
 })
 export default connect(mapStateToProps, {
     getPaymentDetails,

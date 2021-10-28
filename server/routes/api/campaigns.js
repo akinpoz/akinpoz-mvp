@@ -70,9 +70,12 @@ router.get('/campaign_id', async (req, res) => {
  */
 router.post('/add', auth, (req, res) => {
     try {
-        const details = req.body
-        details.date = new Date()
-        const newCampaign = new Campaign(details);
+        const campaign = req.body
+        if (campaign.details.type === 'Fastpass') {
+            campaign.title = 'Fastpass'
+        }
+        campaign.date = new Date()
+        const newCampaign = new Campaign(campaign);
         newCampaign.save(async function (err, campaign) {
             if (err) res.status(500).send(err);
             if (campaign) {
@@ -195,7 +198,8 @@ router.post('/submitData', auth, async (req, res) => {
                         results: newResults
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks for your vote!", positive: true, negative: false})
+                const returnableData = {msg: {msg: "Thanks for your vote!", positive: true, negative: false}, campaign_id: campaign._id}
+                res.status(200).send(returnableData)
             } catch (error) {
                 console.error(error)
                 res.status(400).send({msg: error.message, positive: false, negative: true})
@@ -214,7 +218,8 @@ router.post('/submitData', auth, async (req, res) => {
                         results: campaign.details.results
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment.", positive: true, negative: false})
+                const returnableData = {msg: {msg: "Thanks purchasing a fast pass! Please verify your name is on the list when you arrive at the establishment.", positive: true, negative: false}, campaign_id: campaign._id}
+                res.status(200).send(returnableData)
             } catch (error) {
                 console.error(error)
                 res.status(400).send({msg: error.message, positive: false, negative: true})
@@ -237,7 +242,9 @@ router.post('/submitData', auth, async (req, res) => {
                         results: newResults
                     }
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send({msg: "Thanks for participating in our raffle! We will let you know if you won.", positive: true, negative: false})
+                const returnableData = {msg: {msg: "Thanks for participating in our raffle! We will let you know if you won.", positive: true, negative: false}, campaign_id: campaign._id}
+
+                res.status(200).send(returnableData)
             } catch (error) {
                 console.error(error)
                 res.status(400).send({msg: error.message, positive: false, negative: true})

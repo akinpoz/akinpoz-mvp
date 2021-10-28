@@ -68,6 +68,10 @@ function Slider(props) {
         setLoc(location)
     }, [location])
 
+    useEffect(() => {
+        setCampaign('')
+    }, [setCampaign])
+
     function handleClick(campaign) {
         setCampaign(campaign)
         history.push(`/campaign/?campaign_id=${campaign._id}`)
