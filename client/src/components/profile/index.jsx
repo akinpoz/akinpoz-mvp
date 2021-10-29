@@ -138,6 +138,9 @@ function History(props) {
                         <ul style={{margin: 0, padding: 0}} key={`${tab.timeWillBeSubmitted}`}>
                             <h4>{month}/{day}/{year} - {tab.locationName}</h4>
                             {tab.items.map(item => {
+                                if (item.description === 'Tab fee'){
+                                    return <></>;
+                                }
                                 return (
                                     <li style={{marginLeft: 20}}
                                         key={`${tab.timeWillBeSubmitted}_${item.data.transactionID}`}>

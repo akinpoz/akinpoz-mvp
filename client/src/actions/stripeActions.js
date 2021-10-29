@@ -196,6 +196,10 @@ export const closeTab = (userID) => (dispatch, getState) => {
     })
 }
 
+export const tabExpired = () => (dispatch) => {
+    dispatch({type: SUCCESSFULLY_CLOSED_TAB})
+}
+
 export const getPastTabs = (userID) => (dispatch, getState) => {
     dispatch({type: REQUESTED_PAST_TABS})
     const params = {userID}

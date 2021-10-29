@@ -176,7 +176,7 @@ router.post('/get-draft-invoice', async function (req, res) {
     if (invoice !== undefined) {
         let items = []
         for (let line of invoice.lines.data) {
-            var amount = line.description.includes("fee") ? parseFloat(line.amount / 100) : line.amount
+            const amount = line.amount / 100
             items.push({
                 amount: amount,
                 description: line.description,
@@ -191,7 +191,6 @@ router.post('/get-draft-invoice', async function (req, res) {
                 }
             })
         }
-
         const tab = {
             amount: invoice.total,
             timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
@@ -221,7 +220,6 @@ router.post('/add-invoice-item', async function (req, res) {
         res.status(400).send({msg: 'User has no customer ID', positive: false, negative: true})
         return
     }
-
     let invoices = await stripe.invoices.list({customer: customerID, status: 'draft'})
     let invoice
     if (invoices.data && invoices.data.length !== 0) {
@@ -272,7 +270,6 @@ router.post('/add-invoice-item', async function (req, res) {
             metadata: {
                 'name': 'Tab Fee'
             }
-
         })
         invoice = await stripe.invoices.create({
             customer: customerID,
@@ -289,15 +286,16 @@ router.post('/add-invoice-item', async function (req, res) {
             setTimeout(closeTab, timeout, invoice.id)
             let items = []
             for (let line of invoice.lines.data) {
-                var amount = line.description.includes("fee") ? parseFloat(line.amount / 100) : line.amount
+                let amount = line.amount / 100
                 items.push({
                     amount: amount,
                     description: line.description,
                     data: line.metadata
                 })
             }
+
             const tab = {
-                amount: invoice.total,
+                amount: invoice.total / 100,
                 timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
                 items: items,
                 fromOnline: true,
@@ -323,10 +321,14 @@ router.post('/close-tab', async function(req, res) {
             res.status(400).send({msg: 'No Tab to Close', positive: false, negative: true})
         }
         for (const invoice of invoices.data) {
-            const invoiceRes = await stripe.invoices.pay(invoice.id)
-            paid = paid && invoiceRes.status === 'paid'
-            if (invoiceRes.status !== 'paid') {
-                errors.push(invoiceRes.status)
+            try {
+                const invoiceRes = await stripe.invoices.pay(invoice.id)
+                paid = paid && invoiceRes.status === 'paid'
+                if (invoiceRes.status !== 'paid') {
+                    errors.push(invoiceRes.status)
+                }
+            } catch (e) {
+                console.error('Invoice Already Paid')
             }
         }
         if (paid) {
@@ -378,20 +380,19 @@ router.post('/get-unpaid-tabs', async function (req, res) {
 
 function createTabs(invoices, open) {
     let tabs = []
-
     // Includes open invoices and marks the tab as 'open' so a message can be displayed that the account is locked until they pay their invoice.
     if (invoices && invoices.data && invoices.data.length > 0) {
         for (let invoice of invoices.data) {
             let items = []
             for (let line of invoice.lines.data) {
                 items.push({
-                    amount: line.amount,
+                    amount: line.amount / 100,
                     description: line.description,
                     data: line.metadata
                 })
             }
             const tab = {
-                amount: invoice.total,
+                amount: invoice.total / 100,
                 timeWillBeSubmitted: invoice.metadata['timeWillBeSubmitted'],
                 items: items,
                 fromOnline: true,
@@ -443,19 +444,21 @@ async function getCustomerID(userID, res) {
     return customerID;
 }
 
+
 // abstracts close tab logic -- part of automated close tab logic
 function closeTab(invoiceID) {
     try {
         stripe.invoices.pay(invoiceID).then(r => {
             if (r.last_finalization_error) {
+                console.log('hello')
                 console.error(r.last_finalization_error.message);
             } else {
                 // This is automated so I want to leave this in
                 console.log('Closed tab: ' + r.id);
             }
         })
-    }catch (e) {
-        console.error(e);
+    } catch (e) {
+        console.log('Invoice Already Paid -- Just FYI');
     }
 }
 

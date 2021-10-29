@@ -10,8 +10,8 @@ import {addLocation} from '../../actions/locationActions';
 function Locations(props) {
     const {locations} = props
     return (
-        <div id="locations-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
-            <Modal action={"add"} trigger={AddTrigger} {...props} />
+        <div id="locations-container" style={{display: "flex", flexDirection: "column", flex: 1, alignItems: "center", width: '100%'}}>
+            <Modal action={"add"} trigger={AddTrigger} {...props}/>
             {locations && locations.length > 0 ? <LocationsList {...props} /> : <NoLocations/>}
         </div>
     )
@@ -20,7 +20,7 @@ function Locations(props) {
 const LocationsList = (props) => {
     const {locations} = props
     return (
-        <div id="locations-list-container">
+        <div id="locations-list-container" style={{width: '100%'}}>
             {
                 locations.map(location => {
                     return (

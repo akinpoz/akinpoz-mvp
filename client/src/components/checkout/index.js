@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Form, Message } from "semantic-ui-react";
 import styles from './checkout.module.css'
-import { clearStripeMsg, closeTab } from "../../actions/stripeActions";
+import {clearStripeMsg, closeTab, getDraftInvoice, tabExpired} from "../../actions/stripeActions";
 import { clearCampaignMsg, submitCampaignData } from "../../actions/campaignActions"
 import { connect } from "react-redux";
-import history from '../../history'
 import { clearSpotifyErrors, queueSong } from "../../actions/spotifyActions";
 
 /**
@@ -38,6 +37,17 @@ function Checkout(props) {
             clearCampaignMsg()
         }
     }, [campaign.msg, clearCampaignMsg])
+
+    useEffect(() => {
+        if (!stripe.hasOpenTab && stripe.newItem === null) {
+            if (location.select_location !== '') {
+                window.location.href = `/#/location/?location_id=${location.select_location._id}`
+            }
+            else {
+                window.location.href = '/#/search'
+            }
+        }
+    }, [stripe.hasOpenTab, stripe.newItem, location.select_location])
 
 
     return (
@@ -138,7 +148,7 @@ function NewTab(props) {
  * @constructor
  */
 function ExistingTab(props) {
-    const { stripe, auth, closeTab, location } = props
+    const { stripe, auth, closeTab, location, tabExpired } = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
     const calculateTimeLeft = useCallback(() => {
         let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
@@ -174,13 +184,19 @@ function ExistingTab(props) {
         timeLeft += ((timeLeft !== '') ? ' Until Tab Expires' : 'Tab Expired')
 
         if (timeLeft === 'Tab Expired') {
+            tabExpired()
             setTimeout(() => {
-                history.go(0)
+                if (location.select_location !== '') {
+                    window.location.href = `/#/location/?location_id=${location.select_location._id}`
+                }
+                else {
+                    window.location.href = '/#/search'
+                }
             }, 5000)
         }
 
         return timeLeft;
-    }, [stripe])
+    }, [stripe, location.select_location, tabExpired])
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
     const [sum, setSum] = useState(0)
@@ -219,25 +235,26 @@ function ExistingTab(props) {
             <Card style={{ padding: 15 }}>
                 <h2>Current Tab</h2>
                 <div className={styles.divider} />
+                <br/>
                 <div className={styles.totalContainer}>
                     <b>Subtotal</b>
                     <b>${sum.toFixed(2)}</b>
                 </div>
                 <div>
-                    {stripe?.tab?.items && stripe.tab.items.map(item => {
-                        return (
-                            <div className={styles.itemContainer} key={item.data.name}>
-                                <p style={{ margin: 0 }}>{item.data.name}</p>
-                                <p>${item.amount.toFixed(2)}</p>
-                            </div>
-                        )
-                    })}
-                    {stripe?.newItem?.item &&
-                        <div className={styles.itemContainer}>
-                            <p style={{ margin: 0 }}>{stripe.newItem.item.data.name}</p>
-                            <p>${stripe.newItem.item.amount.toFixed(2)}</p>
-                        </div>
-                    }
+                    {/*{stripe?.tab?.items && stripe.tab.items.map(item => {*/}
+                    {/*    return (*/}
+                    {/*        <div className={styles.itemContainer} key={item.data.name}>*/}
+                    {/*            <p style={{ margin: 0 }}>{item.data.name}</p>*/}
+                    {/*            <p>${item.amount.toFixed(2)}</p>*/}
+                    {/*        </div>*/}
+                    {/*    )*/}
+                    {/*})}*/}
+                    {/*{stripe?.newItem?.item &&*/}
+                    {/*    <div className={styles.itemContainer}>*/}
+                    {/*        <p style={{ margin: 0 }}>{stripe.newItem.item.data.name}</p>*/}
+                    {/*        <p>${stripe.newItem.item.amount.toFixed(2)}</p>*/}
+                    {/*    </div>*/}
+                    {/*}*/}
                     <br />
                     <div className={styles.timerBox}>
                         <b>{timeLeft}</b>
@@ -283,5 +300,7 @@ export default connect(mapStateToProps, {
     queueSong,
     clearStripeMsg,
     clearCampaignMsg,
-    clearSpotifyErrors
+    clearSpotifyErrors,
+    getDraftInvoice,
+    tabExpired
 })(Checkout);

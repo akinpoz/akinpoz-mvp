@@ -38,9 +38,10 @@ function CustomerCampaign(props) {
     }, [])
 
     const safeSetLocked = useCallback(() => {
+        if (selectCampaign === '') return
         if (stripe.unpaidTabs && stripe.unpaidTabs.length > 0 && selectCampaign.details.type !== 'Product Pluck') {
             setLocked(true)
-        } else if (selectCampaign.details.type === 'Product Pluck' && auth.user?.campaigns?.includes(selectCampaign._id)) {
+        } else if (selectCampaign.details?.type === 'Product Pluck' && auth.user?.campaigns?.includes(selectCampaign._id)) {
             setLocked(true)
         }
         else {

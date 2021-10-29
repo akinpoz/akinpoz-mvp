@@ -62,7 +62,7 @@ export default function AuthReducer(state = initialState, action) {
         case UPDATE_USER_CAMPAIGNS:
             const updatedUser = state.user
             if (updatedUser) {
-                updatedUser.campaigns.push(action.campaign_id)
+                updatedUser.campaigns?.push(action.campaign_id)
             }
             return {
                 ...state,

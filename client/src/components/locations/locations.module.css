@@ -1,31 +1,18 @@
 .button {
-    width: 15% !important;
-    margin-left: auto !important;
-    margin-right: 5% !important;
+    width: 20% !important;
+    /*margin-left: auto !important;*/
+    /*margin-right: 5% !important;*/
     white-space: nowrap !important;
     font-size: 75% !important;
     float: right;
-    margin-bottom: 2%;
+    background-color: #5704d4 !important;
+    margin-bottom: 2% !important;
+    margin-top: 2% !important;
+    color: white !important;
 }
 
 .button {
-    background-color: #5704d4 !important;
-    /* width: 15% !important;
-    margin-left: auto !important;
-    margin-right: 5% !important;
-    white-space: nowrap !important;
-    font-size: 75% !important;
-    float: right;
-    margin-bottom: 2%;
-    border: none;
-    border-radius: .25em;
-    background: #5704d4;
-    color: white;
-    font-size: 1.1em !important; */
-    float: right;
-    margin-right: 5% !important;
-    margin-bottom: 2% !important;
-    color: white !important;
+
 }
 
 .scroll_box {

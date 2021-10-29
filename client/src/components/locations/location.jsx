@@ -42,7 +42,7 @@ function Location(props) {
     }
     return (
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: '100%'}}>
-            <Card style={{marginBottom: 20, width: '90%', padding: 20}}>
+            <Card style={{marginBottom: 20, width: '90%', padding: 20, maxWidth: 800}}>
                 <div style={{display: "flex", flexDirection: 'row', alignItems: "center", marginBottom: 10}}>
                     <h2 style={{marginRight: 20, marginBottom: 0, marginTop: 0}}>{name}</h2>
                     <div style={{display: 'flex', alignItems: 'flex-start'}}>
