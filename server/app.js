@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
 const mongoose = require('mongoose')
+const fileUpload = require('express-fileupload')
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -20,6 +21,7 @@ mongoose.connect(db, {
 })
 
 const app = express();
+app.use(fileUpload())
 
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/stripe/webhook') {

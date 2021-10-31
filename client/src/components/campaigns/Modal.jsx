@@ -6,7 +6,7 @@ import { addCampaign, updateCampaign } from "../../actions/campaignActions"
 
 function CampaignModal(props) {
     const [open, setOpen] = useState(false);
-    const [msg, setMsg] = useState();
+    const [msg, setMsg] = useState({ msg: null, positive: false, negative: false });
     const { title, description, question, details, auth, location, _id, action, trigger } = props
     const [values, setValues] = useState(
         {
@@ -16,6 +16,8 @@ function CampaignModal(props) {
             details: details || { type: "Product Pluck", options: ["", ""], results: new Map() },
 
         });
+    const [imageOne, setImageOne] = useState()
+    const [imageTwo, setImageTwo] = useState()
     useEffect(() => {
         setValues(
             {
@@ -23,13 +25,15 @@ function CampaignModal(props) {
                 description: description || "",
                 question: question || "",
                 details: details || { type: "Product Pluck", options: ["", ""], results: new Map() },
-
             }
+        
         );
+        setImageOne(null)
+        setImageTwo(null)
     }, [open, title, description, question, details]);
 
     function submit(e) {
-        e.preventDefault();
+        e.preventDefault()
 
         if (values.details.type === 'Fastpass' && parseInt(values.question) < 25) {
             setMsg({ msg: 'Please enter an amount greater than $24.99', positive: false, negative: true })
@@ -50,16 +54,20 @@ function CampaignModal(props) {
             user: auth.user._id,
             location: location,
             campaign_id: _id,
-            active: true
-        }
+            active: true,
 
+        }
+        const formData = new FormData()
+        formData.append('imageOne', imageOne)
+        formData.append('imageTwo', imageTwo)
+        formData.append('campaignDetails', JSON.stringify(campaignDetails))
         if (!values.details) {
-            setMsg({ msg: "Please fill in all required fields", positive: false, negative: true});
+            setMsg({ msg: "Please fill in all required fields", positive: false, negative: true });
         } else {
             if (values.details.type === "Fastpass") {
                 values.details.options = []
             }
-            props[`${action}Campaign`](campaignDetails);
+            props[`${action}Campaign`](formData);
             close()
         }
     }
@@ -96,6 +104,19 @@ function CampaignModal(props) {
     //     setValues({...values, details: {...values.details, options}})
     // }
 
+    function handleUpload(e) {
+        const fileName = e.target.files[0].name
+        var extFile = fileName.split(".")[1]
+        if (extFile === "jpg" || extFile === "jpeg" || extFile === "png" || extFile === 'PNG') {
+            if (e.target.name === "One") {
+                setImageOne(e.target.files[0])
+            } else {
+                setImageTwo(e.target.files[0])
+            }
+        } else {
+            setMsg({ msg: "Failed: Only .jpg, .jpeg, .png, and .PNG files are allowed!", positive: false, negative: true });
+        }
+    }
     const campaignTitle = action?.substring(0, 1).toUpperCase() + action?.substring(1)
     return (
         <Modal onClose={() => setOpen(false)}
@@ -114,9 +135,9 @@ function CampaignModal(props) {
                     <Button toggle active={values.details.type === "Fastpass"} onClick={handleClick}>Fastpass</Button>
                 </Button.Group>}
                 <Form style={{ marginTop: 10 }}>
-                    {msg && msg.msg &&
-                        <Message negative={msg.negative} positive={msg.positive} style={{ marginTop: 20 }}>
-                            <Message.Header>{msg.msg}</Message.Header>
+                    {msg?.msg &&
+                        <Message negative={msg?.negative} positive={msg?.positive} style={{ marginTop: 20 }}>
+                            <Message.Header>{msg?.msg}</Message.Header>
                         </Message>}
                     {values.details.type === 'Raffle' &&
                         <Form.Input required label={`${values.details.type} Title`} placeholder="e.g. Fat Baby's Raffle"
@@ -128,6 +149,20 @@ function CampaignModal(props) {
                     {/*{values.details.type === "Product Pluck" &&*/}
                     {/*<Form.Input required label='What products would you like to offer?'*/}
                     {/*            onChange={handleChange} value={values.question} name="question"/>}*/}
+                    {values.details.type === "Product Pluck" &&
+                        <div style={{ display: 'grid', gridTemplateColumns: "50% 50%", gridGap: '2%', gridTemplateRows: "10% 90%", padding: "8px" }}>
+                            <div>
+                                <p>Upload an Image of Product One</p>
+                                <input type="file" name="One" accept="image/*" onChange={handleUpload} />
+                                <img src={imageOne && URL.createObjectURL(imageOne)} styles={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />
+                            </div>
+                            <div>
+                                <p>Upload an Image of Product Two</p>
+                                <input type="file" accept="image/*" name="Two" onChange={handleUpload} />
+                                <img src={imageTwo && URL.createObjectURL(imageTwo)} styles={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />
+                            </div>
+                        </div>
+                    }
                     {values.details.type === "Raffle" &&
                         <Form.Input required value={values.question} label='Cost Per Ticket' type="number"
                             placeholder='Enter in dollar amount...' onChange={handleChange} name="question" />}

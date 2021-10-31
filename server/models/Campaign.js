@@ -51,6 +51,14 @@ const CampaignSchema = new Schema({
     },
     active: {
         type: Boolean,
+    },
+    imageOne: {
+        data: Buffer,
+        contentType: String
+    },
+    imageTwo: {
+        data: Buffer,
+        contentType: String
     }
 }, {minimize: false})
 
