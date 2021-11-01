@@ -18,9 +18,9 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  * @access Public
  */
 router.post('/', function (req, res) {
-    const { name, email, password, type, customerID, paymentMethod } = req.body;
+    const { name, email, password, type, customerID, paymentMethod, age, phone } = req.body;
     // Simple validation
-    if (!name || !email || !password || !type || !customerID) {
+    if (!name || !email || !password || !type || !customerID || !age || !phone) {
         return res.status(400).json({ msg: 'Please Enter all fields', positive: false, negative: true})
     }
 
@@ -30,7 +30,7 @@ router.post('/', function (req, res) {
     // Check for existing user
     User.findOne({ email }).then(user => {
         if (user) return res.status(400).json({ msg: 'User already exists', positive: false, negative: true})
-        const newUser = new User({ name, email, password, type, locations: [], customerID: encryptedCustomerID, paymentMethod: encryptedPaymentMethod })
+        const newUser = new User({ name, email, password, type, age, phone, locations: [], customerID: encryptedCustomerID, paymentMethod: encryptedPaymentMethod })
         // Create salt & hash
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -50,6 +50,8 @@ router.post('/', function (req, res) {
                                     name: user.name,
                                     email: user.email,
                                     type: user.type,
+                                    age: user.age,
+                                    phone: user.phone,
                                     customerID: user.customerID,
                                     paymentMethod: user.paymentMethod
                                 }
@@ -84,11 +86,13 @@ router.post('/update', auth, function (req, res) {
                 }
                 let resUser =  {
                     _id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        type: user.type,
-                        customerID: user.customerID,
-                        paymentMethod: user.paymentMethod
+                    name: user.name,
+                    email: user.email,
+                    type: user.type,
+                    age: user.age,
+                    phone: user.phone,
+                    customerID: user.customerID,
+                    paymentMethod: user.paymentMethod
                 }
                 res.json(resUser)
             })

@@ -43,10 +43,16 @@ router.post('/create-customer', async function (req, res) {
             customer = await stripe.customers.create({
                 payment_method: params.paymentMethod,
                 name: params.name,
-                email: params.email
+                email: params.email,
+                phone: params.phone,
+                metadata: { 'age': `${params.age}` }
             })
         } else {
-            customer = await stripe.customers.create({name: params.name, email: params.email})
+            customer = await stripe.customers.create({
+                name: params.name, email: params.email,
+                phone: params.phone,
+                metadata: {'age': `${params.age}`}
+            })
         }
         res.status(200).send(customer.id)
     } catch (e) {

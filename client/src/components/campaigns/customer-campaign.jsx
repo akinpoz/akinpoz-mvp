@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import history from '../../history'
-import { connect } from 'react-redux'
-import { clearCampaignMsg, getCampaign, submitCampaignData } from '../../actions/campaignActions'
-import { Button, Card, Icon, Message, Radio } from 'semantic-ui-react'
-import { clearStripeMsg, setupNewTab } from "../../actions/stripeActions";
-import { getLocation } from "../../actions/locationActions";
-import { arrayBufferToBase64 } from '../../utils'
+import {connect} from 'react-redux'
+import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
+import {Button, Card, Divider, Icon, Message, Segment} from 'semantic-ui-react'
+import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
+import {getLocation} from "../../actions/locationActions";
+import {arrayBufferToBase64} from '../../utils';
+import styles from './campaigns.module.css'
 
 
 function CustomerCampaign(props) {
@@ -15,6 +16,8 @@ function CustomerCampaign(props) {
     const msgRef = useRef()
     const [msg, setMsg] = useState()
     const [locked, setLocked] = useState(true)
+    const [backgroundColor1, setBackgroundColor1] = useState('none')
+    const [backgroundColor2, setBackgroundColor2] = useState('none')
 
     const {
         auth,
@@ -44,8 +47,7 @@ function CustomerCampaign(props) {
             setLocked(true)
         } else if (selectCampaign.details?.type === 'Product Pluck' && auth.user?.campaigns?.includes(selectCampaign._id)) {
             setLocked(true)
-        }
-        else {
+        } else {
             setLocked(false)
         }
     }, [stripe, selectCampaign, auth.user?.campaigns])
@@ -116,7 +118,7 @@ function CustomerCampaign(props) {
             if (campaign.msg.msg.includes('Thanks')) {
                 priority = 0
             }
-            setMsgWithPriority({ ...campaign.msg, priority: priority })
+            setMsgWithPriority({...campaign.msg, priority: priority})
             clearCampaignMsg()
         }
     }, [campaign.msg, clearCampaignMsg, setMsgWithPriority])
@@ -141,14 +143,26 @@ function CustomerCampaign(props) {
             safeSetLocked()
         }
         if (stripe.msg) {
-            setMsgWithPriority({ ...stripe.msg, priority: 2, negative: true, positive: false })
+            setMsgWithPriority({...stripe.msg, priority: 2, negative: true, positive: false})
             clearStripeMsg()
         }
 
     }, [stripe, clearStripeMsg, setMsgWithPriority, safeSetLocked])
 
-    function handleClick(e, { value }) {
+    function handleClick(value) {
         setInfo(value)
+        if (value === selectCampaign.details.options[0]) {
+            setBackgroundColor1('#E2DFD2')
+            setBackgroundColor2('transparent')
+        }
+        else if (value === selectCampaign.details.options[1]) {
+            setBackgroundColor2('#E2DFD2')
+            setBackgroundColor1('transparent')
+        }
+        else {
+            setBackgroundColor1('transparent')
+            setBackgroundColor2('transparent')
+        }
     }
 
     function handleSubmit() {
@@ -197,7 +211,7 @@ function CustomerCampaign(props) {
     function campaignLabel() {
         switch (selectCampaign.details.type) {
             case 'Product Pluck':
-                return selectCampaign.question
+                return 'Tap One Option and Submit Vote'
             case 'Raffle':
                 return `Cost per ticket: $ ${selectCampaign.question}`
             case 'Fastpass':
@@ -208,65 +222,70 @@ function CustomerCampaign(props) {
     }
 
     return (
-        <div id="customer-campaign_container" style={{ display: "grid", placeItems: "center", height: '100%' }}>
+        <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
             <div id="customer-campaign-card-message_container"
-                style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <Button style={{ position: 'absolute', top: 75, left: 15, zIndex: 0 }}
-                    onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'} />Back</Button>
+                 style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}}
+                        onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon
+                    name={'angle left'}/>Back</Button>
                 {msg && msg.msg &&
-                    <Message
-                        positive={msg.positive} negative={msg.negative}>
-                        <Message.Header>
-                            {msg.msg}
-                            {msg.msg.includes("login") &&
-                                <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Sign Up</a>
-                                </p>}
-                            {(msg.msg.includes("Participate") || msg.msg.includes("already")) &&
-                                <p><a href={`/#/location/?location_id=${location.select_location._id}`}
-                                    onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
-                        </Message.Header>
-                    </Message>}
+                <Message
+                    positive={msg.positive} negative={msg.negative} style={{marginTop: 40}}>
+                    <Message.Header>
+                        {msg.msg}
+                        {msg.msg.includes("login") &&
+                        <p><a href="/#/login">Login</a> or <a href="/#/register" onClick={handleRedirect}>Sign Up</a>
+                        </p>}
+                        {(msg.msg.includes("Participate") || msg.msg.includes("already")) &&
+                        <p><a href={`/#/location/?location_id=${location.select_location._id}`}
+                              onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
+                    </Message.Header>
+                </Message>}
                 {selectCampaign &&
-                    <Card>
+                <div style={{padding: 10, marginTop: (msg && msg.msg) ? 0 : 10, maxWidth: 600}}>
+                    <Card fluid>
                         <Card.Content>
                             <Card.Header>{selectCampaign.title}</Card.Header>
                             {selectCampaign.details && selectCampaign.details.type === 'Raffle' &&
-                                <Card.Meta>{selectCampaign.details.type}</Card.Meta>
+                            <Card.Meta>{selectCampaign.details.type}</Card.Meta>
                             }
-                            <br />
+                            <br/>
                             <b>
                                 {campaignLabel()}
                             </b>
-                            <br />
-                            <br />
+                            <br/>
+                            <br/>
                             <View type={selectCampaign.details.type} campaign={selectCampaign} setInfo={setInfo}
-                                handleClick={handleClick} info={info} />
-                            <br />
+                                  handleClick={handleClick} info={info} backgroundColor1={backgroundColor1} backgroundColor2={backgroundColor2}/>
+                            <br/>
                         </Card.Content>
                         {auth.isAuthenticated &&
-                            <Card.Content extra>
-                                <div style={{ flexDirection: "row-reverse", display: "flex" }}>
-                                    {selectCampaign.details.type !== 'Product Pluck' &&
-                                        <div id="submit-button-div">
-                                            {hasPaymentMethod() && <Button primary onClick={handleSubmit}
-                                                disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>{buttonLabel}</Button>}
-                                            {!hasPaymentMethod() && <Button primary onClick={() => {
-                                                history.push({ pathname: '/profile' })
-                                            }}>Add a Payment Method</Button>}
-                                        </div>}
-                                    {selectCampaign.details.type === 'Product Pluck' &&
-                                        <Button primary disabled={locked || !info || info === '' || (msg?.msg.includes('Thanks') ?? false)} onClick={handleSubmit}>Submit Vote</Button>}
-                                </div>
-                            </Card.Content>
+                        <Card.Content extra>
+                            <div style={{flexDirection: "row-reverse", display: "flex"}}>
+                                {selectCampaign.details.type !== 'Product Pluck' &&
+                                <div id="submit-button-div">
+                                    {hasPaymentMethod() && <Button primary onClick={handleSubmit}
+                                                                   disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>{buttonLabel}</Button>}
+                                    {!hasPaymentMethod() && <Button primary onClick={() => {
+                                        history.push({pathname: '/profile'})
+                                    }}>Add a Payment Method</Button>}
+                                </div>}
+                                {selectCampaign.details.type === 'Product Pluck' &&
+                                <Button primary
+                                        disabled={locked || !info || info === '' || (msg?.msg.includes('Thanks') ?? false)}
+                                        onClick={handleSubmit}>Submit Vote</Button>}
+                            </div>
+                        </Card.Content>
                         }
-                    </Card>}
+                    </Card>
+                </div>}
             </div>
         </div>
     )
 }
 
 function View(props) {
-    const { type, campaign, handleClick, info, setInfo } = props
+    const {type, campaign, handleClick, info, setInfo, backgroundColor1, backgroundColor2} = props
 
     function safeSetInfo(value) {
         const newInfo = info + value
@@ -278,31 +297,42 @@ function View(props) {
     switch (type) {
         case "Product Pluck":
             return (
-                <div>
-                    <div>
-                        <img src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageOne.data.data)}`} styles={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />
+                <Segment style={{padding: 0}} >
+                    <div className={styles.product_pluck_option} style={{marginRight: 14, backgroundColor: backgroundColor1}}
+                         onClick={() => handleClick(campaign.details.options[0])}>
+                        <img alt='image1'
+                             src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageOne.data.data)}`}
+                             style={{width: "100%", margin: "auto auto", marginBottom: 5}}/>
+                        <h6 style={{textAlign: 'center', fontWeight: 'bold'}}>{campaign.details.options[0]}</h6>
                     </div>
-                    <div>
-                        <img src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageTwo.data.data)}`} styles={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />
+                    <Divider vertical>OR</Divider>
+                    <div className={styles.product_pluck_option} style={{marginLeft: 14, backgroundColor: backgroundColor2}}
+                         onClick={() => handleClick(campaign.details.options[1])}>
+                        <img alt='image2'
+                             src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageTwo.data.data)}`}
+                             style={{width: "100%", margin: "auto auto", marginBottom: 5}}/>
+                        <h6 style={{textAlign: 'center', fontWeight: 'bold'}}>{campaign.details.options[1]}</h6>
                     </div>
-                    {campaign && campaign.details.options.map((option, index) => {
-                        return (
-                            <div key={index}>
-                                <Radio label={option} name='radioGroup' value={option} onChange={handleClick}
-                                    checked={info === option} />
-                            </div>
-                        )
-                    })}
-                </div>
+
+
+                    {/*{campaign && campaign.details.options.map((option, index) => {*/}
+                    {/*    return (*/}
+                    {/*        <div key={index}>*/}
+                    {/*            <Radio label={option} name='radioGroup' value={option} onChange={handleClick}*/}
+                    {/*                checked={info === option} />*/}
+                    {/*        </div>*/}
+                    {/*    )*/}
+                    {/*})}*/}
+                </Segment>
             )
         case "Fastpass":
-            return (<div />)
+            return (<div/>)
         case "Raffle":
             return (
-                <div style={{ display: "flex", flexDirection: 'row', justifyContent: 'center' }}>
-                    <Button icon={'minus'} style={{ margin: 0 }} onClick={() => safeSetInfo(-1)} disabled={info === 0} />
-                    <h3 style={{ marginLeft: 10, marginRight: 10 }}>{info}</h3>
-                    <Button icon={'plus'} style={{ margin: 0 }} onClick={() => safeSetInfo(1)} />
+                <div style={{display: "flex", flexDirection: 'row', justifyContent: 'center'}}>
+                    <Button icon={'minus'} style={{margin: 0}} onClick={() => safeSetInfo(-1)} disabled={info === 0}/>
+                    <h3 style={{marginLeft: 10, marginRight: 10}}>{info}</h3>
+                    <Button icon={'plus'} style={{margin: 0}} onClick={() => safeSetInfo(1)}/>
                 </div>
             )
         default:

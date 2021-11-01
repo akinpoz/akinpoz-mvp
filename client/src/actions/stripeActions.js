@@ -36,13 +36,15 @@ import {
  * Creates stripe customer object to save and process payment
  * @param name
  * @param email
+ * @param phone
+ * @param age
  * @param paymentMethod payment id for saved payment info in stripe api
  * @return {(function(*): void)|*}
  */
-export const createCustomer = (name, email, paymentMethod) => (dispatch) => {
+export const createCustomer = (name, email, phone, age, paymentMethod) => (dispatch) => {
     dispatch({type: REQUESTED_CUSTOMER})
     const params = {
-        name, email, paymentMethod
+        name, email, phone, age, paymentMethod
     }
     axios.post('/api/stripe/create-customer', params).then(res => {
         if (res.status === 200) {

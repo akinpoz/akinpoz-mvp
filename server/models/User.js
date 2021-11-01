@@ -20,6 +20,22 @@ const UserSchema = new Schema({
         },
         unqiue: true
     },
+    phone: {
+        type: "Number",
+        required: true,
+        date: {
+            type: Date,
+            default: Date.now()
+        }
+    },
+    age: {
+        type: "Number",
+        required: true,
+        date: {
+            type: Date,
+            default: Date.now()
+        }
+    },
     password: {
         type: String,
         required: true,

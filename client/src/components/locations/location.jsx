@@ -54,7 +54,7 @@ function Location(props) {
                 </div>
                 <p>{description}</p>
                 <br/>
-                <div style={{marginLeft: 20}}>
+                <div style={{marginLeft: 20, marginRight: 20}}>
                     <div style={{
                         display: "flex",
                         flexDirection: 'row',

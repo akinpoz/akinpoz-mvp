@@ -40,6 +40,8 @@ router.post('/', function (req, res) {
                             name: user.name,
                             email: user.email,
                             type: user.type,
+                            phone: user.phone,
+                            age: user.age,
                             customerID: user.customerID,
                             paymentMethod: user.paymentMethod
                         }

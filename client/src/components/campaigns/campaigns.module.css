@@ -7,3 +7,16 @@
     grid-template-columns: 33.33% 33.33% 33.33%;
     place-items: center;
 }
+
+.product_pluck_option {
+    display: inline-block;
+    width: calc(50% - 14px);
+    margin: auto;
+    padding: 14px;
+    height: 100%;
+}
+
+.product_pluck_option:hover {
+    background-color: #E2DFD2;
+    cursor: pointer;
+}

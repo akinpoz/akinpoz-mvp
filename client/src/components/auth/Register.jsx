@@ -39,7 +39,9 @@ function RegisterForm(props) {
         password: '',
         type: '',
         nameOnCard: '',
-        cardApproved: false
+        cardApproved: false,
+        age: 0,
+        phone: ''
     })
     const [paymentMethod, setPaymentMethod] = useState('')
     const [msg, setMsg] = useState(null)
@@ -167,7 +169,7 @@ function RegisterForm(props) {
     }, [elements, values])
     useEffect(() => {
         if (stripe.customer !== '' && !auth.isLoading) {
-            const {name, email, password, type} = values
+            const {name, email, password, type, age, phone} = values
             const customerID = stripe.customer;
             let newUser
             if (paymentActive) {
@@ -177,7 +179,9 @@ function RegisterForm(props) {
                     password,
                     type,
                     customerID,
-                    paymentMethod
+                    paymentMethod,
+                    age,
+                    phone
                 }
             } else {
                 newUser = {
@@ -185,7 +189,9 @@ function RegisterForm(props) {
                     email,
                     password,
                     type,
-                    customerID
+                    customerID,
+                    age,
+                    phone
                 }
             }
             register(newUser)
@@ -201,13 +207,13 @@ function RegisterForm(props) {
     }
 
     function isValid() {
-        const {name, email, password, type} = values
-        return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '');
+        const {name, email, password, type, age, phone} = values
+        return (score > 0 && name !== '' && email !== '' && password !== '' && type !== '' && age >= 13 && phone.length > 9 && phone.length <= 11 && !isNaN(phone));
     }
 
     const onSubmit = async e => {
         e.preventDefault()
-        const {name, email, nameOnCard} = values
+        const {name, email, nameOnCard, phone, age} = values
 
         // clear prev errors
         clearErrors()
@@ -221,7 +227,7 @@ function RegisterForm(props) {
         let result = ''
 
         if (paymentAuthenticatedByMobile) {
-            createCustomer(name, email, paymentMethod)
+            createCustomer(name, email, phone, age, paymentMethod)
         } else {
             if (paymentActive) {
                 result = await useStripeInst.confirmCardSetup(stripe.clientSecret, {
@@ -231,13 +237,13 @@ function RegisterForm(props) {
                 })
                 setPaymentMethod(result.setupIntent.payment_method)
                 if (result.error) {
-                    createCustomer(name, email)
+                    createCustomer(name, email, phone, age)
                     console.error(result.error)
                 } else {
-                    createCustomer(name, email, result.setupIntent.payment_method)
+                    createCustomer(name, email, phone, age, result.setupIntent.payment_method)
                 }
             } else {
-                createCustomer(name, email)
+                createCustomer(name, email, phone, age)
             }
         }
     }
@@ -272,6 +278,10 @@ function RegisterForm(props) {
 
             <Form.Input required name="name" label="Name" placeholder="First and Last Name" onChange={handleChange}
                         value={values.name}/>
+            <div id={'age_and_phone_container'} style={{display: "flex", flexDirection: "row", justifyContent: 'space-between'}}>
+                <Form.Input required name='age' error={values.age < 13} label='Age (13+)' placeholder='18' type='number' fluid width={6} onChange={handleChange} value={values.age}/>
+                <Form.Input required name='phone' label='Phone Number' error={values.phone.length < 10 || values.phone.length > 11 || isNaN(values.phone)} placeholder='Just enter the numbers' fluid width={9} onChange={handleChange} value={values.phone}/>
+            </div>
             <Form.Input required type="email" label="Email" onChange={handleChange} placeholder="Email..."
                         value={values.email} name="email"/>
             <Form.Input required type="password" label="Password" onChange={handleChange} placeholder="Password..."
