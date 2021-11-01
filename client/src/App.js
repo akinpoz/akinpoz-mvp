@@ -21,6 +21,8 @@ class App extends Component {
           <NavBar />
 
           <Router />
+          <p style={{margin: 0, textAlign: "center"}}>Property of Bio97 LLC</p>
+          <p style={{margin: 0, textAlign: "center"}}>Reach us at <a href='mailto:contact@apokoz.com'> contact@apokoz.com</a></p>
         </div>
       </Provider>
     )

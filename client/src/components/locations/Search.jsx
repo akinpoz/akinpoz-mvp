@@ -39,7 +39,6 @@ function Search(props) {
 
     return (
         <div id="search-container" className={styles.search_container}>
-            <br/>
             <SemanticSearch
                 size='large'
                 value={searchTerm}
@@ -47,28 +46,30 @@ function Search(props) {
                 results={[]}
                 showNoResults={false}
                 placeholder={'Search'}
+                style={{marginBottom: 20}}
             />
-            <br/>
-            {filteredLocations.map(location => {
-                    return (
-                        <div key={location._id} style={{
-                            borderBottom: '2px solid #0ac7b7',
-                            width: "90%",
-                            maxWidth: 500,
-                            background: '#5704d4',
-                            borderRadius: 15,
-                            marginBottom: 10,
-                            color: 'white'
+            <div style={{display: 'flex', flexDirection: 'column', flex: 1, overflowY: "auto", width: '100%', alignItems: "center"}}>
+                {filteredLocations.map(location => {
+                        return (
+                            <div key={location._id} style={{
+                                borderBottom: '2px solid #0ac7b7',
+                                width: "90%",
+                                maxWidth: 500,
+                                background: '#5704d4',
+                                borderRadius: 15,
+                                marginBottom: 10,
+                                color: 'white',
 
-                        }}>
-                            <div id="search-item-container" style={{width: "95%", margin: 'auto', cursor: 'pointer'}}
-                                 onClick={handleClick.bind(null, location)}>
-                                <h2 style={{textAlign: 'center'}}>{location.name}</h2>
+                            }}>
+                                <div id="search-item-container" style={{width: "95%", margin: 'auto', cursor: 'pointer'}}
+                                     onClick={handleClick.bind(null, location)}>
+                                    <h2 style={{textAlign: 'center'}}>{location.name}</h2>
+                                </div>
                             </div>
-                        </div>
-                    )
-                }
-            )}
+                        )
+                    }
+                )}
+            </div>
             <br/>
             {filteredLocations.length === 0 &&
             <h4>No Results :(</h4>

@@ -38,7 +38,7 @@ function CampaignModal(props) {
             setMsg({msg: 'Please enter an amount greater than $24.99', positive: false, negative: true})
             return;
         }
-
+        let details = values.details
         let question = values.question
         let title = values.title
         if (values.details.type === 'Product Pluck') {
@@ -54,12 +54,15 @@ function CampaignModal(props) {
                 return
             }
         }
+        else {
+            details = {...details, options: []}
+        }
 
         const campaignDetails = {
             title: title,
             description: values.description,
             question: question,
-            details: values.details,
+            details: details,
             user: auth.user._id,
             location: location,
             campaign_id: _id,

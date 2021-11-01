@@ -71,7 +71,7 @@ router.get('/campaign_id', async (req, res) => {
 router.post('/add', auth, (req, res) => {
     try {
         const { campaignDetails } = req.body
-        const { imageOne, imageTwo } = req.files
+        const { imageOne, imageTwo } = req.files || {}
         const campaign = JSON.parse(campaignDetails)
         console.log(campaign.details)
         if (campaign.details.type === 'Fastpass') {

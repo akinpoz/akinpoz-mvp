@@ -245,15 +245,14 @@ function CustomerCampaign(props) {
                 <div style={{padding: 10, marginTop: (msg && msg.msg) ? 0 : 10, maxWidth: 600}}>
                     <Card fluid>
                         <Card.Content>
-                            <Card.Header>{selectCampaign.title}</Card.Header>
+                            <Card.Header textAlign={'center'}>{selectCampaign.title}</Card.Header>
                             {selectCampaign.details && selectCampaign.details.type === 'Raffle' &&
-                            <Card.Meta>{selectCampaign.details.type}</Card.Meta>
+                            <Card.Meta textAlign={'center'}>{selectCampaign.details.type}</Card.Meta>
                             }
                             <br/>
-                            <b>
+                            <p style={{textAlign: "center", width: '100%', margin: 0, padding: 0}}><b>
                                 {campaignLabel()}
-                            </b>
-                            <br/>
+                            </b></p>
                             <br/>
                             <View type={selectCampaign.details.type} campaign={selectCampaign} setInfo={setInfo}
                                   handleClick={handleClick} info={info} backgroundColor1={backgroundColor1} backgroundColor2={backgroundColor2}/>

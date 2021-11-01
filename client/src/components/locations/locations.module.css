@@ -49,9 +49,11 @@
 }
 
 .search_container {
-    display: grid;
-    place-items: center;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    flex: 1
 }
 
 @media only screen and (max-width: 750px) {

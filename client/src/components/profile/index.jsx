@@ -41,7 +41,7 @@ function EndUserDashboard(props) {
         <div>
             <br/>
             <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                <h1 style={{textAlign: "center"}}>Welcome, {auth.user.name}!</h1>
+                <h3 style={{textAlign: "center"}}>Welcome, {auth.user.name}!</h3>
                 <div className={styles.divider}/>
             </div>
             <br/>
@@ -51,9 +51,9 @@ function EndUserDashboard(props) {
             </Message>
             }
             <Card.Group className={styles.endUserDashboardContainer}>
-                <AccountSettings {...props} />
                 {auth.user.type === 'customer' &&
                 <PaymentOptions {...props} setMsg={setMsg}/>}
+                <AccountSettings {...props} />
                 {auth.user.type === 'customer' &&
                 <History {...props}/>
                 }
@@ -66,12 +66,18 @@ function AccountSettings(props) {
     const {auth, updateUser, deleteUser} = props
     const [name, setName] = useState(auth.user.name)
     const [email, setEmail] = useState(auth.user.email)
+    const [phone, setPhone] = useState(auth.user.phone)
+    const [age, setAge] = useState(auth.user.age)
 
     function handleChange(e, data) {
         if (data.name === 'name') {
             setName(data.value)
         } else if (data.name === 'email') {
             setEmail(data.value)
+        } else if (data.name === 'phone') {
+            setPhone(data.value)
+        } else if (data.name === 'age') {
+            setAge(data.value)
         }
     }
 
@@ -79,6 +85,8 @@ function AccountSettings(props) {
         const modifiedUser = {
             name: name,
             email: email,
+            age: age,
+            phone: phone,
             _id: auth.user._id
         }
         updateUser(modifiedUser)
@@ -91,12 +99,14 @@ function AccountSettings(props) {
     return (
         <Card>
             <div className={styles.userAccountSettings}>
-                <h2>Account</h2>
+                <h4>Account</h4>
 
-                <br/>
                 <Form style={{width: '90%'}}>
-                    <Form.Input placeholder="Email" name="email" required value={email} onChange={handleChange}/>
-                    <Form.Input placeholder='Name' name="name" required value={name} onChange={handleChange}/>
+                    <Form.Input placeholder="Email" label='Email' name="email" required value={email} onChange={handleChange}/>
+                    <Form.Input placeholder='Name' label='Name' name="name" required value={name} onChange={handleChange}/>
+                    <Form.Input required name='phone' label='Phone Number' error={phone.length < 10 || phone.length > 11 || isNaN(phone)} placeholder='Just enter the numbers' onChange={handleChange} value={phone}/>
+                    <Form.Input required name='age' error={age < 13} label='Age (13+)' placeholder='18' type='number' fluid onChange={handleChange} value={age}/>
+
                 </Form>
                 <br/>
                 <div className={styles.buttonContainer}>
@@ -124,7 +134,7 @@ function History(props) {
     return (
         <Card>
             <div className={styles.userAccountSettings}>
-                <h2>History</h2>
+                <h4>History</h4>
                 <div className={styles.divider}/>
                 <br/>
                 {(stripe?.pastTabs?.length ?? 0) > 0 &&
@@ -311,8 +321,7 @@ function PaymentOptions(props) {
     return (
         <Card>
             <div className={styles.userAccountSettings}>
-                <h2>Payment</h2>
-                <br/>
+                <h4>Payment</h4>
                 {stripe.paymentDetails &&
                 <div id={'payment-details'} style={{width: '100%'}}>
                     <Card>

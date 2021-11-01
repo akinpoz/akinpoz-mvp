@@ -73,15 +73,14 @@ router.post('/', function (req, res) {
  * @access Private
  */
 router.post('/update', auth, function (req, res) {
-    const { name, email } = req.body
-    User.findOneAndUpdate({ _id: req.body._id }, { name, email }, { new: true })
+    const { _id, name, email, age, phone } = req.body
+    User.findOneAndUpdate({ _id: _id }, { name, email, age, phone }, { new: true })
         .then(user => {
             const customerID = decrypt(user.customerID)
-            stripe.customers.update(customerID, {email: email}).then((r, error) => {
+            stripe.customers.update(customerID, {email: email, phone: phone, metadata: {'age': `${age}`}}).then((r, error) => {
                 if (error) {
                     console.error(error.msg)
-                }
-                else {
+                } else {
                     console.log('Stripe Object Updated')
                 }
                 let resUser =  {
