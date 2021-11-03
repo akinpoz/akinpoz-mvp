@@ -237,17 +237,14 @@ function CustomerCampaign(props) {
     }
 
     return (
-        <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
+        <div id="customer-campaign_container" style={{display: "flex", flexDirection: "column", flex: 1, justifyContent: "center"}}>
             <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
                      content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
             <div id="customer-campaign-card-message_container"
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}}
-                        onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon
-                    name={'angle left'}/>Back</Button>
                 {msg && msg.msg &&
                 <Message
-                    positive={msg.positive} negative={msg.negative} style={{marginTop: 40}}>
+                    positive={msg.positive} negative={msg.negative} style={{marginTop: 10}}>
                     <Message.Header>
                         {msg.msg}
                         {msg.msg.includes("login") &&
@@ -258,8 +255,9 @@ function CustomerCampaign(props) {
                               onClick={handleRedirect}>Participate in Another Campaign!</a></p>}
                     </Message.Header>
                 </Message>}
+            </div>
                 {selectCampaign &&
-                <div style={{padding: 10, marginTop: (msg && msg.msg) ? 0 : 10, maxWidth: 600}}>
+                <div style={{padding: 10, maxWidth: 600}}>
                     <Card fluid>
                         <Card.Content>
                             <Card.Header textAlign={'center'}>{selectCampaign.title}</Card.Header>
@@ -278,7 +276,9 @@ function CustomerCampaign(props) {
                         </Card.Content>
                         {auth.isAuthenticated &&
                         <Card.Content extra>
-                            <div style={{flexDirection: "row-reverse", display: "flex"}}>
+                            <div style={{flexDirection: "row", display: "flex", justifyContent: 'space-between'}}>
+                                <Button onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}>
+                                    <Icon name={'angle left'}/>Back</Button>
                                 {selectCampaign.details.type !== 'Product Pluck' &&
                                 <div id="submit-button-div">
                                     {hasPaymentMethod() && !stripe.hasOpenTab &&
@@ -301,7 +301,6 @@ function CustomerCampaign(props) {
                         }
                     </Card>
                 </div>}
-            </div>
         </div>
     )
 }

@@ -201,9 +201,9 @@ function Jukebox(props) {
             <Loader active={spotify.loading} />
             <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
                      content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
-            <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>
+            <Button style={{position: 'fixed', top: 75, left: 15, zIndex: 0}} onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>
 
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            <div id={'top_spacer'} style={{height: 50}} />
             {msg && (!auth.user || (auth.user && auth.user.type === "customer")) && msg.msg && <Message positive={msg.positive} negative={msg.negative}>
                 <Message.Header>
                     {msg.msg}
@@ -226,9 +226,7 @@ function Jukebox(props) {
                 </Message.Header>
             </Message>
             }
-            <br/>
-            <br/>
-            <br/>
+
             <div className={styles.shiftUp}>
                 {loc && <h4 style={{textAlign: 'center'}}>Playing @ {loc.name}</h4>}
                 <Card fluid>
@@ -267,7 +265,7 @@ function Jukebox(props) {
                     </div>
                 </Card>
             </div>
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
+            <div id={'spacer_to_push_up_content'} style={{maxHeight: '30%', display: "flex", flex: 1}} />
         </div>
     )
 }
