@@ -28,7 +28,8 @@ function Location(props) {
         setIsEnabled(!isEnabled)
         toggleMusic({music: !isEnabled, _id})
         if (!isEnabled) {
-            openAuth(_id)
+            const authWindow = window.open('', 'Login to Spotify', 'width=800,height=600')
+            openAuth(_id, authWindow)
         }
     }
 

@@ -2,14 +2,13 @@ import {CLEAR_SPOTIFY_ERRORS, NEW_ITEM_PROCESSING, SPOTIFY_ERROR, SPOTIFY_LOADIN
 import axios from 'axios';
 import {tokenConfig} from "./authActions";
 
-export const openAuth = (location) => (dispatch, getState) => {
+export const openAuth = (location, authWindow) => (dispatch, getState) => {
     const config = {
         headers: tokenConfig(getState).headers,
         params: {location}
     }
     axios.get('/api/spotify/getAuthURL', config).then(res => {
-        window.open(res.data, 'Login to Spotify',
-            'width=800,height=600')
+        authWindow.location.href = res.data
     })
 }
 
