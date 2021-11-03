@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Card, Icon, Radio} from "semantic-ui-react";
+import {Button, Card, Confirm, Icon, Radio} from "semantic-ui-react";
 import {deleteLocation, setLocation, toggleMusic, updateLocation} from '../../actions/locationActions';
 import {deleteCampaign, updateCampaign} from '../../actions/campaignActions'
 import Modal from './Modal'
@@ -9,17 +9,19 @@ import Campaigns from '../campaigns';
 import {openAuth} from "../../actions/spotifyActions";
 
 function Location(props) {
-    const {location, toggleMusic, setLocation, openAuth} = props
+    const {location, toggleMusic, setLocation, openAuth, deleteLocation} = props
     const {name, description, music, _id, user} = location
     const [isEnabled, setIsEnabled] = useState(music)
     const UpdateTrigger = <div><i className="pencil alternate icon" style={{marginRight: 10}}/></div>
+    const [confirmOpen, setConfirmOpen] = useState(false)
 
     function handleDelete() {
         const location = {
             _id,
             user,
         }
-        if (window.confirm('Are you sure you want to delete this location? \nThis action will also delete all campaigns associated with this location. This action is not reversible.')) props.deleteLocation(location)
+        deleteLocation(location)
+        setConfirmOpen(false)
     }
 
     function handleToggle() {
@@ -42,13 +44,16 @@ function Location(props) {
     }
     return (
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: '100%'}}>
+            <Confirm open={confirmOpen} confirmButton={'Yes'} cancelButton={'No'}
+                     content={'Are you sure you want to delete this location?'} onConfirm={() => handleDelete()}
+                     onCancel={() => setConfirmOpen(false)}/>
             <Card style={{marginBottom: 20, width: '90%', padding: 20, maxWidth: 800}}>
                 <div style={{display: "flex", flexDirection: 'row', alignItems: "center", marginBottom: 10}}>
                     <h2 style={{marginRight: 20, marginBottom: 0, marginTop: 0}}>{name}</h2>
                     <div style={{display: 'flex', alignItems: 'flex-start'}}>
                         <ShowQRCode url={url}/>
                         <Modal action={"update"} trigger={UpdateTrigger} {...props} {...location} />
-                        <i className='red trash icon' onClick={handleDelete}/>
+                        <i className='red trash icon' onClick={() => setConfirmOpen(true)}/>
                     </div>
 
                 </div>

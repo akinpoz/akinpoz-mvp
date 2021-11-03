@@ -52,9 +52,6 @@ export const getCampaignsByUserID = (user) => (dispatch, getState) => {
     })
 }
 export const addCampaign = (formData) => (dispatch, getState) => {
-    for (var pair of formData.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
-    }
     dispatch(setCampaignsLoading())
     axios.post('/api/campaigns/add', formData, tokenConfig(getState)).then(res => {
         dispatch({

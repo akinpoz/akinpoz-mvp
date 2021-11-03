@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
-import {Button, Card, Divider, Icon, Message, Segment} from 'semantic-ui-react'
+import {Button, Card, Confirm, Divider, Icon, Message, Segment} from 'semantic-ui-react'
 import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
 import {getLocation} from "../../actions/locationActions";
 import {arrayBufferToBase64} from '../../utils';
@@ -18,6 +18,7 @@ function CustomerCampaign(props) {
     const [locked, setLocked] = useState(true)
     const [backgroundColor1, setBackgroundColor1] = useState('none')
     const [backgroundColor2, setBackgroundColor2] = useState('none')
+    const [confirmOpen, setConfirmOpen] = useState(false)
 
     const {
         auth,
@@ -154,17 +155,16 @@ function CustomerCampaign(props) {
         if (value === selectCampaign.details.options[0]) {
             setBackgroundColor1('#E2DFD2')
             setBackgroundColor2('transparent')
-        }
-        else if (value === selectCampaign.details.options[1]) {
+        } else if (value === selectCampaign.details.options[1]) {
             setBackgroundColor2('#E2DFD2')
             setBackgroundColor1('transparent')
-        }
-        else {
+        } else {
             setBackgroundColor1('transparent')
             setBackgroundColor2('transparent')
         }
     }
 
+    // No open tab or product pluck -- neither need confirm logic.  Either submit (product pluck) or send to checkout (everything else)
     function handleSubmit() {
         const type = selectCampaign.details.type
         let amount = type === "Product Pluck" ? 0 : type === "Raffle" ? parseInt(selectCampaign.question) * parseInt(info) : parseInt(selectCampaign.question)
@@ -184,20 +184,35 @@ function CustomerCampaign(props) {
         }
         if (type !== "Product Pluck") {
             setupNewTab(item)
-            if (stripe.hasOpenTab && parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
-                if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                    if (parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
-                        submitCampaignData(item)
-                    } else {
-                        history.push('/checkout')
-                    }
-                }
-            } else {
-                history.push('/checkout')
-            }
+            history.push('/checkout')
         } else {
             submitCampaignData(item)
         }
+    }
+
+    function confirmLogic() {
+        const type = selectCampaign.details.type
+        let amount = type === "Product Pluck" ? 0 : type === "Raffle" ? parseInt(selectCampaign.question) * parseInt(info) : parseInt(selectCampaign.question)
+        const item = {
+            amount,
+            user: auth.user,
+            description: type,
+            data: {
+                timestamp: new Date().toLocaleDateString("en-US"),
+                type,
+                campaign_id: selectCampaign._id,
+                location_id: selectCampaign.location,
+                transactionID: auth.user._id + Date.now(),
+                name: selectCampaign.title,
+                info
+            }
+        }
+        if (parseInt(stripe?.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+            submitCampaignData(item)
+        } else {
+            history.push('/checkout')
+        }
+        setConfirmOpen(false)
     }
 
     const hasPaymentMethod = () => {
@@ -223,6 +238,8 @@ function CustomerCampaign(props) {
 
     return (
         <div id="customer-campaign_container" style={{display: "grid", placeItems: "center", height: '100%'}}>
+            <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
+                     content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
             <div id="customer-campaign-card-message_container"
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                 <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}}
@@ -255,7 +272,8 @@ function CustomerCampaign(props) {
                             </b></p>
                             <br/>
                             <View type={selectCampaign.details.type} campaign={selectCampaign} setInfo={setInfo}
-                                  handleClick={handleClick} info={info} backgroundColor1={backgroundColor1} backgroundColor2={backgroundColor2}/>
+                                  handleClick={handleClick} info={info} backgroundColor1={backgroundColor1}
+                                  backgroundColor2={backgroundColor2}/>
                             <br/>
                         </Card.Content>
                         {auth.isAuthenticated &&
@@ -263,8 +281,13 @@ function CustomerCampaign(props) {
                             <div style={{flexDirection: "row-reverse", display: "flex"}}>
                                 {selectCampaign.details.type !== 'Product Pluck' &&
                                 <div id="submit-button-div">
-                                    {hasPaymentMethod() && <Button primary onClick={handleSubmit}
-                                                                   disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>{buttonLabel}</Button>}
+                                    {hasPaymentMethod() && !stripe.hasOpenTab &&
+                                    <Button primary onClick={handleSubmit}
+                                            disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>{buttonLabel}</Button>}
+                                    {hasPaymentMethod() && stripe.hasOpenTab &&
+                                    <Button primary onClick={() => setConfirmOpen(true)}
+                                            disabled={(selectCampaign.details.type !== 'Fastpass' && info === '') || locked || (selectCampaign.details.type === 'Raffle' && info === 0)}>
+                                        Add To Tab</Button>}
                                     {!hasPaymentMethod() && <Button primary onClick={() => {
                                         history.push({pathname: '/profile'})
                                     }}>Add a Payment Method</Button>}
@@ -296,8 +319,9 @@ function View(props) {
     switch (type) {
         case "Product Pluck":
             return (
-                <Segment style={{padding: 0}} >
-                    <div className={styles.product_pluck_option} style={{marginRight: 14, backgroundColor: backgroundColor1}}
+                <Segment style={{padding: 0}}>
+                    <div className={styles.product_pluck_option}
+                         style={{marginRight: 14, backgroundColor: backgroundColor1}}
                          onClick={() => handleClick(campaign.details.options[0])}>
                         <img alt='image1'
                              src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageOne.data.data)}`}
@@ -305,7 +329,8 @@ function View(props) {
                         <h6 style={{textAlign: 'center', fontWeight: 'bold'}}>{campaign.details.options[0]}</h6>
                     </div>
                     <Divider vertical>OR</Divider>
-                    <div className={styles.product_pluck_option} style={{marginLeft: 14, backgroundColor: backgroundColor2}}
+                    <div className={styles.product_pluck_option}
+                         style={{marginLeft: 14, backgroundColor: backgroundColor2}}
                          onClick={() => handleClick(campaign.details.options[1])}>
                         <img alt='image2'
                              src={`data:image/*;base64,${arrayBufferToBase64(campaign.imageTwo.data.data)}`}

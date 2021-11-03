@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from './jukebox.module.css'
-import {Button, Card, Icon, Message, Search} from "semantic-ui-react";
+import {Button, Card, Confirm, Icon, Message, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
@@ -32,6 +32,7 @@ function Jukebox(props) {
     const [msg, setMsg] = useState()
     const [buttonLabel, setButtonLabel] = useState('Add Song')
     const [locked, setLocked] = useState(true)
+    const [confirmOpen, setConfirmOpen] = useState(false)
 
     const setMsgWithPriority = useCallback((newMsg) => {
         // checks if new message is prioritized over old message (if no message priority is 5 -- the highest priority is 3)
@@ -163,18 +164,32 @@ function Jukebox(props) {
 
         }
         setupNewTab(item)
-        if (stripe.hasOpenTab && parseInt(stripe.tab?.timeWillBeSubmitted ?? 0) > Date.now()) {
-            if (window.confirm('Are you sure you would you like to add this to your tab?')) {
-                if (parseInt(stripe.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
-                    queueSong(item)
-                } else {
-                    history.push('/checkout')
-                }
+        history.push('/checkout')
+        cleanQuery()
+    }
+
+    function confirmLogic() {
+        const item = {
+            amount: 3,
+            user: auth.user,
+            description: 'song',
+            data: {
+                timestamp: new Date().toLocaleDateString("en-US"),
+                type: 'song',
+                campaign_id: 'jukebox_' + location.select_location._id,
+                location_id: location.select_location._id,
+                transactionID: auth.user._id + Date.now(),
+                name: search.selection.name,
+                songUri: search.selection.uri
             }
+
+        }
+        if (parseInt(stripe.tab?.timeWillBeSubmitted ?? 0) > Date.now() + 5000) {
+            queueSong(item)
         } else {
             history.push('/checkout')
         }
-        cleanQuery()
+        setConfirmOpen(false)
     }
 
     function handleRedirect() {
@@ -183,6 +198,8 @@ function Jukebox(props) {
 
     return (
         <div className={styles.container}>
+            <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
+                     content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
             <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>
 
             <div style={{flex: 1, display: "flex", flexDirection: "column"}}/>
@@ -238,8 +255,9 @@ function Jukebox(props) {
                             <div style={{flexDirection: "row", display: "flex"}}>
                                 <Button style={{marginRight: 10}} onClick={() => cleanQuery()} size={"small"}>
                                     Clear Selection</Button>
-                                {hasPaymentMethod() && <Button primary disabled={search.selection === null}
+                                {hasPaymentMethod() && !stripe.hasOpenTab && <Button primary disabled={search.selection === null}
                                                                onClick={handleSubmit} size={"small"}>{buttonLabel}</Button>}
+                                {hasPaymentMethod() && stripe.hasOpenTab && <Button primary disabled={search.selection === null} onClick={() => setConfirmOpen(true)} size={"small"}>Queue Song</Button>}
                                 {!hasPaymentMethod() && <Button primary onClick={() => {
                                     history.push({pathname: '/profile'})
                                 }} size={"small"}>Add a Payment Method</Button>}

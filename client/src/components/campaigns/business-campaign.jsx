@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Button, Card, Icon} from 'semantic-ui-react'
+import {Button, Card, Confirm, Icon} from 'semantic-ui-react'
 import Modal from './Modal'
 import styles from './campaigns.module.css'
 import {connect} from 'react-redux'
@@ -11,10 +11,11 @@ import {arrayBufferToBase64} from '../../utils'
 
 
 function BusinessCampaign(props) {
-    const {auth, campaign, deleteCampaign, updateCampaign} = props
+    const {campaign, deleteCampaign, updateCampaign} = props
     const {title, details, _id, user, location, description, question, active, imageOne, imageTwo} = campaign
 
     const [options, setOptions] = useState(details.options)
+    const [confirmDeleteCampaignOpen, setConfirmDeleteCampaignOpen] = useState(false)
 
     function handleDelete() {
         const campaign = {
@@ -22,20 +23,8 @@ function BusinessCampaign(props) {
             user,
             location,
         }
-        if (window.confirm("Are you sure you want to delete this campaign?")) deleteCampaign(campaign)
-    }
-
-    function handleNameRemove(name) {
-        const headers = getHeaders()
-        headers["x-auth-token"] = auth.token
-        if (window.confirm("Are you sure you want to remove this name?")) {
-            axios.post('/api/campaigns/removeName', {name, _id, token: {headers: {...headers}}}).then(res => {
-                setOptions(options.filter(option => option !== res.data.name))
-            }).catch(e => {
-                alert(`Failed to move name. ${e}`)
-                console.error(e)
-            })
-        }
+        deleteCampaign(campaign)
+        setConfirmDeleteCampaignOpen(false)
     }
 
     const UpdateTrigger = <Icon name='pencil'/>
@@ -91,15 +80,10 @@ function BusinessCampaign(props) {
                 {details.type === 'Raffle' && <Card.Meta>{details.type}</Card.Meta>}
             </Card.Content>
             <Card.Content>
-                {details.type === 'Fastpass' && <FastPassList options={options} handleNameRemove={handleNameRemove}/>}
+                {details.type === 'Fastpass' &&
+                <FastPassList options={options} setOptions={setOptions} {...props}/>}
                 {details.type === "Product Pluck" &&
                 <div>
-                    {/* <div>*/}
-                    {/*    <img alt={'image1'} src={`data:image/*;base64,${arrayBufferToBase64(imageOne.data.data)}`} style={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />*/}
-                    {/*</div>*/}
-                    {/*<div>*/}
-                    {/*    <img alt={'image2'} src={`data:image/*;base64,${arrayBufferToBase64(imageTwo.data.data)}`} style={{ width: "50%", margin: "auto auto", marginTop: "2%" }} />*/}
-                    {/*</div>*/}
                     {active && results && results.map((result, index) => {
                         return (
                             <div key={index} id={'results'}>
@@ -121,11 +105,6 @@ function BusinessCampaign(props) {
                                  style={{width: "50%", margin: "auto auto", marginTop: "2%"}}/>
                         </div>
                     </div>
-                        // <div key={index} id={'none'}>
-                        //     <p><b>{option}</b> : 0</p>
-                        //     <br />
-                        // </div>
-
                     }
                     {!active &&
                     <div>
@@ -161,7 +140,11 @@ function BusinessCampaign(props) {
                 }
                 <abbr style={{textDecoration: 'none'}} title="Edit Campaign"><Modal action={"update"}
                                                                                     trigger={UpdateTrigger} {...props} {...campaign} /></abbr>
-                <Icon color="red" name="trash" onClick={handleDelete}/>
+                <Icon color="red" name="trash" onClick={() => setConfirmDeleteCampaignOpen(true)}/>
+                <Confirm open={confirmDeleteCampaignOpen} onCancel={() => setConfirmDeleteCampaignOpen(false)}
+                         onConfirm={handleDelete}
+                         content={'Are you sure you want delete this campaign?'} confirmButton={'Yes'}
+                         cancelButton={'No'}/>
             </Card.Content>
         </Card>
     )
@@ -169,7 +152,36 @@ function BusinessCampaign(props) {
 
 // Fastpass "Results" equivalent.
 function FastPassList(props) {
-    const {options, handleNameRemove} = props
+    const {options, setOptions, auth, campaign} = props
+    const {_id} = campaign
+    const [confirmRemoveNameOpen, setConfirmRemoveNameOpen] = useState(false)
+    const [nameToBeRemoved, setNameToBeRemoved] = useState('')
+
+
+    function handleNameRemove() {
+        if (nameToBeRemoved === '') {
+            alert(`Failed to move name.`)
+            return;
+        }
+        const headers = getHeaders()
+        headers["x-auth-token"] = auth.token
+        axios.post('/api/campaigns/removeName', {
+            nameToBeRemoved,
+            _id,
+            token: {headers: {...headers}}
+        }).then(res => {
+            const tempOptions = [...options]
+            const index = tempOptions.findIndex(option => option === res.data.name)
+            tempOptions.splice(index, 1)
+            setOptions(tempOptions)
+        }).catch(e => {
+            alert(`Failed to move name. ${e}`)
+            console.error(e)
+        })
+        setConfirmRemoveNameOpen(false)
+        setNameToBeRemoved('')
+    }
+
     return (
         <table style={{width: '95%', marginLeft: 'auto', marginRight: 'auto'}}>
             <thead>
@@ -181,12 +193,20 @@ function FastPassList(props) {
             }
             </thead>
             <tbody>
+            <Confirm open={confirmRemoveNameOpen} onCancel={() => {
+                setConfirmRemoveNameOpen(false);
+                setNameToBeRemoved('')
+            }} onConfirm={() => handleNameRemove()} cancelButton={'No'} confirmButton={'Yes'}
+                     content={'Are you sure you want to remove this name?'}/>
             {options.length > 0 && options.map((option, index) => {
                 return (
                     <tr key={option + index}>
                         <td>{option}</td>
                         <td style={{textAlign: 'end'}}><Icon name="remove" color="red"
-                                                             onClick={handleNameRemove.bind(null, option)}/></td>
+                                                             onClick={() => {
+                                                                 setNameToBeRemoved(option);
+                                                                 setConfirmRemoveNameOpen(true)
+                                                             }}/></td>
                     </tr>
                 )
             })}

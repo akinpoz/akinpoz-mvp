@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
-import {Button, Card, Form, Message} from "semantic-ui-react";
+import {Button, Card, Confirm, Form, Message} from "semantic-ui-react";
 import {
     clearStripeMsg,
     createSetupIntent,
@@ -68,6 +68,7 @@ function AccountSettings(props) {
     const [email, setEmail] = useState(auth.user.email)
     const [phone, setPhone] = useState(auth.user.phone)
     const [age, setAge] = useState(auth.user.age)
+    const [confirmOpen, setConfirmOpen] = useState(false)
 
     function handleChange(e, data) {
         if (data.name === 'name') {
@@ -92,20 +93,25 @@ function AccountSettings(props) {
         updateUser(modifiedUser)
     }
 
-    function handleDelete() {
-        if (window.confirm("Are you sure you want to delete your account? \nThis action is irreversible and will result in a lose of data.")) deleteUser(auth.user._id)
-    }
-
     return (
         <Card>
             <div className={styles.userAccountSettings}>
+                <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => {
+                    deleteUser(auth.user._id)
+                    setConfirmOpen(false)
+                }} content={'Are you sure you want to delete your account?'} confirmButton={'Yes'} cancelButton={'No'}/>
                 <h4>Account</h4>
 
                 <Form style={{width: '90%'}}>
-                    <Form.Input placeholder="Email" label='Email' name="email" required value={email} onChange={handleChange}/>
-                    <Form.Input placeholder='Name' label='Name' name="name" required value={name} onChange={handleChange}/>
-                    <Form.Input required name='phone' label='Phone Number' error={phone.length < 10 || phone.length > 11 || isNaN(phone)} placeholder='Just enter the numbers' onChange={handleChange} value={phone}/>
-                    <Form.Input required name='age' error={age < 13} label='Age (13+)' placeholder='18' type='number' fluid onChange={handleChange} value={age}/>
+                    <Form.Input placeholder="Email" label='Email' name="email" required value={email}
+                                onChange={handleChange}/>
+                    <Form.Input placeholder='Name' label='Name' name="name" required value={name}
+                                onChange={handleChange}/>
+                    <Form.Input required name='phone' label='Phone Number'
+                                error={phone.length < 10 || phone.length > 11 || isNaN(phone)}
+                                placeholder='Just enter the numbers' onChange={handleChange} value={phone}/>
+                    <Form.Input required name='age' error={age < 13} label='Age (13+)' placeholder='18' type='number'
+                                fluid onChange={handleChange} value={age}/>
 
                 </Form>
                 <br/>
@@ -115,7 +121,7 @@ function AccountSettings(props) {
                 </div>
             </div>
             <Button style={{width: '90%', marginRight: 'auto', marginLeft: 'auto', marginBottom: '10px'}} basic
-                    color="red" onClick={handleDelete}>Delete Account</Button>
+                    color="red" onClick={() => setConfirmOpen(true)}>Delete Account</Button>
 
         </Card>
     )
@@ -148,7 +154,7 @@ function History(props) {
                         <ul style={{margin: 0, padding: 0}} key={`${tab.timeWillBeSubmitted}`}>
                             <h4>{month}/{day}/{year} - {tab.locationName}</h4>
                             {tab.items.map(item => {
-                                if (item.description === 'Tab fee'){
+                                if (item.description === 'Tab fee') {
                                     return <></>;
                                 }
                                 return (
@@ -230,7 +236,11 @@ function PaymentOptions(props) {
                 if (result.error) {
                     event.complete('fail')
                     markComplete('fail')
-                    setMsg({msg: 'Could not update payment.  Please try a different card', positive: false, negative: true})
+                    setMsg({
+                        msg: 'Could not update payment.  Please try a different card',
+                        positive: false,
+                        negative: true
+                    })
                 } else {
                     // even if the request comes back as successful double check payment intent
                     event.complete('success')
@@ -240,7 +250,11 @@ function PaymentOptions(props) {
                         if (error) {
                             console.error(error.message)
                             markComplete('fail')
-                            setMsg({msg: 'Could not update payment.  Please try a different card', positive: false, negative: true})
+                            setMsg({
+                                msg: 'Could not update payment.  Please try a different card',
+                                positive: false,
+                                negative: true
+                            })
                         } else {
                             markComplete('success')
                         }
