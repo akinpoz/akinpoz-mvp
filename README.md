@@ -5,6 +5,10 @@
 - For testing adding a payment method get a testing card from here: https://stripe.com/docs/testing
   - Error received: ```Your card was declined. Your request was in test mode, but used a non test (live) card. For a list of valid test cards, visit: https://stripe.com/docs/testing```
 
+## MISC Notables
+
+- Added max-scale to index.html to prevent zooming
+
 ## TODOS
 
 - [ ] Set up a MongoDB Atlas Custer so we can use the same data across our dev environments if needed. Keep the option to switch to local DB if dev wants it. Atlas Custer should really only be used for displaying designs

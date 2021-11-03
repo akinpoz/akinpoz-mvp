@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from './jukebox.module.css'
-import {Button, Card, Confirm, Icon, Message, Search} from "semantic-ui-react";
+import {Button, Card, Confirm, Icon, Loader, Message, Search} from "semantic-ui-react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import {cleanQuery, startSearch, updateSelection} from "../../actions/searchActions";
@@ -198,6 +198,7 @@ function Jukebox(props) {
 
     return (
         <div className={styles.container}>
+            <Loader active={spotify.loading} />
             <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
                      content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
             <Button style={{position: 'absolute', top: 75, left: 15, zIndex: 0}} onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}><Icon name={'angle left'}/>Back</Button>

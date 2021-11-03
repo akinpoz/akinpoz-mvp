@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Card, Form, Message } from "semantic-ui-react";
+import {Button, Card, Form, Loader, Message} from "semantic-ui-react";
 import styles from './checkout.module.css'
 import {clearStripeMsg, closeTab, getDraftInvoice, tabExpired} from "../../actions/stripeActions";
 import { clearCampaignMsg, submitCampaignData } from "../../actions/campaignActions"
@@ -52,6 +52,7 @@ function Checkout(props) {
 
     return (
         <div className={styles.checkoutContainer}>
+            <Loader active={stripe.loading || spotify.loading || campaign.loading} />
             {msg && msg.msg && <Message positive={msg.positive} negative={msg.negative}><Message.Header>{msg.msg}<br /><a
                 href={`/#/location/?location_id=${location.select_location._id}`}>Participate in Another
                 Campaign!</a></Message.Header></Message>}

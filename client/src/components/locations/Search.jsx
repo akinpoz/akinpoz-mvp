@@ -3,19 +3,20 @@ import styles from './locations.module.css'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {getLocations, setLocation} from '../../actions/locationActions'
-import {Search as SemanticSearch} from 'semantic-ui-react'
+import {Loader, Search as SemanticSearch} from 'semantic-ui-react'
 import {setCampaign} from "../../actions/campaignActions";
 
 function Search(props) {
     const [searchTerm, setSearchTerm] = useState('')
-    const {locations, getLocations, setLocation, no_locations, setCampaign} = props
+    const {locations, getLocations, setLocation, setCampaign, no_locations, loading} = props
     const [filteredLocations, setFilteredLocations] = useState(locations)
     useEffect(() => {
-        if (locations.length === 0) {
-            getLocations()
-        }
+        getLocations()
+    }, [getLocations])
+
+    useEffect(() => {
         setFilteredLocations(locations)
-    }, [locations, getLocations, no_locations])
+    }, [locations])
 
     useEffect(() => {
         setCampaign('')
@@ -48,7 +49,8 @@ function Search(props) {
                 placeholder={'Search'}
                 style={{marginBottom: 20}}
             />
-            <div style={{display: 'flex', flexDirection: 'column', flex: 1, overflowY: "auto", width: '100%', alignItems: "center"}}>
+            <Loader active={loading} />
+            <div style={{display: 'flex', flexDirection: 'column', flex: 1, overflowY: "auto", width: '100%', alignItems: "center"}} hidden={no_locations || loading}>
                 {filteredLocations.map(location => {
                         return (
                             <div key={location._id} style={{
@@ -70,7 +72,7 @@ function Search(props) {
                     }
                 )}
             </div>
-            <br/>
+
             {filteredLocations.length === 0 &&
             <h4>No Results :(</h4>
             }
@@ -80,7 +82,8 @@ function Search(props) {
 
 const mapStateToProps = (state) => ({
     locations: state.location.locations,
-    no_locations: state.location.no_locations
+    no_locations: state.location.no_locations,
+    loading: state.location.loading
 })
 
 export default connect(mapStateToProps, {getLocations, setLocation, setCampaign})(Search)

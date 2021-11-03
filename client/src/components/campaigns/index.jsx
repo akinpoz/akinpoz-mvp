@@ -3,13 +3,15 @@ import {connect} from 'react-redux'
 import BusinessCampaign from './business-campaign'
 import CustomerCampaign from './customer-campaign'
 import ModalAddCampaign from './Modal';
+import {Loader} from "semantic-ui-react";
 
 function Campaigns(props) {
     const {campaigns, location_id, user_type} = props
     const filteredCampaigns = campaigns.filter(campaign => campaign.location === location_id)
     return (
         <div id="campaigns-container">
-            {user_type === 'business' && filteredCampaigns && filteredCampaigns.length > 0 ?
+            <Loader active={campaigns.loading} />
+                {user_type === 'business' && filteredCampaigns && filteredCampaigns.length > 0 ?
                 <CampaignList campaigns={filteredCampaigns}/> : <NoCampaigns/>}
             <br/>
             {user_type === 'business' &&

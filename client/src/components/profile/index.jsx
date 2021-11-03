@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import styles from './profile.module.css'
-import {Button, Card, Confirm, Form, Message} from "semantic-ui-react";
+import {Button, Card, Confirm, Form, Loader, Message} from "semantic-ui-react";
 import {
     clearStripeMsg,
     createSetupIntent,
@@ -95,6 +95,7 @@ function AccountSettings(props) {
 
     return (
         <Card>
+            <Loader active={auth.isLoading} />
             <div className={styles.userAccountSettings}>
                 <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => {
                     deleteUser(auth.user._id)
@@ -334,6 +335,7 @@ function PaymentOptions(props) {
 
     return (
         <Card>
+            <Loader active={stripe.loading} />
             <div className={styles.userAccountSettings}>
                 <h4>Payment</h4>
                 {stripe.paymentDetails &&
