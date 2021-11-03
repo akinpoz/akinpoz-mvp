@@ -149,7 +149,7 @@ function NewTab(props) {
  * @constructor
  */
 function ExistingTab(props) {
-    const { stripe, auth, closeTab, location, tabExpired } = props
+    const { stripe, location, tabExpired } = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
     const calculateTimeLeft = useCallback(() => {
         let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
@@ -264,9 +264,9 @@ function ExistingTab(props) {
                     <div className={styles.cardFormButtonsContainer}>
                         <Button type={'button'} style={{ marginRight: 5 }}
                             href={`/#/location/?location_id=${location.select_location._id}`}>Go Back</Button>
-                        <Button primary disabled={stripe.loading || stripe.status !== 'unfulfilled'}
-                            onClick={() => closeTab(auth.user._id)}>Close
-                            Tab</Button>
+                        {/*<Button primary disabled={stripe.loading || stripe.status !== 'unfulfilled'}*/}
+                        {/*    onClick={() => closeTab(auth.user._id)}>Close*/}
+                        {/*    Tab</Button>*/}
                     </div>
                 </div>
             </Card>
