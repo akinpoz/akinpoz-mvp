@@ -1,6 +1,5 @@
 import { CLEAN_QUERY, FINISH_SEARCH, START_SEARCH, UPDATE_SELECTION } from "./types";
 import axios from "axios";
-import { setSpotifyLoading } from "./spotifyActions";
 
 
 export const startSearch = (query) => (dispatch) => {
@@ -9,7 +8,6 @@ export const startSearch = (query) => (dispatch) => {
         return;
     }
     dispatch({ type: START_SEARCH, query: query })
-    dispatch(setSpotifyLoading())
 
     axios.get('/api/spotify/search', { params: { query } }).then(res => {
         dispatch({

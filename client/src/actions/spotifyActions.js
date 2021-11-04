@@ -47,8 +47,4 @@ export const clearSpotifyErrors = () => (dispatch) => {
     dispatch({type: CLEAR_SPOTIFY_ERRORS})
 }
 
-export const setSpotifyLoading = () => {
-    return {
-        type: SPOTIFY_LOADING
-    }
-}
+

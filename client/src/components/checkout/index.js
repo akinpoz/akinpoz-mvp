@@ -262,7 +262,7 @@ function ExistingTab(props) {
                     </div>
                     <br />
                     <div className={styles.cardFormButtonsContainer}>
-                        <Button type={'button'} style={{ marginRight: 5 }}
+                        <Button style={{ marginRight: 5 }}
                             href={`/#/location/?location_id=${location.select_location._id}`}>Go Back</Button>
                         {/*<Button primary disabled={stripe.loading || stripe.status !== 'unfulfilled'}*/}
                         {/*    onClick={() => closeTab(auth.user._id)}>Close*/}

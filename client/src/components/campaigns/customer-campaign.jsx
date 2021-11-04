@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import history from '../../history'
 import {connect} from 'react-redux'
 import {clearCampaignMsg, getCampaign, submitCampaignData} from '../../actions/campaignActions'
-import {Button, Card, Confirm, Divider, Icon, Message, Segment} from 'semantic-ui-react'
+import {Button, Card, Confirm, Divider, Icon, Loader, Message, Segment} from 'semantic-ui-react'
 import {clearStripeMsg, setupNewTab} from "../../actions/stripeActions";
 import {getLocation} from "../../actions/locationActions";
 import {arrayBufferToBase64} from '../../utils';
@@ -237,9 +237,10 @@ function CustomerCampaign(props) {
     }
 
     return (
-        <div id="customer-campaign_container" style={{display: "flex", flexDirection: "column", flex: 1, justifyContent: "center"}}>
+        <div id="customer-campaign_container" style={{display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", alignItems: "center"}}>
             <Confirm open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={() => confirmLogic()}
                      content={'Are you sure you want to add to your tab?'} confirmButton={'Yes'} cancelButton={'No'}/>
+            <Loader active={campaign.loading} />
             <div id="customer-campaign-card-message_container"
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                 {msg && msg.msg &&

@@ -76,7 +76,7 @@ router.get('/callback', async function (req, res) {
                     access_token: encrypt(data.body['access_token']),
                     refresh_token: encrypt(data.body['refresh_token'])
                 }, {useFindAndModify: false, new: true})
-                res.status(200).send("<script>window.close();</script >")
+                res.status(200).send("<script>setTimeout(() => window.close(), 500);</script >")
             } catch (e) {
                 console.error(e)
                 res.status(500).send(e)
