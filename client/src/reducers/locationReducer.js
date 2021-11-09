@@ -55,7 +55,7 @@ export default function LocationReducer(state = initialState, action) {
         case LOCATIONS_LOADING:
             return {
                 ...state,
-                loading: true
+                loading: action.loading ?? true
             }
         case SET_LOCATION:
             return {

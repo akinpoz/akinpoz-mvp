@@ -1,11 +1,11 @@
-import { GET_LOCATIONS_BY_USER_ID, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC, SET_LOCATION, GET_ERRORS, GET_LOCATIONS, GET_LOCATION } from './types'
+import { GET_LOCATIONS_BY_USER_ID, LOCATIONS_LOADING, ADD_LOCATION, UPDATE_LOCATION, DELETE_LOCATION, TOGGLE_MUSIC, SET_LOCATION, GET_ERRORS, GET_LOCATIONS, GET_LOCATION, USER_LOADING } from './types'
 import axios from 'axios'
 import { tokenConfig } from './authActions'
 
 
 
 export const getLocations = () => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     axios.get('/api/locations/').then(res => {
         dispatch({
             type: GET_LOCATIONS,
@@ -14,10 +14,11 @@ export const getLocations = () => (dispatch, getState) => {
     }).catch(err => {
         console.error(err)
         dispatch({type: GET_ERRORS, payload: err})
+        dispatch(setLocationsLoading(false))
     })
 }
 export const getLocationsByUserID = (user) => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     dispatch({ type: SET_LOCATION, payload: "" })
     const config = {
         headers: tokenConfig(getState).headers,
@@ -39,7 +40,7 @@ export const getLocation = (location_id) => (dispatch, getState) => {
     })
 }
 export const addLocation = (location) => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     axios.post('/api/locations/add', location, tokenConfig(getState)).then(res => {
         dispatch({
             type: ADD_LOCATION,
@@ -48,7 +49,7 @@ export const addLocation = (location) => (dispatch, getState) => {
     })
 }
 export const updateLocation = (location) => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     axios.post('/api/locations/update', location, tokenConfig(getState)).then(res => {
         dispatch({
             type: UPDATE_LOCATION,
@@ -57,7 +58,7 @@ export const updateLocation = (location) => (dispatch, getState) => {
     })
 }
 export const deleteLocation = (location) => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     axios.post(`/api/locations/delete`, location, tokenConfig(getState)).then(res => {
         dispatch({
             type: DELETE_LOCATION,
@@ -66,7 +67,7 @@ export const deleteLocation = (location) => (dispatch, getState) => {
     })
 }
 export const toggleMusic = (payload) => (dispatch, getState) => {
-    dispatch(setLocationsLoading())
+    dispatch(setLocationsLoading(true))
     const { music, _id } = payload
     axios.post(`/api/locations/toggleMusic`, { music, _id }, tokenConfig(getState)).then(res => {
         dispatch({
@@ -85,9 +86,10 @@ export const setLocation = _id => (dispatch) => {
     dispatch({ type: SET_LOCATION, payload: _id })
 }
 
-export const setLocationsLoading = () => {
+export const setLocationsLoading = (loading) => {
     return {
-        type: LOCATIONS_LOADING
+        type: LOCATIONS_LOADING,
+        loading: loading
     }
 }
 
