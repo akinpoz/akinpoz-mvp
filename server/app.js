@@ -38,9 +38,9 @@ app.use(express.static(path.join(__dirname, 'public/build')));
 
 app.use(cors())
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/build/index.html'))
-})
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public/build/index.html'))
+// })
 
 app.use('/api/users', require('./routes/api/users'))
 app.use('/api/auth', require('./routes/api/auth'))
