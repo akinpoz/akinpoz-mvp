@@ -4,9 +4,10 @@ import App from './App';
 import axios from 'axios'
 
 const host = window.location.host
+const port = window.location.port
 const baseURL = `https://${host}:3501`
 axios.defaults.baseURL = baseURL
-console.log(baseURL)
+console.log(baseURL + ' port: ' + port)
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 ReactDOM.render(
