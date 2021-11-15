@@ -37,12 +37,7 @@ function Location(props) {
         setLocation(_id)
     }
 
-    let url
-    if (process.env.NODE_ENV === 'development') {
-        url = `http://localhost:3000/#/customer-home/?location_id=${_id}`
-    } else {
-        url = `https://apokoz.com/#/customer-home/?location_id=${_id}`
-    }
+    let url = window.location.host
     return (
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: '100%'}}>
             <Confirm open={confirmOpen} confirmButton={'Yes'} cancelButton={'No'}

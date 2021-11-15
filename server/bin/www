@@ -89,7 +89,7 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
   //TODO: !Create production url and domain-name
-  const url = process.env.NODE_ENV === 'development' ? 'http://localhost:8001' : ""
+  const url = window.location.host
   //TODO: !Create .env in production VM
   console.log(`%cServer is running on: ${url}`, "color: green")
  // open(url);
