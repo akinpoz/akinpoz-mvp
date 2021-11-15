@@ -7,7 +7,7 @@ const SpotifyWebApi = require('spotify-web-api-node')
 const {encrypt, decrypt} = require("./encryption");
 dotenv.config();
 
-const redirectUri = 'http://localhost:8001/api/spotify/callback';
+const redirectUri = 'https://localhost:8001/api/spotify/callback';
 
 /**
  * searches for song based on query.  Uses access token retrieved from client credentials flow through the spotify api
