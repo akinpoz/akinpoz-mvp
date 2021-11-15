@@ -4,8 +4,7 @@ import App from './App';
 import axios from 'axios'
 
 const host = window.location.host
-const protocol = window.location.protocol
-const baseURL = `${protocol}://${host}`
+const baseURL = `https://${host}`
 axios.defaults.baseURL = baseURL
 console.log(baseURL)
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
