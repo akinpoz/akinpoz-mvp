@@ -4,8 +4,10 @@ import App from './App';
 import axios from 'axios'
 
 const host = window.location.host
-console.log(host)
-axios.defaults.baseURL = host
+const protocol = window.location.protocol
+const baseURL = `${protocol}://${host}`
+axios.defaults.baseURL = baseURL
+console.log(baseURL)
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 ReactDOM.render(
