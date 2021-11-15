@@ -45,10 +45,6 @@ app.use('/api/spotify', require('./routes/api/spotify'))
 app.use('/api/campaigns', require('./routes/api/campaigns'))
 app.use('/api/stripe', require('./routes/api/stripe'))
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/build/index.html'))
-})
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -64,5 +60,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.json({ error: err.message })
 });
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/build/index.html'))
+})
 
 module.exports = app;
