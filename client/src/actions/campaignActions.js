@@ -5,7 +5,6 @@ import {
     UPDATE_CAMPAIGN,
     DELETE_CAMPAIGN,
     GET_CAMPAIGNS,
-    GET_CAMPAIGN,
     SET_CAMPAIGN,
     GET_ERRORS,
     SUBMITTING_CAMPAIGN,
@@ -32,7 +31,7 @@ export const getCampaigns = () => (dispatch, getState) => {
 }
 export const getCampaign = (campaign_id) => (dispatch) => {
     axios.get(`/api/campaigns/campaign_id`, { params: { campaign_id } }).then(res => {
-        dispatch({ type: GET_CAMPAIGN, payload: res.data })
+        dispatch({ type: SET_CAMPAIGN, payload: res.data })
     })
 }
 export const setCampaign = (campaign) => (dispatch) => {

@@ -199,6 +199,7 @@ export const closeTab = (userID) => (dispatch, getState) => {
 }
 
 export const tabExpired = () => (dispatch) => {
+    console.log('tabexpired')
     dispatch({type: SUCCESSFULLY_CLOSED_TAB})
 }
 

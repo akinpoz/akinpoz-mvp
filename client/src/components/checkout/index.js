@@ -152,10 +152,16 @@ function ExistingTab(props) {
     const { stripe, location, tabExpired } = props
     // Calculates time remaining on an open tab and formats it into a string.  If expired, will refresh the page in 5 seconds
     const calculateTimeLeft = useCallback(() => {
-        let expTime = stripe?.tab?.timeWillBeSubmitted ?? Date.now()
+        let expTime = stripe?.tab?.timeWillBeSubmitted
+
+        if (expTime === null) {
+            return;
+        }
+
         let difference = expTime - Date.now()
         let timeLeftComponents = {};
         let timeLeft = ''
+
 
         if (difference > 0) {
             timeLeftComponents = {

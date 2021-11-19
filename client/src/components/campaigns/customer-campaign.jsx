@@ -275,12 +275,11 @@ function CustomerCampaign(props) {
                                   backgroundColor2={backgroundColor2}/>
                             <br/>
                         </Card.Content>
-                        {auth.isAuthenticated &&
                         <Card.Content extra>
                             <div style={{flexDirection: "row", display: "flex", justifyContent: 'space-between'}}>
                                 <Button onClick={() => window.location.href = `/#/location/?location_id=${location.select_location._id}`}>
                                     <Icon name={'angle left'}/>Back</Button>
-                                {selectCampaign.details.type !== 'Product Pluck' &&
+                                {selectCampaign.details.type !== 'Product Pluck' && auth.isAuthenticated && 
                                 <div id="submit-button-div">
                                     {hasPaymentMethod() && !stripe.hasOpenTab &&
                                     <Button primary onClick={handleSubmit}
@@ -293,13 +292,12 @@ function CustomerCampaign(props) {
                                         history.push({pathname: '/profile'})
                                     }}>Add a Payment Method</Button>}
                                 </div>}
-                                {selectCampaign.details.type === 'Product Pluck' &&
+                                {selectCampaign.details.type === 'Product Pluck' && auth.isAuthenticated && 
                                 <Button primary
                                         disabled={locked || !info || info === '' || (msg?.msg.includes('Thanks') ?? false)}
                                         onClick={handleSubmit}>Submit Vote</Button>}
                             </div>
                         </Card.Content>
-                        }
                     </Card>
                 </div>}
         </div>

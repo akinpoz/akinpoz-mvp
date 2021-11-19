@@ -5,7 +5,6 @@ import {
     UPDATE_CAMPAIGN,
     DELETE_CAMPAIGN,
     GET_CAMPAIGNS,
-    GET_CAMPAIGN,
     SET_CAMPAIGN,
     SUBMITTED_CAMPAIGN, SUBMITTING_CAMPAIGN, SUBMIT_CAMPAIGN_ERROR, CLEAR_CAMPAIGN_MSG
 } from '../actions/types'
@@ -26,15 +25,11 @@ export default function CampaignReducer(state = initialState, action) {
                 campaigns: action.payload,
                 loading: false
             }
-        case GET_CAMPAIGN:
-            return {
-                ...state,
-                select_campaign: action.payload
-            }
         case SET_CAMPAIGN:
             return {
                 ...state,
-                select_campaign: action.payload
+                select_campaign: action.payload,
+                loading: false
             }
         case ADD_CAMPAIGN:
             return {
